@@ -656,19 +656,52 @@ function Library:CreateWindow(Name, Toggle, keybind)
             Window.ESPPreview.Main.Visible = visible;
         end;
 
+        -- Create LeftPanel and RightPanel for ESP options
+        Window.ESPPreview.LeftPanel = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.LeftPanel.Size = UDim2.fromOffset(180, 300);
+        Window.ESPPreview.LeftPanel.Position = UDim2.fromOffset(-190, 0);
+        Window.ESPPreview.LeftPanel.BackgroundColor3 = Library.Theme.BackGround1;
+        Window.ESPPreview.LeftPanel.BorderSizePixel = 0;
+
+        local leftCorner = Instance.new("UICorner", Window.ESPPreview.LeftPanel);
+        leftCorner.CornerRadius = UDim.new(0, 4);
+
+        local leftStroke = Instance.new("UIStroke", Window.ESPPreview.LeftPanel);
+        leftStroke.Color = Library.Theme.Outline;
+        leftStroke.Thickness = 1;
+
+        Window.ESPPreview.RightPanel = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.RightPanel.Size = UDim2.fromOffset(180, 300);
+        Window.ESPPreview.RightPanel.Position = UDim2.fromOffset(150, 0);
+        Window.ESPPreview.RightPanel.BackgroundColor3 = Library.Theme.BackGround1;
+        Window.ESPPreview.RightPanel.BorderSizePixel = 0;
+
+        local rightCorner = Instance.new("UICorner", Window.ESPPreview.RightPanel);
+        rightCorner.CornerRadius = UDim.new(0, 4);
+
+        local rightStroke = Instance.new("UIStroke", Window.ESPPreview.RightPanel);
+        rightStroke.Color = Library.Theme.Outline;
+        rightStroke.Thickness = 1;
+
         -- ESP Preview is now complete with static humanoid figure built into DisplayArea
 
-        function Window:CreateColorPicker()
-                local ColorPicker = { };
-                ColorPicker.Flag = nil;
-                ColorPicker.Color = nil;
-                ColorPicker.HuePosition = 0;
-
-                ColorPicker.Main = Instance.new("Frame", Window.ScreenGui);
-                ColorPicker.Main.Size = UDim2.fromOffset(266, 277);
-                ColorPicker.Main.BackgroundColor3 = Library.Theme.BackGround2
-                ColorPicker.Main.ClipsDescendants = true;
-                ColorPicker.Main.Name = "c"
+        -- Create ESP Options Function
+        Window.ESPPreview.CreateESPOptions = function()
+            -- Create ESP option toggles in LeftPanel
+            local options = {"Box", "Name", "Health", "Distance", "Skeleton"}
+            local yPos = 25
+            
+            for i, optionName in ipairs(options) do
+                local enabled = Window.ESPPreview.Settings[optionName]
+                
+                local optionFrame = Instance.new("Frame", Window.ESPPreview.LeftPanel)
+                optionFrame.Size = UDim2.fromOffset(165, 28)
+                optionFrame.Position = UDim2.fromOffset(8, yPos)
+                optionFrame.BackgroundColor3 = Library.Theme.BackGround1
+                optionFrame.BorderSizePixel = 0
+                
+                local optionCorner = Instance.new("UICorner", optionFrame)
+                optionCorner.CornerRadius = UDim.new(0, 4)
 
                 local optionStroke = Instance.new("UIStroke", optionFrame)
                 optionStroke.Color = enabled and Library.Theme.Selected or Library.Theme.Outline
@@ -739,9 +772,20 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         checkmark:Destroy()
                     end
                     
-                    Window.ESPPreview.UpdateESP()
+                    -- Call UpdateESP if it exists
+                    if Window.ESPPreview.UpdateESP then
+                        Window.ESPPreview.UpdateESP()
+                    end
                 end)
+                
+                yPos = yPos + 35
             end
+        end
+
+        -- Update ESP Function
+        Window.ESPPreview.UpdateESP = function()
+            -- This function can be expanded to update visual elements based on settings
+            print("ESP Preview settings updated")
         end
 
         -- Create the ESP options
@@ -4861,3 +4905,4 @@ else
 end
 
 return Library;
+end
