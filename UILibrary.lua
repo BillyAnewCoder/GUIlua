@@ -1,4 +1,3 @@
-
 -- Enhanced Roblox UI Library - Professional Enhancement
 -- Fixed typo: "Libary" -> "Library" for better code quality
 -- Comprehensive bug fixes and feature completion
@@ -36,7 +35,7 @@ local function SafeServiceCall(service, method, args)
             return service[method](service);
         end
     end);
-    
+
     if success then
         return result;
     else
@@ -93,14 +92,14 @@ Library.Config = {
 -- Configuration management functions
 function Library:SaveConfig()
         if not HttpService then return false; end
-        
+
         local config = {
                 Flags = self.Flags;
                 Theme = self.Theme;
                 Config = self.Config;
                 WindowPositions = {};
         };
-        
+
         -- Save window positions
         for _, window in pairs(self.Windows) do
                 if window.Main and window.Main.Position then
@@ -110,11 +109,11 @@ function Library:SaveConfig()
                         };
                 end
         end
-        
+
         local success, encoded = pcall(function()
                 return HttpService:JSONEncode(config);
         end);
-        
+
         if success then
                 if writefile then
                         writefile(self.Config.SaveFileName, encoded);
@@ -128,16 +127,16 @@ end
 
 function Library:LoadConfig()
         if not HttpService or not isfile or not readfile then return false; end
-        
+
         if not isfile(self.Config.SaveFileName) then
                 return false;
         end
-        
+
         local success, config = pcall(function()
                 local content = readfile(self.Config.SaveFileName);
                 return HttpService:JSONDecode(content);
         end);
-        
+
         if success and config then
                 -- Restore flags
                 if config.Flags then
@@ -145,7 +144,7 @@ function Library:LoadConfig()
                                 self.Flags[flag] = value;
                         end
                 end
-                
+
                 return true;
         else
                 warn("[UI Library] Failed to load config: " .. tostring(config));
@@ -160,14 +159,14 @@ function Library:CreateNotification(options)
         elseif not options then
                 options = {};
         end
-        
+
         local notification = {
                 Title = options.Title or "UI Library";
                 Text = options.Text or "";
                 Duration = options.Duration or 3;
                 Type = options.Type or "Info"; -- Info, Success, Warning, Error
         };
-        
+
         -- Create notification using StarterGui
         local success = pcall(function()
                 StarterGui:SetCore("SendNotification", {
@@ -177,11 +176,11 @@ function Library:CreateNotification(options)
                         Icon = options.Icon;
                 });
         end);
-        
+
         if not success then
                 print("[UI Library] " .. notification.Title .. ": " .. notification.Text);
         end
-        
+
         return notification;
 end
 
@@ -190,38 +189,38 @@ end
 -- Executor-specific debugging and testing functions
 function Library:Test()
         print("[UI Library] Starting comprehensive test...");
-        
+
         -- Test basic functionality
         local testWindow = self:CreateWindow("Test Window");
         if testWindow then
                 print("[UI Library] ✓ Window creation successful");
-                
+
                 local testTab = testWindow:CreateTab("Test Tab");
                 if testTab then
                         print("[UI Library] ✓ Tab creation successful");
-                        
+
                         local testSection = testTab:CreateSection("Test Section");
                         if testSection then
                                 print("[UI Library] ✓ Section creation successful");
-                                
+
                                 -- Test components
                                 testSection:CreateButton("Test Button", function()
                                         print("[UI Library] Button clicked!");
                                 end);
-                                
+
                                 testSection:CreateToggle("Test Toggle", "testFlag", false, function(value)
                                         print("[UI Library] Toggle changed to: " .. tostring(value));
                                 end);
-                                
+
                                 testSection:CreateSlider("Test Slider", "testSlider", 0, 100, 50, 0, function(value)
                                         print("[UI Library] Slider changed to: " .. tostring(value));
                                 end);
-                                
+
                                 print("[UI Library] ✓ All components created successfully");
                         end
                 end
         end
-        
+
         -- Test notification system
         self:CreateNotification({
                 Title = "Test Complete";
@@ -229,7 +228,7 @@ function Library:Test()
                 Duration = 5;
                 Type = "Success";
         });
-        
+
         print("[UI Library] ✓ Test completed successfully - Library is ready for executor use!");
         return true;
 end
@@ -253,20 +252,20 @@ function Library:Cleanup()
                         connection:Disconnect();
                 end
         end
-        
+
         -- Clean up windows
         for _, window in pairs(self.Windows) do
                 if window and window.ScreenGui then
                         window.ScreenGui:Destroy();
                 end
         end
-        
+
         -- Clear tables
         self.Connections = {};
         self.Windows = {};
         self.Items = {};
         self.Flags = {};
-        
+
         print("[UI Library] Cleanup completed");
 end
 
@@ -357,16 +356,23 @@ function Utility:RGBtoHSV(color)
 end
 
 -- Enhanced window creation function
-function Library:CreateWindow(Name, Toggle, keybind)
+function Library:CreateWindow(options)
         local Window = { };
-        -- Ensure Name is a string, handle table input properly
-        if type(Name) == "table" then
-                Window.Name = Name.Name or "Enhanced UI Library";
+        -- Handle both table and string inputs
+        if type(options) == "table" then
+                Window.Name = options.Name or "Enhanced UI Library";
+                Window.Keybind = options.Keybind or Enum.KeyCode.RightShift;
+                Window.Size = options.Size or UDim2.fromOffset(921, 428);
+        elseif type(options) == "string" then
+                Window.Name = options;
+                Window.Keybind = Enum.KeyCode.RightShift;
+                Window.Size = UDim2.fromOffset(921, 428);
         else
-                Window.Name = tostring(Name or "Enhanced UI Library");
+                Window.Name = "Enhanced UI Library";
+                Window.Keybind = Enum.KeyCode.RightShift;
+                Window.Size = UDim2.fromOffset(921, 428);
         end
-        Window.Toggle = Toggle or false;
-        Window.Keybind = keybind or Enum.KeyCode.RightShift;
+        Window.Toggle = true; -- Start visible
         Window.ColorPickerSelected = nil;
         Window.Tabs = {};
         Window.CurrentTab = nil;
@@ -554,16 +560,16 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         end
                 end
 
-                -- Enhanced keybind handling
-                local keybindConnection = UserInputService.InputBegan:Connect(function(Key)
-                        if Key.KeyCode == Window.Keybind then
-                                if ColorPicker.Main.Visible then
-                                        CloseFrame(ColorPicker.Main);
-                                else
-                                        OpenFrame(ColorPicker.Main);
-                                end
+                -- Enhanced keybind handling for ColorPicker
+        local colorPickerKeybindConnection = UserInputService.InputBegan:Connect(function(Key)
+                if Key.KeyCode == Enum.KeyCode.C and UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                        if ColorPicker.Main.Visible then
+                                CloseFrame(ColorPicker.Main);
+                        else
+                                OpenFrame(ColorPicker.Main);
                         end
-                end)
+                end
+        end)
 
                 -- Connect drag events
                 ColorPicker.Main.InputBegan:Connect(dragStart2);
@@ -798,7 +804,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         local SizeY = math.clamp((input.Position.Y - ColorPicker.Hue.AbsolutePosition.Y) / ColorPicker.Hue.AbsoluteSize.Y, 0, 1);
 
                         ColorPicker.HueSelect.Position = UDim2.new(0, 0, SizeY, SizeY * 200 - 1);
-                        ColorPicker.HuePosition = SizeY;
+                        Color```tool_code
+Picker.HuePosition = SizeY;
                         Hue = SizeY;
 
                         ColorPicker:Set(Color3.fromHSV(SizeY, Sat, Val), 0, true);
@@ -838,11 +845,11 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
         -- Enhanced main window with better styling
         Window.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.Main.Size = UDim2.fromOffset(921, 428);
+        Window.Main.Size = Window.Size;
         Window.Main.Position = UDim2.fromScale(0.3, 0.3);
         Window.Main.BackgroundColor3 = Library.Theme.BackGround1;
         Window.Main.ClipsDescendants = true;
-        Window.Main.Visible = Window.Toggle;
+        Window.Main.Visible = true; -- Show by default
         Window.Main.BorderSizePixel = 0;
 
         Window.MainCorner = Instance.new("UICorner", Window.Main);
@@ -976,7 +983,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
         -- Enhanced toggle function with keybind support
         function Window:Toggle()
                 Window.Toggle = not Window.Toggle;
-                
+                Window.Main.Visible = Window.Toggle;
+
                 if Window.Toggle then
                         OpenFrame(Window.Main);
                 else
@@ -984,8 +992,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 end
         end
 
-        -- Keybind handling
-        local keybindConnection = UserInputService.InputBegan:Connect(function(Key, GameProcessed)
+        -- Keybind handling for main window
+        local mainKeybindConnection = UserInputService.InputBegan:Connect(function(Key, GameProcessed)
                 if not GameProcessed and Key.KeyCode == Window.Keybind then
                         Window:Toggle();
                 end
@@ -2106,8 +2114,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
         -- Enhanced cleanup on window destruction
         function Window:Destroy()
-                if keybindConnection then
-                        keybindConnection:Disconnect();
+                if mainKeybindConnection then
+                        mainKeybindConnection:Disconnect();
                 end
                 if Window.ScreenGui then
                         Window.ScreenGui:Destroy();
@@ -2127,7 +2135,7 @@ function Library:CreateNotification(Title, Description, Duration, Type)
         Notification.Duration = Duration or 5;
         Notification.Type = Type or "Info"; -- Info, Success, Warning, Error
 
-        
+
         -- Simple notification for executor environments  
         if StarterGui then
                 local success = pcall(function()
@@ -2137,14 +2145,14 @@ function Library:CreateNotification(Title, Description, Duration, Type)
                                 Duration = Notification.Duration;
                         });
                 end);
-                
+
                 if not success then
                         print("[UI Library] " .. Notification.Title .. ": " .. Notification.Description);
                 end
         else
                 print("[UI Library] " .. Notification.Title .. ": " .. Notification.Description);
         end
-        
+
         return Notification;
 end
 -- Example usage and final return for executor environments
