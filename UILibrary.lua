@@ -1178,7 +1178,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         Section.Title.Size = UDim2.new(1, -20, 0, 30);
                         Section.Title.Position = UDim2.fromOffset(10, 0);
                         Section.Title.BackgroundTransparency = 1;
-                        Section.Title.Text = Section.Name;
+                        Section.Title.Text = tostring(Section.Name);
                         Section.Title.Font = Enum.Font.Ubuntu;
                         Section.Title.TextSize = 14;
                         Section.Title.TextColor3 = Library.Theme.Selected;
@@ -1224,7 +1224,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Button.Button = Instance.new("TextButton", Button.Frame);
                                 Button.Button.Size = UDim2.fromScale(1, 1);
                                 Button.Button.BackgroundTransparency = 1;
-                                Button.Button.Text = Button.Name;
+                                Button.Button.Text = tostring(Button.Name);
                                 Button.Button.Font = Enum.Font.Ubuntu;
                                 Button.Button.TextSize = 14;
                                 Button.Button.TextColor3 = Library.Theme.TextColor;
@@ -1317,7 +1317,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Toggle.Label.Size = UDim2.new(1, -50, 1, 0);
                                 Toggle.Label.Position = UDim2.fromOffset(10, 0);
                                 Toggle.Label.BackgroundTransparency = 1;
-                                Toggle.Label.Text = Toggle.Name;
+                                Toggle.Label.Text = tostring(Toggle.Name);
                                 Toggle.Label.Font = Enum.Font.Ubuntu;
                                 Toggle.Label.TextSize = 14;
                                 Toggle.Label.TextColor3 = Library.Theme.TextColor;
@@ -1430,7 +1430,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Slider.Label.Size = UDim2.new(1, -100, 0, 25);
                                 Slider.Label.Position = UDim2.fromOffset(10, 5);
                                 Slider.Label.BackgroundTransparency = 1;
-                                Slider.Label.Text = Slider.Name;
+                                Slider.Label.Text = tostring(Slider.Name);
                                 Slider.Label.Font = Enum.Font.Ubuntu;
                                 Slider.Label.TextSize = 14;
                                 Slider.Label.TextColor3 = Library.Theme.TextColor;
@@ -1614,7 +1614,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Dropdown.Label.Size = UDim2.new(1, -30, 0, 17);
                                 Dropdown.Label.Position = UDim2.fromOffset(10, 2);
                                 Dropdown.Label.BackgroundTransparency = 1;
-                                Dropdown.Label.Text = Dropdown.Name;
+                                Dropdown.Label.Text = tostring(Dropdown.Name);
                                 Dropdown.Label.Font = Enum.Font.Ubuntu;
                                 Dropdown.Label.TextSize = 12;
                                 Dropdown.Label.TextColor3 = Library.Theme.TextColor;
@@ -1624,7 +1624,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Dropdown.SelectedLabel.Size = UDim2.new(1, -30, 0, 15);
                                 Dropdown.SelectedLabel.Position = UDim2.fromOffset(10, 17);
                                 Dropdown.SelectedLabel.BackgroundTransparency = 1;
-                                Dropdown.SelectedLabel.Text = Dropdown.Selected or "None";
+                                Dropdown.SelectedLabel.Text = tostring(Dropdown.Selected or "None");
                                 Dropdown.SelectedLabel.Font = Enum.Font.Ubuntu;
                                 Dropdown.SelectedLabel.TextSize = 13;
                                 Dropdown.SelectedLabel.TextColor3 = Library.Theme.Selected;
@@ -1674,7 +1674,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                                 optionButton.Size = UDim2.new(1, 0, 0, 25);
                                                 optionButton.BackgroundColor3 = Library.Theme.BackGround2;
                                                 optionButton.BorderSizePixel = 0;
-                                                optionButton.Text = option;
+                                                optionButton.Text = tostring(option);
                                                 optionButton.Font = Enum.Font.Ubuntu;
                                                 optionButton.TextSize = 13;
                                                 optionButton.TextColor3 = Library.Theme.TextColor;
@@ -1708,7 +1708,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                                 function Dropdown:Set(Option)
                                         Dropdown.Selected = Option;
-                                        Dropdown.SelectedLabel.Text = Option or "None";
+                                        Dropdown.SelectedLabel.Text = tostring(Option or "None");
                                         
                                         if Dropdown.Flag then
                                                 Library.Flags[Dropdown.Flag] = Option;
@@ -1753,7 +1753,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 -- Initialize
                                 Dropdown:Refresh();
                                 if Dropdown.Selected then
-                                        Dropdown.SelectedLabel.Text = Dropdown.Selected;
+                                        Dropdown.SelectedLabel.Text = tostring(Dropdown.Selected);
                                 end
 
                                 -- Button interactions
@@ -1814,7 +1814,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 ColorPicker.Label.Size = UDim2.new(1, -50, 1, 0);
                                 ColorPicker.Label.Position = UDim2.fromOffset(10, 0);
                                 ColorPicker.Label.BackgroundTransparency = 1;
-                                ColorPicker.Label.Text = ColorPicker.Name;
+                                ColorPicker.Label.Text = tostring(ColorPicker.Name);
                                 ColorPicker.Label.Font = Enum.Font.Ubuntu;
                                 ColorPicker.Label.TextSize = 14;
                                 ColorPicker.Label.TextColor3 = Library.Theme.TextColor;
@@ -1886,7 +1886,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 local Textbox = {};
                                 Textbox.Name = Name or "Textbox";
                                 Textbox.Flag = Flag;
-                                Textbox.Text = Default or "";
+                                Textbox.Text = tostring(Default or "");
                                 Textbox.PlaceholderText = PlaceholderText or "Enter text...";
                                 Textbox.CallBack = CallBack;
 
@@ -1911,7 +1911,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Textbox.Label.Size = UDim2.new(1, -20, 0, 25);
                                 Textbox.Label.Position = UDim2.fromOffset(10, 5);
                                 Textbox.Label.BackgroundTransparency = 1;
-                                Textbox.Label.Text = Textbox.Name;
+                                Textbox.Label.Text = tostring(Textbox.Name);
                                 Textbox.Label.Font = Enum.Font.Ubuntu;
                                 Textbox.Label.TextSize = 14;
                                 Textbox.Label.TextColor3 = Library.Theme.TextColor;
@@ -1922,7 +1922,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Textbox.Input.Position = UDim2.fromOffset(10, 25);
                                 Textbox.Input.BackgroundColor3 = Library.Theme.BackGround3;
                                 Textbox.Input.BorderSizePixel = 0;
-                                Textbox.Input.Text = Textbox.Text;
+                                Textbox.Input.Text = tostring(Textbox.Text);
                                 Textbox.Input.PlaceholderText = Textbox.PlaceholderText;
                                 Textbox.Input.Font = Enum.Font.Ubuntu;
                                 Textbox.Input.TextSize = 13;
@@ -1933,8 +1933,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Textbox.InputCorner.CornerRadius = UDim.new(0, 4);
 
                                 function Textbox:Set(Text)
-                                        Textbox.Text = Text;
-                                        Textbox.Input.Text = Text;
+                                        Textbox.Text = tostring(Text);
+                                        Textbox.Input.Text = tostring(Text);
                                         
                                         if Textbox.Flag then
                                                 Library.Flags[Textbox.Flag] = Text;
