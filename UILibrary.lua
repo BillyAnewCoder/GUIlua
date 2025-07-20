@@ -1201,51 +1201,6 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 return Button;
                         end
 
-                        function Sector:CreateButton(Name, CallBack)
-                                local Button = {};
-                                Button.Name = Name or "";
-                                Button.CallBack = CallBack or function() end;
-
-                                Button.Main = Instance.new("TextButton", Sector.Holder);
-                                Button.Main.Size = UDim2.fromOffset(300, 30);
-                                Button.Main.BackgroundColor3 = Library.Theme.BackGround1;
-                                Button.Main.BorderSizePixel = 0;
-                                Button.Main.AutoButtonColor = false;
-                                Button.Main.Text = "";
-
-                                Button.UICorner = Instance.new("UICorner", Button.Main);
-                                Button.UICorner.CornerRadius = UDim.new(0, 4);
-
-                                Button.UIStroke = Instance.new("UIStroke", Button.Main);
-                                Button.UIStroke.Color = Library.Theme.Outline;
-                                Button.UIStroke.Thickness = 1;
-
-                                Button.TextLabel = Instance.new("TextLabel", Button.Main);
-                                Button.TextLabel.Size = UDim2.fromScale(1, 1);
-                                Button.TextLabel.BackgroundTransparency = 1;
-                                Button.TextLabel.Text = Button.Name;
-                                Button.TextLabel.TextColor3 = Library.Theme.TextColor;
-                                Button.TextLabel.TextSize = Library.Theme.TextSize;
-                                Button.TextLabel.Font = Library.Theme.Font;
-                                Button.TextLabel.TextXAlignment = Enum.TextXAlignment.Center;
-
-                                Button.Main.MouseEnter:Connect(function()
-                                        TweenService:Create(Button.Main, TweenInfo.new(0.2), {BackgroundColor3 = Library.Theme.Selected}):Play();
-                                end);
-
-                                Button.Main.MouseLeave:Connect(function()
-                                        TweenService:Create(Button.Main, TweenInfo.new(0.2), {BackgroundColor3 = Library.Theme.BackGround1}):Play();
-                                end);
-
-                                Button.Main.MouseButton1Click:Connect(function()
-                                        pcall(Button.CallBack);
-                                end);
-
-                                Sector:FixSize();
-                                table.insert(Library.Items, Button);
-                                return Button;
-                        end
-
                         function Sector:CreateToggle(Name, Defult, CallBack, Flag)
                                 local Toggle = { };
                                 Toggle.Name = Name or "";
