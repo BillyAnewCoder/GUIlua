@@ -188,14 +188,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ScreenGui.ResetOnSpawn = false;
         Window.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 
-        -- ESP Preview Window
+        -- ESP Preview Window with Visual Humanoid Representation
         Window.ESPPreview = {};
         Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.ESPPreview.Main.Size = UDim2.fromOffset(300, 428);
-        Window.ESPPreview.Main.Position = UDim2.fromScale(0.6, 0.3); -- Positioned to the right of main window
+        Window.ESPPreview.Main.Size = UDim2.fromOffset(380, 520);
+        Window.ESPPreview.Main.Position = UDim2.fromScale(0.65, 0.25);
         Window.ESPPreview.Main.BackgroundColor3 = Library.Theme.BackGround1;
         Window.ESPPreview.Main.ClipsDescendants = true;
-        Window.ESPPreview.Main.Visible = true;
+        Window.ESPPreview.Main.Visible = false;
         Window.ESPPreview.Main.BorderSizePixel = 0;
 
         Window.ESPPreview.UICorner = Instance.new("UICorner", Window.ESPPreview.Main);
@@ -208,7 +208,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
         -- ESP Preview Header
         Window.ESPPreview.Header = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.Header.Size = UDim2.fromOffset(298, 40);
+        Window.ESPPreview.Header.Size = UDim2.fromOffset(378, 35);
         Window.ESPPreview.Header.Position = UDim2.fromOffset(1, 1);
         Window.ESPPreview.Header.BackgroundColor3 = Library.Theme.BackGround2;
         Window.ESPPreview.Header.BorderSizePixel = 0;
@@ -218,186 +218,362 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
         Window.ESPPreview.Title = Instance.new("TextLabel", Window.ESPPreview.Header);
         Window.ESPPreview.Title.Size = UDim2.fromScale(1, 1);
-        Window.ESPPreview.Title.Position = UDim2.fromOffset(0, 0);
         Window.ESPPreview.Title.BackgroundTransparency = 1;
         Window.ESPPreview.Title.Text = "ESP Preview";
         Window.ESPPreview.Title.TextColor3 = Library.Theme.TextColor;
         Window.ESPPreview.Title.TextSize = 16;
         Window.ESPPreview.Title.Font = Library.Theme.Font;
         Window.ESPPreview.Title.TextXAlignment = Enum.TextXAlignment.Center;
-        Window.ESPPreview.Title.TextYAlignment = Enum.TextYAlignment.Center;
 
-        -- ESP Preview Content Area
-        Window.ESPPreview.Content = Instance.new("ScrollingFrame", Window.ESPPreview.Main);
-        Window.ESPPreview.Content.Size = UDim2.fromOffset(298, 385);
-        Window.ESPPreview.Content.Position = UDim2.fromOffset(1, 42);
-        Window.ESPPreview.Content.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.Content.BorderSizePixel = 0;
-        Window.ESPPreview.Content.ScrollBarThickness = 6;
-        Window.ESPPreview.Content.ScrollBarImageColor3 = Library.Theme.Selected;
-        Window.ESPPreview.Content.CanvasSize = UDim2.fromOffset(0, 0);
+        -- Left Panel - ESP Options
+        Window.ESPPreview.LeftPanel = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.LeftPanel.Size = UDim2.fromOffset(180, 480);
+        Window.ESPPreview.LeftPanel.Position = UDim2.fromOffset(5, 40);
+        Window.ESPPreview.LeftPanel.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreview.LeftPanel.BorderSizePixel = 0;
 
-        Window.ESPPreview.ContentCorner = Instance.new("UICorner", Window.ESPPreview.Content);
-        Window.ESPPreview.ContentCorner.CornerRadius = UDim.new(0, 4);
+        Window.ESPPreview.LeftCorner = Instance.new("UICorner", Window.ESPPreview.LeftPanel);
+        Window.ESPPreview.LeftCorner.CornerRadius = UDim.new(0, 4);
 
-        -- ESP Preview List Layout
-        Window.ESPPreview.ListLayout = Instance.new("UIListLayout", Window.ESPPreview.Content);
-        Window.ESPPreview.ListLayout.Padding = UDim.new(0, 2);
-        Window.ESPPreview.ListLayout.FillDirection = Enum.FillDirection.Vertical;
-        Window.ESPPreview.ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
-        Window.ESPPreview.ListLayout.SortOrder = Enum.SortOrder.LayoutOrder;
-        Window.ESPPreview.ListLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
+        Window.ESPPreview.LeftStroke = Instance.new("UIStroke", Window.ESPPreview.LeftPanel);
+        Window.ESPPreview.LeftStroke.Color = Library.Theme.Outline;
+        Window.ESPPreview.LeftStroke.Thickness = 1;
 
-        -- ESP Preview Players Container
-        Window.ESPPreview.PlayersContainer = Instance.new("Frame", Window.ESPPreview.Content);
-        Window.ESPPreview.PlayersContainer.Size = UDim2.fromOffset(280, 0);
-        Window.ESPPreview.PlayersContainer.Position = UDim2.fromOffset(5, 5);
-        Window.ESPPreview.PlayersContainer.BackgroundTransparency = 1;
-        Window.ESPPreview.PlayersContainer.AutomaticSize = Enum.AutomaticSize.Y;
+        -- Right Panel - Humanoid Visualization
+        Window.ESPPreview.RightPanel = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.RightPanel.Size = UDim2.fromOffset(185, 480);
+        Window.ESPPreview.RightPanel.Position = UDim2.fromOffset(190, 40);
+        Window.ESPPreview.RightPanel.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreview.RightPanel.BorderSizePixel = 0;
 
-        Window.ESPPreview.PlayersLayout = Instance.new("UIListLayout", Window.ESPPreview.PlayersContainer);
-        Window.ESPPreview.PlayersLayout.Padding = UDim.new(0, 3);
-        Window.ESPPreview.PlayersLayout.FillDirection = Enum.FillDirection.Vertical;
-        Window.ESPPreview.PlayersLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
-        Window.ESPPreview.PlayersLayout.SortOrder = Enum.SortOrder.LayoutOrder;
+        Window.ESPPreview.RightCorner = Instance.new("UICorner", Window.ESPPreview.RightPanel);
+        Window.ESPPreview.RightCorner.CornerRadius = UDim.new(0, 4);
 
-        -- ESP Data Storage
-        Window.ESPPreview.PlayerData = {};
-        Window.ESPPreview.PlayerFrames = {};
+        Window.ESPPreview.RightStroke = Instance.new("UIStroke", Window.ESPPreview.RightPanel);
+        Window.ESPPreview.RightStroke.Color = Library.Theme.Outline;
+        Window.ESPPreview.RightStroke.Thickness = 1;
 
-        -- ESP Real-time Update Function
-        Window.ESPPreview.UpdateESP = function()
-            if not Window.ESPPreview.Main.Visible then return end
-            
-            local Players = game:GetService("Players");
-            local LocalPlayer = Players.LocalPlayer;
-            
-            -- Clear old frames for players who left
-            for playerId, frame in pairs(Window.ESPPreview.PlayerFrames) do
-                local player = Players:GetPlayerByUserId(playerId);
-                if not player or player == LocalPlayer then
-                    frame:Destroy();
-                    Window.ESPPreview.PlayerFrames[playerId] = nil;
-                    Window.ESPPreview.PlayerData[playerId] = nil;
+        -- ESP Options Title
+        Window.ESPPreview.OptionsTitle = Instance.new("TextLabel", Window.ESPPreview.LeftPanel);
+        Window.ESPPreview.OptionsTitle.Size = UDim2.fromOffset(170, 25);
+        Window.ESPPreview.OptionsTitle.Position = UDim2.fromOffset(5, 5);
+        Window.ESPPreview.OptionsTitle.BackgroundTransparency = 1;
+        Window.ESPPreview.OptionsTitle.Text = "ESP Settings";
+        Window.ESPPreview.OptionsTitle.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.OptionsTitle.TextSize = 14;
+        Window.ESPPreview.OptionsTitle.Font = Library.Theme.Font;
+        Window.ESPPreview.OptionsTitle.TextXAlignment = Enum.TextXAlignment.Left;
+
+        -- Preview Title
+        Window.ESPPreview.PreviewTitle = Instance.new("TextLabel", Window.ESPPreview.RightPanel);
+        Window.ESPPreview.PreviewTitle.Size = UDim2.fromOffset(175, 25);
+        Window.ESPPreview.PreviewTitle.Position = UDim2.fromOffset(5, 5);
+        Window.ESPPreview.PreviewTitle.BackgroundTransparency = 1;
+        Window.ESPPreview.PreviewTitle.Text = "Preview";
+        Window.ESPPreview.PreviewTitle.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.PreviewTitle.TextSize = 14;
+        Window.ESPPreview.PreviewTitle.Font = Library.Theme.Font;
+        Window.ESPPreview.PreviewTitle.TextXAlignment = Enum.TextXAlignment.Center;
+
+        -- Humanoid Preview Frame (properly sized to fit within panel)
+        Window.ESPPreview.HumanoidFrame = Instance.new("Frame", Window.ESPPreview.RightPanel);
+        Window.ESPPreview.HumanoidFrame.Size = UDim2.fromOffset(165, 225);
+        Window.ESPPreview.HumanoidFrame.Position = UDim2.fromOffset(10, 35);
+        Window.ESPPreview.HumanoidFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
+        Window.ESPPreview.HumanoidFrame.BorderSizePixel = 0;
+
+        Window.ESPPreview.HumanoidCorner = Instance.new("UICorner", Window.ESPPreview.HumanoidFrame);
+        Window.ESPPreview.HumanoidCorner.CornerRadius = UDim.new(0, 4);
+
+        Window.ESPPreview.HumanoidStroke = Instance.new("UIStroke", Window.ESPPreview.HumanoidFrame);
+        Window.ESPPreview.HumanoidStroke.Color = Library.Theme.Selected;
+        Window.ESPPreview.HumanoidStroke.Thickness = 1;
+
+        -- Create Humanoid Visual Representation
+        Window.ESPPreview.CreateHumanoidVisual = function()
+            -- Clear existing visual elements
+            for _, child in pairs(Window.ESPPreview.HumanoidFrame:GetChildren()) do
+                if child.Name:find("ESP") then
+                    child:Destroy()
                 end
             end
-            
-            -- Update or create frames for current players
-            for _, player in pairs(Players:GetPlayers()) do
-                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                    local playerId = player.UserId;
-                    local character = player.Character;
-                    local humanoidRootPart = character.HumanoidRootPart;
-                    local humanoid = character:FindFirstChild("Humanoid");
-                    
-                    -- Calculate distance
-                    local distance = 0;
-                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                        distance = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - humanoidRootPart.Position).Magnitude);
-                    end
-                    
-                    -- Get health
-                    local health = humanoid and math.floor(humanoid.Health) or 0;
-                    local maxHealth = humanoid and math.floor(humanoid.MaxHealth) or 100;
-                    
-                    -- Create or update player frame
-                    if not Window.ESPPreview.PlayerFrames[playerId] then
-                        local playerFrame = Instance.new("Frame", Window.ESPPreview.PlayersContainer);
-                        playerFrame.Size = UDim2.fromOffset(275, 60);
-                        playerFrame.BackgroundColor3 = Library.Theme.BackGround2;
-                        playerFrame.BorderSizePixel = 0;
-                        playerFrame.LayoutOrder = playerId;
-                        
-                        local frameCorner = Instance.new("UICorner", playerFrame);
-                        frameCorner.CornerRadius = UDim.new(0, 4);
-                        
-                        local nameLabel = Instance.new("TextLabel", playerFrame);
-                        nameLabel.Size = UDim2.fromOffset(180, 20);
-                        nameLabel.Position = UDim2.fromOffset(10, 5);
-                        nameLabel.BackgroundTransparency = 1;
-                        nameLabel.Text = player.Name;
-                        nameLabel.TextColor3 = Library.Theme.TextColor;
-                        nameLabel.TextSize = 14;
-                        nameLabel.Font = Library.Theme.Font;
-                        nameLabel.TextXAlignment = Enum.TextXAlignment.Left;
-                        nameLabel.Name = "NameLabel";
-                        
-                        local distanceLabel = Instance.new("TextLabel", playerFrame);
-                        distanceLabel.Size = UDim2.fromOffset(80, 20);
-                        distanceLabel.Position = UDim2.fromOffset(190, 5);
-                        distanceLabel.BackgroundTransparency = 1;
-                        distanceLabel.Text = distance .. "m";
-                        distanceLabel.TextColor3 = Color3.fromRGB(150, 150, 150);
-                        distanceLabel.TextSize = 12;
-                        distanceLabel.Font = Library.Theme.Font;
-                        distanceLabel.TextXAlignment = Enum.TextXAlignment.Right;
-                        distanceLabel.Name = "DistanceLabel";
-                        
-                        local healthLabel = Instance.new("TextLabel", playerFrame);
-                        healthLabel.Size = UDim2.fromOffset(260, 20);
-                        healthLabel.Position = UDim2.fromOffset(10, 25);
-                        healthLabel.BackgroundTransparency = 1;
-                        healthLabel.Text = "Health: " .. health .. "/" .. maxHealth;
-                        healthLabel.TextColor3 = health > maxHealth * 0.6 and Color3.fromRGB(0, 255, 0) or 
-                                                health > maxHealth * 0.3 and Color3.fromRGB(255, 255, 0) or 
-                                                Color3.fromRGB(255, 0, 0);
-                        healthLabel.TextSize = 11;
-                        healthLabel.Font = Library.Theme.Font;
-                        healthLabel.TextXAlignment = Enum.TextXAlignment.Left;
-                        healthLabel.Name = "HealthLabel";
-                        
-                        local positionLabel = Instance.new("TextLabel", playerFrame);
-                        positionLabel.Size = UDim2.fromOffset(260, 15);
-                        positionLabel.Position = UDim2.fromOffset(10, 45);
-                        positionLabel.BackgroundTransparency = 1;
-                        local pos = humanoidRootPart.Position;
-                        positionLabel.Text = string.format("Pos: %.0f, %.0f, %.0f", pos.X, pos.Y, pos.Z);
-                        positionLabel.TextColor3 = Color3.fromRGB(200, 200, 200);
-                        positionLabel.TextSize = 10;
-                        positionLabel.Font = Library.Theme.Font;
-                        positionLabel.TextXAlignment = Enum.TextXAlignment.Left;
-                        positionLabel.Name = "PositionLabel";
-                        
-                        Window.ESPPreview.PlayerFrames[playerId] = playerFrame;
-                    else
-                        -- Update existing frame
-                        local playerFrame = Window.ESPPreview.PlayerFrames[playerId];
-                        local distanceLabel = playerFrame:FindFirstChild("DistanceLabel");
-                        local healthLabel = playerFrame:FindFirstChild("HealthLabel");
-                        local positionLabel = playerFrame:FindFirstChild("PositionLabel");
-                        
-                        if distanceLabel then
-                            distanceLabel.Text = distance .. "m";
-                        end
-                        
-                        if healthLabel then
-                            healthLabel.Text = "Health: " .. health .. "/" .. maxHealth;
-                            healthLabel.TextColor3 = health > maxHealth * 0.6 and Color3.fromRGB(0, 255, 0) or 
-                                                    health > maxHealth * 0.3 and Color3.fromRGB(255, 255, 0) or 
-                                                    Color3.fromRGB(255, 0, 0);
-                        end
-                        
-                        if positionLabel then
-                            local pos = humanoidRootPart.Position;
-                            positionLabel.Text = string.format("Pos: %.0f, %.0f, %.0f", pos.X, pos.Y, pos.Z);
-                        end
-                    end
-                end
+
+            local settings = Window.ESPPreview.Settings
+            local themeColor = Library.Theme.Selected
+
+            -- ESP Box
+            if settings.Box then
+                local espBox = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
+                espBox.Name = "ESPBox"
+                espBox.Size = UDim2.fromOffset(80, 140)
+                espBox.Position = UDim2.fromOffset(42, 40)
+                espBox.BackgroundTransparency = 1
+                espBox.BorderSizePixel = 0
+                
+                local boxStroke = Instance.new("UIStroke", espBox)
+                boxStroke.Color = themeColor
+                boxStroke.Thickness = 2
             end
-            
-            -- Update canvas size
-            Window.ESPPreview.Content.CanvasSize = UDim2.fromOffset(0, Window.ESPPreview.PlayersLayout.AbsoluteContentSize.Y + 10);
+
+            -- Player Name
+            if settings.Name then
+                local nameLabel = Instance.new("TextLabel", Window.ESPPreview.HumanoidFrame)
+                nameLabel.Name = "ESPName"
+                nameLabel.Size = UDim2.fromOffset(120, 20)
+                nameLabel.Position = UDim2.fromOffset(22, 15)
+                nameLabel.BackgroundTransparency = 1
+                nameLabel.Text = "Player123"
+                nameLabel.TextColor3 = themeColor
+                nameLabel.TextSize = 12
+                nameLabel.Font = Library.Theme.Font
+                nameLabel.TextXAlignment = Enum.TextXAlignment.Center
+            end
+
+            -- Health Bar
+            if settings.Health then
+                local healthBar = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
+                healthBar.Name = "ESPHealth"
+                healthBar.Size = UDim2.fromOffset(4, 140)
+                healthBar.Position = UDim2.fromOffset(35, 40)
+                healthBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+                healthBar.BorderSizePixel = 0
+                
+                local healthFill = Instance.new("Frame", healthBar)
+                healthFill.Size = UDim2.fromOffset(4, 98) -- 70% health
+                healthFill.Position = UDim2.fromOffset(0, 42)
+                healthFill.BackgroundColor3 = Color3.fromRGB(67, 181, 129)
+                healthFill.BorderSizePixel = 0
+            end
+
+            -- Distance
+            if settings.Distance then
+                local distanceLabel = Instance.new("TextLabel", Window.ESPPreview.HumanoidFrame)
+                distanceLabel.Name = "ESPDistance"
+                distanceLabel.Size = UDim2.fromOffset(80, 15)
+                distanceLabel.Position = UDim2.fromOffset(42, 185)
+                distanceLabel.BackgroundTransparency = 1
+                distanceLabel.Text = "25m"
+                distanceLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+                distanceLabel.TextSize = 10
+                distanceLabel.Font = Library.Theme.Font
+                distanceLabel.TextXAlignment = Enum.TextXAlignment.Center
+            end
+
+            -- Skeleton/Wireframe
+            if settings.Skeleton then
+                -- Head
+                local head = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
+                head.Name = "ESPHead"
+                head.Size = UDim2.fromOffset(20, 20)
+                head.Position = UDim2.fromOffset(72, 45)
+                head.BackgroundTransparency = 1
+                
+                local headStroke = Instance.new("UIStroke", head)
+                headStroke.Color = themeColor
+                headStroke.Thickness = 1
+                
+                local headCorner = Instance.new("UICorner", head)
+                headCorner.CornerRadius = UDim.new(0.5, 0)
+
+                -- Body lines would be more complex to draw with frames
+                -- This is a simplified representation
+                local bodyLine = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
+                bodyLine.Name = "ESPBody"
+                bodyLine.Size = UDim2.fromOffset(2, 60)
+                bodyLine.Position = UDim2.fromOffset(81, 65)
+                bodyLine.BackgroundColor3 = themeColor
+                bodyLine.BorderSizePixel = 0
+            end
         end
+
+        -- Remove the automatic layout to use manual positioning for better control
+
+        -- Storage for ESP settings and visuals
+        Window.ESPPreview.Settings = {
+            Box = true;
+            Name = true;
+            Health = true;
+            Distance = true;
+            Skeleton = false;
+        };
+        Window.ESPPreview.PlayerFrames = {};
+        Window.ESPPreview.PlayerData = {};
+
+        -- Create initial visual
+        Window.ESPPreview.CreateHumanoidVisual();
+
+        -- ESP Visual Update Function
+        Window.ESPPreview.UpdateESP = function()
+            -- Update the visual representation when settings change
+            Window.ESPPreview.CreateHumanoidVisual()
+        end
+
+        -- Add ESP Option Toggles with proper spacing
+        Window.ESPPreview.CreateESPOptions = function()
+            local optionsList = {"Box", "Name", "Health", "Distance", "Skeleton"}
+            
+            for i, optionName in ipairs(optionsList) do
+                local enabled = Window.ESPPreview.Settings[optionName]
+                local yPos = 40 + (i - 1) * 32  -- 32px spacing between options
+                
+                local optionFrame = Instance.new("Frame", Window.ESPPreview.LeftPanel)
+                optionFrame.Size = UDim2.fromOffset(165, 28)
+                optionFrame.Position = UDim2.fromOffset(8, yPos)
+                optionFrame.BackgroundColor3 = Library.Theme.BackGround1
+                optionFrame.BorderSizePixel = 0
+
+                local optionCorner = Instance.new("UICorner", optionFrame)
+                optionCorner.CornerRadius = UDim.new(0, 4)
+
+                local optionStroke = Instance.new("UIStroke", optionFrame)
+                optionStroke.Color = enabled and Library.Theme.Selected or Library.Theme.Outline
+                optionStroke.Thickness = 1
+
+                local optionLabel = Instance.new("TextLabel", optionFrame)
+                optionLabel.Size = UDim2.fromOffset(120, 28)
+                optionLabel.Position = UDim2.fromOffset(10, 0)
+                optionLabel.BackgroundTransparency = 1
+                optionLabel.Text = optionName
+                optionLabel.TextColor3 = Library.Theme.TextColor
+                optionLabel.TextSize = 13
+                optionLabel.Font = Library.Theme.Font
+                optionLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+                local optionToggle = Instance.new("Frame", optionFrame)
+                optionToggle.Size = UDim2.fromOffset(16, 16)
+                optionToggle.Position = UDim2.fromOffset(135, 6)
+                optionToggle.BackgroundColor3 = enabled and Library.Theme.Selected or Library.Theme.BackGround2
+                optionToggle.BorderSizePixel = 0
+
+                local toggleCorner = Instance.new("UICorner", optionToggle)
+                toggleCorner.CornerRadius = UDim.new(0, 3)
+
+                local toggleStroke = Instance.new("UIStroke", optionToggle)
+                toggleStroke.Color = Library.Theme.Selected
+                toggleStroke.Thickness = 1
+
+                -- Add checkmark when enabled
+                if enabled then
+                    local checkmark = Instance.new("TextLabel", optionToggle)
+                    checkmark.Size = UDim2.fromScale(1, 1)
+                    checkmark.BackgroundTransparency = 1
+                    checkmark.Text = "✓"
+                    checkmark.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    checkmark.TextSize = 12
+                    checkmark.Font = Library.Theme.Font
+                    checkmark.TextXAlignment = Enum.TextXAlignment.Center
+                    checkmark.Name = "Checkmark"
+                end
+
+                -- Make clickable
+                local optionButton = Instance.new("TextButton", optionFrame)
+                optionButton.Size = UDim2.fromScale(1, 1)
+                optionButton.BackgroundTransparency = 1
+                optionButton.Text = ""
+                
+                optionButton.MouseButton1Click:Connect(function()
+                    Window.ESPPreview.Settings[optionName] = not Window.ESPPreview.Settings[optionName]
+                    local newEnabled = Window.ESPPreview.Settings[optionName]
+                    
+                    optionStroke.Color = newEnabled and Library.Theme.Selected or Library.Theme.Outline
+                    optionToggle.BackgroundColor3 = newEnabled and Library.Theme.Selected or Library.Theme.BackGround2
+                    
+                    -- Update checkmark
+                    local checkmark = optionToggle:FindFirstChild("Checkmark")
+                    if newEnabled and not checkmark then
+                        checkmark = Instance.new("TextLabel", optionToggle)
+                        checkmark.Size = UDim2.fromScale(1, 1)
+                        checkmark.BackgroundTransparency = 1
+                        checkmark.Text = "✓"
+                        checkmark.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        checkmark.TextSize = 12
+                        checkmark.Font = Library.Theme.Font
+                        checkmark.TextXAlignment = Enum.TextXAlignment.Center
+                        checkmark.Name = "Checkmark"
+                    elseif not newEnabled and checkmark then
+                        checkmark:Destroy()
+                    end
+                    
+                    Window.ESPPreview.UpdateESP()
+                end)
+            end
+        end
+
+        -- Create the ESP options
+        Window.ESPPreview.CreateESPOptions()
+
+        -- Instructions Section
+        Window.ESPPreview.Instructions = Instance.new("TextLabel", Window.ESPPreview.LeftPanel);
+        Window.ESPPreview.Instructions.Size = UDim2.fromOffset(165, 40);
+        Window.ESPPreview.Instructions.Position = UDim2.fromOffset(8, 210);
+        Window.ESPPreview.Instructions.BackgroundTransparency = 1;
+        Window.ESPPreview.Instructions.Text = "Toggle ESP options to see\nreal-time preview changes";
+        Window.ESPPreview.Instructions.TextColor3 = Color3.fromRGB(150, 150, 150);
+        Window.ESPPreview.Instructions.TextSize = 11;
+        Window.ESPPreview.Instructions.Font = Library.Theme.Font;
+        Window.ESPPreview.Instructions.TextXAlignment = Enum.TextXAlignment.Center;
+        Window.ESPPreview.Instructions.TextWrapped = true;
+
+        -- Viewport Color Selection (positioned below humanoid preview with proper spacing)
+        Window.ESPPreview.ViewportColor = Instance.new("Frame", Window.ESPPreview.RightPanel);
+        Window.ESPPreview.ViewportColor.Size = UDim2.fromOffset(165, 30);
+        Window.ESPPreview.ViewportColor.Position = UDim2.fromOffset(10, 275);
+        Window.ESPPreview.ViewportColor.BackgroundColor3 = Library.Theme.BackGround1;
+        Window.ESPPreview.ViewportColor.BorderSizePixel = 0;
+
+        Window.ESPPreview.ViewportCorner = Instance.new("UICorner", Window.ESPPreview.ViewportColor);
+        Window.ESPPreview.ViewportCorner.CornerRadius = UDim.new(0, 4);
+
+        Window.ESPPreview.ViewportStroke = Instance.new("UIStroke", Window.ESPPreview.ViewportColor);
+        Window.ESPPreview.ViewportStroke.Color = Library.Theme.Outline;
+        Window.ESPPreview.ViewportStroke.Thickness = 1;
+
+        Window.ESPPreview.ViewportLabel = Instance.new("TextLabel", Window.ESPPreview.ViewportColor);
+        Window.ESPPreview.ViewportLabel.Size = UDim2.fromOffset(100, 30);
+        Window.ESPPreview.ViewportLabel.Position = UDim2.fromOffset(8, 0);
+        Window.ESPPreview.ViewportLabel.BackgroundTransparency = 1;
+        Window.ESPPreview.ViewportLabel.Text = "Theme Color";
+        Window.ESPPreview.ViewportLabel.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.ViewportLabel.TextSize = 12;
+        Window.ESPPreview.ViewportLabel.Font = Library.Theme.Font;
+        Window.ESPPreview.ViewportLabel.TextXAlignment = Enum.TextXAlignment.Left;
+
+        Window.ESPPreview.ColorDisplay = Instance.new("Frame", Window.ESPPreview.ViewportColor);
+        Window.ESPPreview.ColorDisplay.Size = UDim2.fromOffset(45, 18);
+        Window.ESPPreview.ColorDisplay.Position = UDim2.fromOffset(115, 6);
+        Window.ESPPreview.ColorDisplay.BackgroundColor3 = Library.Theme.Selected;
+        Window.ESPPreview.ColorDisplay.BorderSizePixel = 0;
+
+        Window.ESPPreview.ColorCorner = Instance.new("UICorner", Window.ESPPreview.ColorDisplay);
+        Window.ESPPreview.ColorCorner.CornerRadius = UDim.new(0, 3);
+
+        Window.ESPPreview.ColorButton = Instance.new("TextButton", Window.ESPPreview.ColorDisplay);
+        Window.ESPPreview.ColorButton.Size = UDim2.fromScale(1, 1);
+        Window.ESPPreview.ColorButton.BackgroundTransparency = 1;
+        Window.ESPPreview.ColorButton.Text = "";
+
+        -- Connect color picker
+        Window.ESPPreview.ColorButton.MouseButton1Click:Connect(function()
+            if Window.ColorPickerSelected then
+                Window.ColorPickerSelected:Add("esp_viewport_color", function(color)
+                    Window.ESPPreview.ColorDisplay.BackgroundColor3 = color;
+                    Library.Theme.Selected = color;
+                    Window.ESPPreview.UpdateESP();
+                end);
+                if ColorPickerM and ColorPickerM.Main then
+                    if ColorPickerM.Main.Visible then
+                        CloseFrame(ColorPickerM.Main);
+                    else
+                        OpenFrame(ColorPickerM.Main);
+                    end
+                end
+            end
+        end);
 
         -- ESP Preview Toggle Visibility Function
         Window.ESPPreview.SetVisible = function(visible)
             Window.ESPPreview.Main.Visible = visible;
         end
-
-        -- Start ESP Update Loop
-        Window.ESPPreview.UpdateConnection = RunService.Heartbeat:Connect(function()
-            pcall(Window.ESPPreview.UpdateESP);
-        end);
 
         -- Store connection for cleanup
         table.insert(Library.Items, Window.ESPPreview.UpdateConnection);
