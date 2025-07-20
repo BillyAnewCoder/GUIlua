@@ -1228,13 +1228,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
             }
         };
 
-        -- ESP Preview Window Frame
-        Window.ESPFrame = Instance.new("Frame", Window.Main);
-        Window.ESPFrame.Position = UDim2.fromOffset(930, 0);
-        Window.ESPFrame.Size = UDim2.fromOffset(236, 339);
+        -- ESP Preview Window Frame (positioned to right of main window)
+        Window.ESPFrame = Instance.new("Frame", Window.ScreenGui);
+        Window.ESPFrame.Position = UDim2.new(0, Window.Main.Position.X.Offset + 930, 0, Window.Main.Position.Y.Offset);
+        Window.ESPFrame.Size = UDim2.fromOffset(280, 380);
         Window.ESPFrame.BackgroundColor3 = Library.Theme.Outline;
         Window.ESPFrame.BorderSizePixel = 0;
         Window.ESPFrame.Visible = false;
+        Window.ESPFrame.ZIndex = 10;
 
         Window.ESPCorner = Instance.new("UICorner", Window.ESPFrame);
         Window.ESPCorner.CornerRadius = UDim.new(0, 4);
@@ -1242,9 +1243,10 @@ function Library:CreateWindow(Name, Toggle, keybind)
         -- ESP Inner Frame
         Window.ESPInner = Instance.new("Frame", Window.ESPFrame);
         Window.ESPInner.Position = UDim2.fromOffset(1, 1);
-        Window.ESPInner.Size = UDim2.fromOffset(234, 337);
+        Window.ESPInner.Size = UDim2.fromOffset(278, 378);
         Window.ESPInner.BackgroundColor3 = Library.Theme.Selected;
         Window.ESPInner.BorderSizePixel = 0;
+        Window.ESPInner.ZIndex = 11;
 
         Window.ESPInnerCorner = Instance.new("UICorner", Window.ESPInner);
         Window.ESPInnerCorner.CornerRadius = UDim.new(0, 4);
@@ -1252,69 +1254,76 @@ function Library:CreateWindow(Name, Toggle, keybind)
         -- ESP Content Frame
         Window.ESPContent = Instance.new("Frame", Window.ESPInner);
         Window.ESPContent.Position = UDim2.fromOffset(1, 1);
-        Window.ESPContent.Size = UDim2.fromOffset(232, 335);
+        Window.ESPContent.Size = UDim2.fromOffset(276, 376);
         Window.ESPContent.BackgroundColor3 = Library.Theme.BackGround1;
         Window.ESPContent.BorderSizePixel = 0;
+        Window.ESPContent.ZIndex = 12;
 
         Window.ESPContentCorner = Instance.new("UICorner", Window.ESPContent);
         Window.ESPContentCorner.CornerRadius = UDim.new(0, 4);
 
         -- ESP Title
         Window.ESPTitle = Instance.new("TextLabel", Window.ESPContent);
-        Window.ESPTitle.Position = UDim2.fromOffset(4, 2);
-        Window.ESPTitle.Size = UDim2.fromOffset(150, 16);
+        Window.ESPTitle.Position = UDim2.fromOffset(8, 6);
+        Window.ESPTitle.Size = UDim2.fromOffset(200, 20);
         Window.ESPTitle.BackgroundTransparency = 1;
         Window.ESPTitle.Text = "ESP Preview";
         Window.ESPTitle.Font = Library.Theme.Font;
-        Window.ESPTitle.TextSize = Library.Theme.TextSize;
+        Window.ESPTitle.TextSize = 16;
         Window.ESPTitle.TextColor3 = Library.Theme.TextColor;
         Window.ESPTitle.TextXAlignment = Enum.TextXAlignment.Left;
+        Window.ESPTitle.ZIndex = 13;
 
         -- ESP Close Button
         Window.ESPClose = Instance.new("TextButton", Window.ESPContent);
-        Window.ESPClose.Position = UDim2.fromOffset(210, 2);
-        Window.ESPClose.Size = UDim2.fromOffset(16, 16);
+        Window.ESPClose.Position = UDim2.fromOffset(250, 6);
+        Window.ESPClose.Size = UDim2.fromOffset(20, 20);
         Window.ESPClose.BackgroundTransparency = 1;
         Window.ESPClose.Text = "X";
         Window.ESPClose.Font = Library.Theme.Font;
-        Window.ESPClose.TextSize = Library.Theme.TextSize;
+        Window.ESPClose.TextSize = 14;
         Window.ESPClose.TextColor3 = Library.Theme.TextColor;
+        Window.ESPClose.ZIndex = 13;
 
         -- ESP Preview Area
         Window.ESPPreviewArea = Instance.new("Frame", Window.ESPContent);
-        Window.ESPPreviewArea.Position = UDim2.fromOffset(4, 22);
-        Window.ESPPreviewArea.Size = UDim2.fromOffset(224, 309);
+        Window.ESPPreviewArea.Position = UDim2.fromOffset(8, 32);
+        Window.ESPPreviewArea.Size = UDim2.fromOffset(260, 336);
         Window.ESPPreviewArea.BackgroundColor3 = Library.Theme.BackGround2;
         Window.ESPPreviewArea.BorderSizePixel = 0;
+        Window.ESPPreviewArea.ZIndex = 12;
 
         Window.ESPPreviewCorner = Instance.new("UICorner", Window.ESPPreviewArea);
         Window.ESPPreviewCorner.CornerRadius = UDim.new(0, 4);
 
         -- ESP Preview Box (Simulated Player)
         Window.ESPBox = Instance.new("Frame", Window.ESPPreviewArea);
-        Window.ESPBox.Position = UDim2.fromOffset(160, 50);
+        Window.ESPBox.Position = UDim2.fromOffset(105, 80);
         Window.ESPBox.Size = UDim2.fromOffset(50, 100);
         Window.ESPBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
         Window.ESPBox.BackgroundTransparency = 1;
         Window.ESPBox.BorderSizePixel = 2;
-        Window.ESPBox.BorderColor3 = Color3.fromRGB(255, 255, 255);
+        Window.ESPBox.BorderColor3 = Library.Theme.Selected;
+        Window.ESPBox.ZIndex = 13;
 
         -- ESP Health Bar
         Window.ESPHealthOutline = Instance.new("Frame", Window.ESPPreviewArea);
-        Window.ESPHealthOutline.Position = UDim2.fromOffset(150, 49);
+        Window.ESPHealthOutline.Position = UDim2.fromOffset(95, 79);
         Window.ESPHealthOutline.Size = UDim2.fromOffset(4, 102);
         Window.ESPHealthOutline.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
         Window.ESPHealthOutline.BorderSizePixel = 0;
+        Window.ESPHealthOutline.ZIndex = 13;
 
         Window.ESPHealthBar = Instance.new("Frame", Window.ESPHealthOutline);
         Window.ESPHealthBar.Position = UDim2.fromOffset(1, 1);
         Window.ESPHealthBar.Size = UDim2.fromOffset(2, 75);
         Window.ESPHealthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0);
         Window.ESPHealthBar.BorderSizePixel = 0;
+        Window.ESPHealthBar.ZIndex = 14;
 
         -- ESP Name Label
         Window.ESPName = Instance.new("TextLabel", Window.ESPPreviewArea);
-        Window.ESPName.Position = UDim2.fromOffset(185, 30);
+        Window.ESPName.Position = UDim2.fromOffset(130, 60);
         Window.ESPName.Size = UDim2.fromOffset(60, 16);
         Window.ESPName.BackgroundTransparency = 1;
         Window.ESPName.Text = "Player";
@@ -1322,10 +1331,11 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ESPName.TextSize = 12;
         Window.ESPName.TextColor3 = Library.Theme.TextColor;
         Window.ESPName.TextXAlignment = Enum.TextXAlignment.Center;
+        Window.ESPName.ZIndex = 14;
 
         -- ESP Distance Label
         Window.ESPDistance = Instance.new("TextLabel", Window.ESPPreviewArea);
-        Window.ESPDistance.Position = UDim2.fromOffset(185, 155);
+        Window.ESPDistance.Position = UDim2.fromOffset(130, 190);
         Window.ESPDistance.Size = UDim2.fromOffset(40, 16);
         Window.ESPDistance.BackgroundTransparency = 1;
         Window.ESPDistance.Text = "25m";
@@ -1333,10 +1343,11 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ESPDistance.TextSize = 12;
         Window.ESPDistance.TextColor3 = Library.Theme.TextColor;
         Window.ESPDistance.TextXAlignment = Enum.TextXAlignment.Center;
+        Window.ESPDistance.ZIndex = 14;
 
         -- ESP Tool Label  
         Window.ESPTool = Instance.new("TextLabel", Window.ESPPreviewArea);
-        Window.ESPTool.Position = UDim2.fromOffset(185, 175);
+        Window.ESPTool.Position = UDim2.fromOffset(130, 210);
         Window.ESPTool.Size = UDim2.fromOffset(50, 16);
         Window.ESPTool.BackgroundTransparency = 1;
         Window.ESPTool.Text = "Tool";
@@ -1344,6 +1355,42 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ESPTool.TextSize = 12;
         Window.ESPTool.TextColor3 = Library.Theme.TextColor;
         Window.ESPTool.TextXAlignment = Enum.TextXAlignment.Center;
+        Window.ESPTool.ZIndex = 14;
+
+        -- ESP Close Button Functionality
+        Window.ESPClose.MouseButton1Click:Connect(function()
+            Window.ESPFrame.Visible = false;
+            Library.Notify("ESP Preview", "ESP Preview window closed", 3);
+        end);
+
+        -- ESP Preview Toggle Function
+        function Window:ToggleESPPreview(visible)
+            if visible == nil then
+                visible = not Window.ESPFrame.Visible;
+            end
+            
+            Window.ESPFrame.Visible = visible;
+            
+            if visible then
+                -- Update ESP window position relative to main window
+                Window.ESPFrame.Position = UDim2.new(
+                    Window.Main.Position.X.Scale, 
+                    Window.Main.Position.X.Offset + Window.Main.Size.X.Offset + 10,
+                    Window.Main.Position.Y.Scale, 
+                    Window.Main.Position.Y.Offset
+                );
+                
+                Library.Notify("ESP Preview", "ESP Preview window opened", 3);
+            else
+                Library.Notify("ESP Preview", "ESP Preview window closed", 3);
+            end
+            
+            return visible;
+        end;
+
+        -- Add ESP Preview to Window methods  
+        Window.ShowESPPreview = function() Window:ToggleESPPreview(true) end;
+        Window.HideESPPreview = function() Window:ToggleESPPreview(false) end;
 
         -- ESP Toggle Functions
         function Window:ToggleESPPreview(state)
