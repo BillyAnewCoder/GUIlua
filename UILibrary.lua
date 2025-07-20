@@ -23,22 +23,15 @@ local Library = {
         };
 };
 
--- Executor-compatible service initialization
-local UserInputService, RunService, TweenService, CoreGui, PlayerGui, LocalPlayer, Mouse, CurrentCamera;
-
--- Safe service initialization for executors
-pcall(function()
-        UserInputService = game:GetService("UserInputService");
-        RunService = game:GetService("RunService");
-        TweenService = game:GetService("TweenService");
-
-        CoreGui = game:FindFirstChild("CoreGui") or (gethui and gethui()) or game:GetService("CoreGui");
-        PlayerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui");
-
-        LocalPlayer = game:GetService("Players").LocalPlayer;
-        Mouse = LocalPlayer:GetMouse();
-        CurrentCamera = game.Workspace.CurrentCamera;
-end);
+-- Roblox Services for Executor Environment
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService") 
+local TweenService = game:GetService("TweenService")
+local CoreGui = gethui and gethui() or game:GetService("CoreGui")
+local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+local LocalPlayer = game:GetService("Players").LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local CurrentCamera = workspace.CurrentCamera
 
 -- Fallbacks for missing services in test environments
 if not UserInputService then
@@ -80,7 +73,20 @@ end
 
 if not TweenService then
     TweenService = {
-        Create = function() return {Play = function() end, Completed = {Connect = function() end}} end;
+        Create = function(instance, tweenInfo, properties) 
+            return {
+                Play = function() 
+                    -- Apply properties immediately for compatibility
+                    if instance and properties then
+                        for prop, value in pairs(properties) do
+                            pcall(function() instance[prop] = value end)
+                        end
+                    end
+                end, 
+                Cancel = function() end,
+                Completed = {Connect = function() end}
+            }
+        end;
     }
 end
 
@@ -101,15 +107,29 @@ if not Instance then
                 Text = "";
                 Font = "Gotham";
                 TextSize = 14;
+                -- Enhanced mouse event compatibility
                 MouseButton1Click = {Connect = function() return {Disconnect = function() end} end};
+                MouseButton1Down = {Connect = function() return {Disconnect = function() end} end};
+                MouseButton1Up = {Connect = function() return {Disconnect = function() end} end};
+                MouseEnter = {Connect = function() return {Disconnect = function() end} end};
+                MouseLeave = {Connect = function() return {Disconnect = function() end} end};
                 InputBegan = {Connect = function() return {Disconnect = function() end} end};
                 InputChanged = {Connect = function() return {Disconnect = function() end} end};
                 InputEnded = {Connect = function() return {Disconnect = function() end} end};
                 Name = className .. "_MockObject";
+                -- Enhanced Instance methods
                 GetChildren = function() return {} end;
                 FindFirstChild = function() return nil end;
                 WaitForChild = function(name) return obj end;
+                IsA = function(checkType) return checkType == className end;
+                Destroy = function() end;
             }
+            -- Add SelectedAnimation for compatibility
+            if className == "TextButton" then
+                obj.SelectedAnimation = {
+                    Size = UDim2 and UDim2.fromScale(0, 1) or {X = {Scale = 0, Offset = 0}, Y = {Scale = 1, Offset = 0}};
+                }
+            end
             return obj
         end
     }
@@ -195,6 +215,22 @@ end
 -- tick() compatibility for test environments
 if not tick then
     tick = function() return os.clock() or os.time() end
+end
+
+-- TweenInfo compatibility for executor environments
+if not TweenInfo then
+    TweenInfo = {
+        new = function(duration, easingStyle, easingDirection, repeatCount, reverses, delayTime)
+            return {
+                Time = duration or 1;
+                EasingStyle = easingStyle or "Linear";
+                EasingDirection = easingDirection or "Out";
+                RepeatCount = repeatCount or 0;
+                Reverses = reverses or false;
+                DelayTime = delayTime or 0;
+            }
+        end
+    }
 end
 
 -- Drawing compatibility for executor environments
@@ -1066,24 +1102,34 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         ColorPicker:Set(Color3.fromHSV(ColorPicker.HuePosition, SizeX, SizeY), 0, true);
                 end;
 
-                ColorPicker.Saturation.MouseButton1Down:Connect(function()
+                -- MouseButton1Down compatibility fix for ColorPicker.Saturation
+                if ColorPicker.Saturation.MouseButton1Down then
+                    ColorPicker.Saturation.MouseButton1Down:Connect(function()
                         ColorPicker.SlidingSaturation = true;
                         ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
-                end);
+                    end);
+                end
 
-                ColorPicker.Saturation.InputChanged:Connect(function()
+                if ColorPicker.Saturation.InputChanged then
+                    ColorPicker.Saturation.InputChanged:Connect(function()
                         if ColorPicker.SlidingSaturation then
-                                ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
+                            ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
                         end;
-                end);
+                    end);
+                end
 
-                ColorPicker.Saturation.MouseButton1Up:Connect(function()
+                -- MouseButton1Up and MouseLeave compatibility fixes
+                if ColorPicker.Saturation.MouseButton1Up then
+                    ColorPicker.Saturation.MouseButton1Up:Connect(function()
                         ColorPicker.SlidingSaturation = false;
-                end);
+                    end);
+                end
 
-                ColorPicker.Saturation.MouseLeave:Connect(function()
+                if ColorPicker.Saturation.MouseLeave then
+                    ColorPicker.Saturation.MouseLeave:Connect(function()
                         ColorPicker.SlidingSaturation = false;
-                end);
+                    end);
+                end
 
                 function ColorPicker.SlideHue(input)
                         local SizeY = 1 - math.clamp((input.Position.Y - ColorPicker.Hue.AbsolutePosition.Y) / ColorPicker.Hue.AbsoluteSize.Y, 0, 1)
@@ -1094,24 +1140,34 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         ColorPicker:Set(Color3.fromHSV(SizeY, Sat, Val), 0, true);
                 end;
 
-                ColorPicker.Hue.MouseButton1Down:Connect(function()
+                -- MouseButton1Down compatibility fix for ColorPicker.Hue
+                if ColorPicker.Hue.MouseButton1Down then
+                    ColorPicker.Hue.MouseButton1Down:Connect(function()
                         ColorPicker.SlidingHue = true;
                         ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
-                end);
+                    end);
+                end
 
-                ColorPicker.Hue.InputChanged:Connect(function()
+                if ColorPicker.Hue.InputChanged then
+                    ColorPicker.Hue.InputChanged:Connect(function()
                         if ColorPicker.SlidingHue then
-                                ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
+                            ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
                         end;
-                end);
+                    end);
+                end
 
-                ColorPicker.Hue.MouseButton1Up:Connect(function()
+                -- MouseButton1Up and MouseLeave compatibility fixes for Hue
+                if ColorPicker.Hue.MouseButton1Up then
+                    ColorPicker.Hue.MouseButton1Up:Connect(function()
                         ColorPicker.SlidingHue = false;
-                end);
+                    end);
+                end
 
-                ColorPicker.Hue.MouseLeave:Connect(function()
+                if ColorPicker.Hue.MouseLeave then
+                    ColorPicker.Hue.MouseLeave:Connect(function()
                         ColorPicker.SlidingHue = false;
-                end);
+                    end);
+                end
 
                 return ColorPicker;
         end;
@@ -1663,13 +1719,21 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Tab.Button.BorderSizePixel = 0;
                 Tab.Button.AutoButtonColor = false;
                 Tab.Button.Text = "";
-                Tab.Button.MouseEnter:Connect(function()
+                -- MouseEnter and MouseLeave compatibility fixes for Tab.Button
+                if Tab.Button.MouseEnter then
+                    Tab.Button.MouseEnter:Connect(function()
                         TweenService:Create(Tab.TextLable, TweenInfo.new(Library.Theme.TabOptionsHoverTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(0.06, 0,0.287, 0)}):Play();
-                end)
-                Tab.Button.MouseLeave:Connect(function()
+                    end)
+                end
+                if Tab.Button.MouseLeave then
+                    Tab.Button.MouseLeave:Connect(function()
                         TweenService:Create(Tab.TextLable, TweenInfo.new(Library.Theme.TabOptionsHoverTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0,0.287, 0)}):Play();
-                end)
-                Tab.Button.MouseButton1Click:Connect(function()Tab:Select();end);
+                    end)
+                end
+                -- MouseButton1Click compatibility fix for Tab.Button
+                if Tab.Button.MouseButton1Click then
+                    Tab.Button.MouseButton1Click:Connect(function()Tab:Select();end);
+                end
 
                 Tab.TextLable = Instance.new("TextLabel", Tab.Button);
                 Tab.TextLable.BackgroundTransparency = 1;
@@ -1824,17 +1888,25 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Button.TextLabel.Font = Library.Theme.Font;
                                 Button.TextLabel.TextXAlignment = Enum.TextXAlignment.Center;
 
-                                Button.Main.MouseEnter:Connect(function()
+                                -- MouseEnter and MouseLeave compatibility fixes for Button.Main
+                                if Button.Main.MouseEnter then
+                                    Button.Main.MouseEnter:Connect(function()
                                         TweenService:Create(Button.Main, TweenInfo.new(0.2), {BackgroundColor3 = Library.Theme.Selected}):Play();
-                                end);
+                                    end);
+                                end
 
-                                Button.Main.MouseLeave:Connect(function()
+                                if Button.Main.MouseLeave then
+                                    Button.Main.MouseLeave:Connect(function()
                                         TweenService:Create(Button.Main, TweenInfo.new(0.2), {BackgroundColor3 = Library.Theme.BackGround1}):Play();
-                                end);
+                                    end);
+                                end
 
-                                Button.Main.MouseButton1Click:Connect(function()
+                                -- MouseButton1Click compatibility fix for Button.Main
+                                if Button.Main.MouseButton1Click then
+                                    Button.Main.MouseButton1Click:Connect(function()
                                         pcall(Button.CallBack);
-                                end);
+                                    end);
+                                end
 
                                 Sector:FixSize();
                                 table.insert(Library.Items, Button);
