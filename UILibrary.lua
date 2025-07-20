@@ -1,3 +1,4 @@
+
 -- Enhanced Roblox UI Library - Professional Enhancement
 -- Fixed typo: "Libary" -> "Library" for better code quality
 -- Comprehensive bug fixes and feature completion
@@ -203,7 +204,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         targetSize = UDim2.fromOffset(921, 0);
                 end
                 
-                local CloseTween = TweenService:Create(Frame, TweenInfo.new(Libary.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = targetSize});
+                local CloseTween = TweenService:Create(Frame, TweenInfo.new(Library.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = targetSize});
                 CloseTween:Play();
                 CloseTween.Completed:Connect(function()
                         Frame.Visible = false;
@@ -225,7 +226,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Frame.Size = startSize;
                 Frame.Visible = true;
 
-                local OpenTween = TweenService:Create(Frame, TweenInfo.new(Libary.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = targetSize});
+                local OpenTween = TweenService:Create(Frame, TweenInfo.new(Library.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = targetSize});
                 OpenTween:Play();
         end
 
@@ -258,7 +259,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 ColorPicker.Main = Instance.new("Frame", Window.ScreenGui);
                 ColorPicker.Main.Size = UDim2.fromOffset(266, 277);
                 ColorPicker.Main.Position = UDim2.fromScale(0.1, 0.1);
-                ColorPicker.Main.BackgroundColor3 = Libary.Theme.BackGround2;
+                ColorPicker.Main.BackgroundColor3 = Library.Theme.BackGround2;
                 ColorPicker.Main.ClipsDescendants = true;
                 ColorPicker.Main.Name = "c";
                 ColorPicker.Main.Visible = false;
@@ -267,7 +268,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 ColorPicker.UICorner.CornerRadius = UDim.new(0, 4);
 
                 ColorPicker.UIStroke = Instance.new("UIStroke", ColorPicker.Main);
-                ColorPicker.UIStroke.Color = Libary.Theme.Outline;
+                ColorPicker.UIStroke.Color = Library.Theme.Outline;
                 ColorPicker.UIStroke.Thickness = 1;
                 ColorPicker.UIStroke.ApplyStrokeMode = "Border";
 
@@ -343,7 +344,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 ColorPicker.Line.Position = UDim2.fromOffset(0, 34);
                 ColorPicker.Line.Size = UDim2.new(1, 0, 0, 1);
                 ColorPicker.Line.BorderSizePixel = 0;
-                ColorPicker.Line.BackgroundColor3 = Libary.Theme.Outline;
+                ColorPicker.Line.BackgroundColor3 = Library.Theme.Outline;
 
                 ColorPicker.Lable = Instance.new("TextLabel", ColorPicker.Frame);
                 ColorPicker.Lable.Size = UDim2.fromOffset(116, 34);
@@ -378,7 +379,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 ColorPicker.Saturation.Image = "rbxassetid://4155801252"; -- Better saturation texture
                 ColorPicker.Saturation.AutoButtonColor = false;
                 ColorPicker.Saturation.BorderSizePixel = 1;
-                ColorPicker.Saturation.BorderColor3 = Libary.Theme.Outline;
+                ColorPicker.Saturation.BorderColor3 = Library.Theme.Outline;
 
                 ColorPicker.SaturationSelect = Instance.new("Frame", ColorPicker.Saturation);
                 ColorPicker.SaturationSelect.Size = UDim2.fromOffset(4, 4);
@@ -393,7 +394,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 ColorPicker.Hue.Size = UDim2.fromOffset(20, 200);
                 ColorPicker.Hue.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
                 ColorPicker.Hue.BorderSizePixel = 1;
-                ColorPicker.Hue.BorderColor3 = Libary.Theme.Outline;
+                ColorPicker.Hue.BorderColor3 = Library.Theme.Outline;
                 ColorPicker.Hue.AutoButtonColor = false;
                 ColorPicker.Hue.Text = "";
 
@@ -422,7 +423,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 ColorPicker.View.Size = UDim2.fromOffset(50, 20);
                 ColorPicker.View.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
                 ColorPicker.View.BorderSizePixel = 1;
-                ColorPicker.View.BorderColor3 = Libary.Theme.Outline;
+                ColorPicker.View.BorderColor3 = Library.Theme.Outline;
 
                 -- RGB display labels
                 ColorPicker.RGBFrame = Instance.new("Frame", ColorPicker.Frame);
@@ -484,7 +485,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         end
 
                         if ColorPicker.Flag then
-                                Libary.Flags[ColorPicker.Flag] = color;
+                                Library.Flags[ColorPicker.Flag] = color;
                         end
 
                         if ColorPicker.CallBack then
@@ -506,12 +507,12 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         ColorPicker.Flag = Flag;
                         ColorPicker.CallBack = CallBack;
                         
-                        if Flag and Libary.Flags[Flag] then
-                                ColorPicker:Set(Libary.Flags[Flag], 0, false);
+                        if Flag and Library.Flags[Flag] then
+                                ColorPicker:Set(Library.Flags[Flag], 0, false);
                         else
                                 ColorPicker:Set(Color3.fromRGB(255, 255, 255), 0, false);
                                 if Flag then
-                                        Libary.Flags[Flag] = Color3.fromRGB(255, 255, 255);
+                                        Library.Flags[Flag] = Color3.fromRGB(255, 255, 255);
                                 end
                         end
                 end
@@ -602,7 +603,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.Main = Instance.new("Frame", Window.ScreenGui);
         Window.Main.Size = UDim2.fromOffset(921, 428);
         Window.Main.Position = UDim2.fromScale(0.3, 0.3);
-        Window.Main.BackgroundColor3 = Libary.Theme.BackGround1;
+        Window.Main.BackgroundColor3 = Library.Theme.BackGround1;
         Window.Main.ClipsDescendants = true;
         Window.Main.Visible = Window.Toggle;
         Window.Main.BorderSizePixel = 0;
@@ -611,7 +612,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.MainCorner.CornerRadius = UDim.new(0, 6);
 
         Window.MainStroke = Instance.new("UIStroke", Window.Main);
-        Window.MainStroke.Color = Libary.Theme.Outline;
+        Window.MainStroke.Color = Library.Theme.Outline;
         Window.MainStroke.Thickness = 1;
         Window.MainStroke.ApplyStrokeMode = "Border";
 
@@ -622,7 +623,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         -- Top bar with close button and title
         Window.TopBar = Instance.new("Frame", Window.Main);
         Window.TopBar.Size = UDim2.new(1, 0, 0, 40);
-        Window.TopBar.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.TopBar.BackgroundColor3 = Library.Theme.BackGround2;
         Window.TopBar.BorderSizePixel = 0;
 
         Window.TopBarCorner = Instance.new("UICorner", Window.TopBar);
@@ -632,7 +633,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         local topBarFix = Instance.new("Frame", Window.TopBar);
         topBarFix.Size = UDim2.new(1, 0, 0, 20);
         topBarFix.Position = UDim2.new(0, 0, 1, -20);
-        topBarFix.BackgroundColor3 = Libary.Theme.BackGround2;
+        topBarFix.BackgroundColor3 = Library.Theme.BackGround2;
         topBarFix.BorderSizePixel = 0;
 
         Window.Title = Instance.new("TextLabel", Window.TopBar);
@@ -642,7 +643,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.Title.Text = Window.Name;
         Window.Title.Font = Enum.Font.Ubuntu;
         Window.Title.TextSize = 16;
-        Window.Title.TextColor3 = Libary.Theme.TextColor;
+        Window.Title.TextColor3 = Library.Theme.TextColor;
         Window.Title.TextXAlignment = Enum.TextXAlignment.Left;
         Window.Title.RichText = true;
 
@@ -654,7 +655,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.CloseButton.Text = "×";
         Window.CloseButton.Font = Enum.Font.Ubuntu;
         Window.CloseButton.TextSize = 20;
-        Window.CloseButton.TextColor3 = Libary.Theme.TextColor;
+        Window.CloseButton.TextColor3 = Library.Theme.TextColor;
 
         Window.CloseButton.MouseEnter:Connect(function()
                 local tween = TweenService:Create(Window.CloseButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 100, 100)});
@@ -662,7 +663,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         end)
 
         Window.CloseButton.MouseLeave:Connect(function()
-                local tween = TweenService:Create(Window.CloseButton, TweenInfo.new(0.2), {TextColor3 = Libary.Theme.TextColor});
+                local tween = TweenService:Create(Window.CloseButton, TweenInfo.new(0.2), {TextColor3 = Library.Theme.TextColor});
                 tween:Play();
         end)
 
@@ -678,15 +679,15 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.MinimizeButton.Text = "−";
         Window.MinimizeButton.Font = Enum.Font.Ubuntu;
         Window.MinimizeButton.TextSize = 20;
-        Window.MinimizeButton.TextColor3 = Libary.Theme.TextColor;
+        Window.MinimizeButton.TextColor3 = Library.Theme.TextColor;
 
         Window.MinimizeButton.MouseEnter:Connect(function()
-                local tween = TweenService:Create(Window.MinimizeButton, TweenInfo.new(0.2), {TextColor3 = Libary.Theme.Selected});
+                local tween = TweenService:Create(Window.MinimizeButton, TweenInfo.new(0.2), {TextColor3 = Library.Theme.Selected});
                 tween:Play();
         end)
 
         Window.MinimizeButton.MouseLeave:Connect(function()
-                local tween = TweenService:Create(Window.MinimizeButton, TweenInfo.new(0.2), {TextColor3 = Libary.Theme.TextColor});
+                local tween = TweenService:Create(Window.MinimizeButton, TweenInfo.new(0.2), {TextColor3 = Library.Theme.TextColor});
                 tween:Play();
         end)
 
@@ -698,7 +699,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.TabContainer = Instance.new("Frame", Window.Main);
         Window.TabContainer.Size = UDim2.new(0, 150, 1, -40);
         Window.TabContainer.Position = UDim2.fromOffset(0, 40);
-        Window.TabContainer.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.TabContainer.BackgroundColor3 = Library.Theme.BackGround2;
         Window.TabContainer.BorderSizePixel = 0;
 
         Window.TabContainerCorner = Instance.new("UICorner", Window.TabContainer);
@@ -708,13 +709,13 @@ function Library:CreateWindow(Name, Toggle, keybind)
         local tabContainerFix1 = Instance.new("Frame", Window.TabContainer);
         tabContainerFix1.Size = UDim2.new(0, 20, 1, 0);
         tabContainerFix1.Position = UDim2.new(1, -20, 0, 0);
-        tabContainerFix1.BackgroundColor3 = Libary.Theme.BackGround2;
+        tabContainerFix1.BackgroundColor3 = Library.Theme.BackGround2;
         tabContainerFix1.BorderSizePixel = 0;
 
         local tabContainerFix2 = Instance.new("Frame", Window.TabContainer);
         tabContainerFix2.Size = UDim2.new(1, 0, 0, 20);
         tabContainerFix2.Position = UDim2.new(0, 0, 0, 0);
-        tabContainerFix2.BackgroundColor3 = Libary.Theme.BackGround2;
+        tabContainerFix2.BackgroundColor3 = Library.Theme.BackGround2;
         tabContainerFix2.BorderSizePixel = 0;
 
         -- Tab list layout
@@ -732,7 +733,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ContentContainer = Instance.new("Frame", Window.Main);
         Window.ContentContainer.Size = UDim2.new(1, -150, 1, -40);
         Window.ContentContainer.Position = UDim2.fromOffset(150, 40);
-        Window.ContentContainer.BackgroundColor3 = Libary.Theme.BackGround1;
+        Window.ContentContainer.BackgroundColor3 = Library.Theme.BackGround1;
         Window.ContentContainer.BorderSizePixel = 0;
 
         -- Enhanced toggle function with keybind support
@@ -765,7 +766,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 -- Tab button
                 Tab.Button = Instance.new("TextButton", Window.TabContainer);
                 Tab.Button.Size = UDim2.new(1, 0, 0, 35);
-                Tab.Button.BackgroundColor3 = Libary.Theme.BackGround1;
+                Tab.Button.BackgroundColor3 = Library.Theme.BackGround1;
                 Tab.Button.BorderSizePixel = 0;
                 Tab.Button.Text = "";
                 Tab.Button.AutoButtonColor = false;
@@ -774,7 +775,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Tab.ButtonCorner.CornerRadius = UDim.new(0, 4);
 
                 Tab.ButtonStroke = Instance.new("UIStroke", Tab.Button);
-                Tab.ButtonStroke.Color = Libary.Theme.Outline;
+                Tab.ButtonStroke.Color = Library.Theme.Outline;
                 Tab.ButtonStroke.Thickness = 0;
                 Tab.ButtonStroke.ApplyStrokeMode = "Border";
 
@@ -785,7 +786,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         Tab.IconLabel.Position = UDim2.fromOffset(10, 10);
                         Tab.IconLabel.BackgroundTransparency = 1;
                         Tab.IconLabel.Image = Tab.Icon;
-                        Tab.IconLabel.ImageColor3 = Libary.Theme.TextColor;
+                        Tab.IconLabel.ImageColor3 = Library.Theme.TextColor;
                 end
 
                 -- Tab text
@@ -796,7 +797,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Tab.TextLabel.Text = Tab.Name;
                 Tab.TextLabel.Font = Enum.Font.Ubuntu;
                 Tab.TextLabel.TextSize = 14;
-                Tab.TextLabel.TextColor3 = Libary.Theme.TextColor;
+                Tab.TextLabel.TextColor3 = Library.Theme.TextColor;
                 Tab.TextLabel.TextXAlignment = Enum.TextXAlignment.Left;
 
                 -- Tab content frame
@@ -805,7 +806,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Tab.Content.BackgroundTransparency = 1;
                 Tab.Content.BorderSizePixel = 0;
                 Tab.Content.ScrollBarThickness = 6;
-                Tab.Content.ScrollBarImageColor3 = Libary.Theme.Outline;
+                Tab.Content.ScrollBarImageColor3 = Library.Theme.Outline;
                 Tab.Content.CanvasSize = UDim2.fromOffset(0, 0);
                 Tab.Content.Visible = false;
 
@@ -839,19 +840,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         Window.CurrentTab = Tab;
 
                         -- Animate selection
-                        local selectTween = TweenService:Create(Tab.Button, TweenInfo.new(Libary.Theme.TabOptionsSelectTween), {
-                                BackgroundColor3 = Libary.Theme.Selected
+                        local selectTween = TweenService:Create(Tab.Button, TweenInfo.new(Library.Theme.TabOptionsSelectTween), {
+                                BackgroundColor3 = Library.Theme.Selected
                         });
                         selectTween:Play();
 
-                        local strokeTween = TweenService:Create(Tab.ButtonStroke, TweenInfo.new(Libary.Theme.TabOptionsSelectTween), {
+                        local strokeTween = TweenService:Create(Tab.ButtonStroke, TweenInfo.new(Library.Theme.TabOptionsSelectTween), {
                                 Thickness = 1,
-                                Color = Libary.Theme.SelectedHover
+                                Color = Library.Theme.SelectedHover
                         });
                         strokeTween:Play();
 
                         if Tab.IconLabel then
-                                local iconTween = TweenService:Create(Tab.IconLabel, TweenInfo.new(Libary.Theme.TabOptionsSelectTween), {
+                                local iconTween = TweenService:Create(Tab.IconLabel, TweenInfo.new(Library.Theme.TabOptionsSelectTween), {
                                         ImageColor3 = Color3.fromRGB(255, 255, 255)
                                 });
                                 iconTween:Play();
@@ -862,19 +863,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         Tab.Active = false;
                         Tab.Content.Visible = false;
 
-                        local deselectTween = TweenService:Create(Tab.Button, TweenInfo.new(Libary.Theme.TabOptionsUnSelectTween), {
-                                BackgroundColor3 = Libary.Theme.BackGround1
+                        local deselectTween = TweenService:Create(Tab.Button, TweenInfo.new(Library.Theme.TabOptionsUnSelectTween), {
+                                BackgroundColor3 = Library.Theme.BackGround1
                         });
                         deselectTween:Play();
 
-                        local strokeTween = TweenService:Create(Tab.ButtonStroke, TweenInfo.new(Libary.Theme.TabOptionsUnSelectTween), {
+                        local strokeTween = TweenService:Create(Tab.ButtonStroke, TweenInfo.new(Library.Theme.TabOptionsUnSelectTween), {
                                 Thickness = 0
                         });
                         strokeTween:Play();
 
                         if Tab.IconLabel then
-                                local iconTween = TweenService:Create(Tab.IconLabel, TweenInfo.new(Libary.Theme.TabOptionsUnSelectTween), {
-                                        ImageColor3 = Libary.Theme.TextColor
+                                local iconTween = TweenService:Create(Tab.IconLabel, TweenInfo.new(Library.Theme.TabOptionsUnSelectTween), {
+                                        ImageColor3 = Library.Theme.TextColor
                                 });
                                 iconTween:Play();
                         end
@@ -883,8 +884,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 -- Tab hover effects
                 Tab.Button.MouseEnter:Connect(function()
                         if not Tab.Active then
-                                local hoverTween = TweenService:Create(Tab.Button, TweenInfo.new(Libary.Theme.TabOptionsHoverTween), {
-                                        BackgroundColor3 = Libary.Theme.BackGround3
+                                local hoverTween = TweenService:Create(Tab.Button, TweenInfo.new(Library.Theme.TabOptionsHoverTween), {
+                                        BackgroundColor3 = Library.Theme.BackGround3
                                 });
                                 hoverTween:Play();
                         end
@@ -892,8 +893,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                 Tab.Button.MouseLeave:Connect(function()
                         if not Tab.Active then
-                                local leaveTween = TweenService:Create(Tab.Button, TweenInfo.new(Libary.Theme.TabOptionsHoverTween), {
-                                        BackgroundColor3 = Libary.Theme.BackGround1
+                                local leaveTween = TweenService:Create(Tab.Button, TweenInfo.new(Library.Theme.TabOptionsHoverTween), {
+                                        BackgroundColor3 = Library.Theme.BackGround1
                                 });
                                 leaveTween:Play();
                         end
@@ -920,14 +921,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                         Section.Frame = Instance.new("Frame", Tab.Content);
                         Section.Frame.Size = UDim2.new(1, 0, 0, 30);
-                        Section.Frame.BackgroundColor3 = Libary.Theme.BackGround2;
+                        Section.Frame.BackgroundColor3 = Library.Theme.BackGround2;
                         Section.Frame.BorderSizePixel = 0;
 
                         Section.Corner = Instance.new("UICorner", Section.Frame);
                         Section.Corner.CornerRadius = UDim.new(0, 6);
 
                         Section.Stroke = Instance.new("UIStroke", Section.Frame);
-                        Section.Stroke.Color = Libary.Theme.Outline;
+                        Section.Stroke.Color = Library.Theme.Outline;
                         Section.Stroke.Thickness = 1;
                         Section.Stroke.ApplyStrokeMode = "Border";
 
@@ -938,7 +939,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         Section.Title.Text = Section.Name;
                         Section.Title.Font = Enum.Font.Ubuntu;
                         Section.Title.TextSize = 14;
-                        Section.Title.TextColor3 = Libary.Theme.Selected;
+                        Section.Title.TextColor3 = Library.Theme.Selected;
                         Section.Title.TextXAlignment = Enum.TextXAlignment.Left;
                         Section.Title.RichText = true;
 
@@ -967,14 +968,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                                 Button.Frame = Instance.new("Frame", Section.Container);
                                 Button.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                Button.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Button.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 Button.Frame.BorderSizePixel = 0;
 
                                 Button.Corner = Instance.new("UICorner", Button.Frame);
                                 Button.Corner.CornerRadius = UDim.new(0, 4);
 
                                 Button.Stroke = Instance.new("UIStroke", Button.Frame);
-                                Button.Stroke.Color = Libary.Theme.Outline;
+                                Button.Stroke.Color = Library.Theme.Outline;
                                 Button.Stroke.Thickness = 1;
                                 Button.Stroke.ApplyStrokeMode = "Border";
 
@@ -984,44 +985,44 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Button.Button.Text = Button.Name;
                                 Button.Button.Font = Enum.Font.Ubuntu;
                                 Button.Button.TextSize = 14;
-                                Button.Button.TextColor3 = Libary.Theme.TextColor;
+                                Button.Button.TextColor3 = Library.Theme.TextColor;
                                 Button.Button.AutoButtonColor = false;
 
                                 -- Button interactions
                                 Button.Button.MouseEnter:Connect(function()
-                                        local tween = TweenService:Create(Button.Frame, TweenInfo.new(Libary.Theme.ButtonTween), {
-                                                BackgroundColor3 = Libary.Theme.BackGround3
+                                        local tween = TweenService:Create(Button.Frame, TweenInfo.new(Library.Theme.ButtonTween), {
+                                                BackgroundColor3 = Library.Theme.BackGround3
                                         });
                                         tween:Play();
 
-                                        local strokeTween = TweenService:Create(Button.Stroke, TweenInfo.new(Libary.Theme.ButtonTween), {
-                                                Color = Libary.Theme.OutlineHover
+                                        local strokeTween = TweenService:Create(Button.Stroke, TweenInfo.new(Library.Theme.ButtonTween), {
+                                                Color = Library.Theme.OutlineHover
                                         });
                                         strokeTween:Play();
                                 end)
 
                                 Button.Button.MouseLeave:Connect(function()
-                                        local tween = TweenService:Create(Button.Frame, TweenInfo.new(Libary.Theme.ButtonTween), {
-                                                BackgroundColor3 = Libary.Theme.BackGround1
+                                        local tween = TweenService:Create(Button.Frame, TweenInfo.new(Library.Theme.ButtonTween), {
+                                                BackgroundColor3 = Library.Theme.BackGround1
                                         });
                                         tween:Play();
 
-                                        local strokeTween = TweenService:Create(Button.Stroke, TweenInfo.new(Libary.Theme.ButtonTween), {
-                                                Color = Libary.Theme.Outline
+                                        local strokeTween = TweenService:Create(Button.Stroke, TweenInfo.new(Library.Theme.ButtonTween), {
+                                                Color = Library.Theme.Outline
                                         });
                                         strokeTween:Play();
                                 end)
 
                                 Button.Button.MouseButton1Down:Connect(function()
                                         local tween = TweenService:Create(Button.Frame, TweenInfo.new(0.05), {
-                                                BackgroundColor3 = Libary.Theme.Selected
+                                                BackgroundColor3 = Library.Theme.Selected
                                         });
                                         tween:Play();
                                 end)
 
                                 Button.Button.MouseButton1Up:Connect(function()
                                         local tween = TweenService:Create(Button.Frame, TweenInfo.new(0.05), {
-                                                BackgroundColor3 = Libary.Theme.BackGround3
+                                                BackgroundColor3 = Library.Theme.BackGround3
                                         });
                                         tween:Play();
                                 end)
@@ -1048,19 +1049,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Toggle.CallBack = CallBack;
 
                                 if Flag then
-                                        Libary.Flags[Flag] = Toggle.State;
+                                        Library.Flags[Flag] = Toggle.State;
                                 end
 
                                 Toggle.Frame = Instance.new("Frame", Section.Container);
                                 Toggle.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                Toggle.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Toggle.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 Toggle.Frame.BorderSizePixel = 0;
 
                                 Toggle.Corner = Instance.new("UICorner", Toggle.Frame);
                                 Toggle.Corner.CornerRadius = UDim.new(0, 4);
 
                                 Toggle.Stroke = Instance.new("UIStroke", Toggle.Frame);
-                                Toggle.Stroke.Color = Libary.Theme.Outline;
+                                Toggle.Stroke.Color = Library.Theme.Outline;
                                 Toggle.Stroke.Thickness = 1;
                                 Toggle.Stroke.ApplyStrokeMode = "Border";
 
@@ -1077,21 +1078,21 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Toggle.Label.Text = Toggle.Name;
                                 Toggle.Label.Font = Enum.Font.Ubuntu;
                                 Toggle.Label.TextSize = 14;
-                                Toggle.Label.TextColor3 = Libary.Theme.TextColor;
+                                Toggle.Label.TextColor3 = Library.Theme.TextColor;
                                 Toggle.Label.TextXAlignment = Enum.TextXAlignment.Left;
 
                                 -- Toggle indicator
                                 Toggle.Indicator = Instance.new("Frame", Toggle.Button);
                                 Toggle.Indicator.Size = UDim2.fromOffset(30, 16);
                                 Toggle.Indicator.Position = UDim2.new(1, -40, 0.5, -8);
-                                Toggle.Indicator.BackgroundColor3 = Toggle.State and Libary.Theme.Selected or Libary.Theme.BackGround3;
+                                Toggle.Indicator.BackgroundColor3 = Toggle.State and Library.Theme.Selected or Library.Theme.BackGround3;
                                 Toggle.Indicator.BorderSizePixel = 0;
 
                                 Toggle.IndicatorCorner = Instance.new("UICorner", Toggle.Indicator);
                                 Toggle.IndicatorCorner.CornerRadius = UDim.new(1, 0);
 
                                 Toggle.IndicatorStroke = Instance.new("UIStroke", Toggle.Indicator);
-                                Toggle.IndicatorStroke.Color = Libary.Theme.Outline;
+                                Toggle.IndicatorStroke.Color = Library.Theme.Outline;
                                 Toggle.IndicatorStroke.Thickness = 1;
                                 Toggle.IndicatorStroke.ApplyStrokeMode = "Border";
 
@@ -1109,16 +1110,16 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Toggle.State = State;
                                         
                                         if Toggle.Flag then
-                                                Libary.Flags[Toggle.Flag] = State;
+                                                Library.Flags[Toggle.Flag] = State;
                                         end
 
                                         -- Animate toggle
-                                        local indicatorTween = TweenService:Create(Toggle.Indicator, TweenInfo.new(Libary.Theme.ToggleTween), {
-                                                BackgroundColor3 = State and Libary.Theme.Selected or Libary.Theme.BackGround3
+                                        local indicatorTween = TweenService:Create(Toggle.Indicator, TweenInfo.new(Library.Theme.ToggleTween), {
+                                                BackgroundColor3 = State and Library.Theme.Selected or Library.Theme.BackGround3
                                         });
                                         indicatorTween:Play();
 
-                                        local circleTween = TweenService:Create(Toggle.Circle, TweenInfo.new(Libary.Theme.ToggleTween), {
+                                        local circleTween = TweenService:Create(Toggle.Circle, TweenInfo.new(Library.Theme.ToggleTween), {
                                                 Position = State and UDim2.fromOffset(16, 2) or UDim2.fromOffset(2, 2)
                                         });
                                         circleTween:Play();
@@ -1133,15 +1134,15 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                                 -- Toggle interactions
                                 Toggle.Button.MouseEnter:Connect(function()
-                                        local tween = TweenService:Create(Toggle.Frame, TweenInfo.new(Libary.Theme.ButtonTween), {
-                                                BackgroundColor3 = Libary.Theme.BackGround3
+                                        local tween = TweenService:Create(Toggle.Frame, TweenInfo.new(Library.Theme.ButtonTween), {
+                                                BackgroundColor3 = Library.Theme.BackGround3
                                         });
                                         tween:Play();
                                 end)
 
                                 Toggle.Button.MouseLeave:Connect(function()
-                                        local tween = TweenService:Create(Toggle.Frame, TweenInfo.new(Libary.Theme.ButtonTween), {
-                                                BackgroundColor3 = Libary.Theme.BackGround1
+                                        local tween = TweenService:Create(Toggle.Frame, TweenInfo.new(Library.Theme.ButtonTween), {
+                                                BackgroundColor3 = Library.Theme.BackGround1
                                         });
                                         tween:Play();
                                 end)
@@ -1167,19 +1168,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Slider.Sliding = false;
 
                                 if Flag then
-                                        Libary.Flags[Flag] = Slider.Value;
+                                        Library.Flags[Flag] = Slider.Value;
                                 end
 
                                 Slider.Frame = Instance.new("Frame", Section.Container);
                                 Slider.Frame.Size = UDim2.new(1, 0, 0, 50);
-                                Slider.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Slider.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 Slider.Frame.BorderSizePixel = 0;
 
                                 Slider.Corner = Instance.new("UICorner", Slider.Frame);
                                 Slider.Corner.CornerRadius = UDim.new(0, 4);
 
                                 Slider.Stroke = Instance.new("UIStroke", Slider.Frame);
-                                Slider.Stroke.Color = Libary.Theme.Outline;
+                                Slider.Stroke.Color = Library.Theme.Outline;
                                 Slider.Stroke.Thickness = 1;
                                 Slider.Stroke.ApplyStrokeMode = "Border";
 
@@ -1190,7 +1191,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Slider.Label.Text = Slider.Name;
                                 Slider.Label.Font = Enum.Font.Ubuntu;
                                 Slider.Label.TextSize = 14;
-                                Slider.Label.TextColor3 = Libary.Theme.TextColor;
+                                Slider.Label.TextColor3 = Library.Theme.TextColor;
                                 Slider.Label.TextXAlignment = Enum.TextXAlignment.Left;
 
                                 Slider.ValueLabel = Instance.new("TextLabel", Slider.Frame);
@@ -1200,14 +1201,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Slider.ValueLabel.Text = tostring(Utility:Round(Slider.Value, Slider.Decimals));
                                 Slider.ValueLabel.Font = Enum.Font.Ubuntu;
                                 Slider.ValueLabel.TextSize = 13;
-                                Slider.ValueLabel.TextColor3 = Libary.Theme.Selected;
+                                Slider.ValueLabel.TextColor3 = Library.Theme.Selected;
                                 Slider.ValueLabel.TextXAlignment = Enum.TextXAlignment.Right;
 
                                 -- Slider track
                                 Slider.Track = Instance.new("Frame", Slider.Frame);
                                 Slider.Track.Size = UDim2.new(1, -20, 0, 6);
                                 Slider.Track.Position = UDim2.fromOffset(10, 35);
-                                Slider.Track.BackgroundColor3 = Libary.Theme.BackGround3;
+                                Slider.Track.BackgroundColor3 = Library.Theme.BackGround3;
                                 Slider.Track.BorderSizePixel = 0;
 
                                 Slider.TrackCorner = Instance.new("UICorner", Slider.Track);
@@ -1216,7 +1217,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 -- Slider fill
                                 Slider.Fill = Instance.new("Frame", Slider.Track);
                                 Slider.Fill.Size = UDim2.new((Slider.Value - Slider.Min) / (Slider.Max - Slider.Min), 0, 1, 0);
-                                Slider.Fill.BackgroundColor3 = Libary.Theme.Selected;
+                                Slider.Fill.BackgroundColor3 = Library.Theme.Selected;
                                 Slider.Fill.BorderSizePixel = 0;
 
                                 Slider.FillCorner = Instance.new("UICorner", Slider.Fill);
@@ -1233,7 +1234,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Slider.HandleCorner.CornerRadius = UDim.new(1, 0);
 
                                 Slider.HandleStroke = Instance.new("UIStroke", Slider.Handle);
-                                Slider.HandleStroke.Color = Libary.Theme.Selected;
+                                Slider.HandleStroke.Color = Library.Theme.Selected;
                                 Slider.HandleStroke.Thickness = 2;
                                 Slider.HandleStroke.ApplyStrokeMode = "Border";
 
@@ -1248,18 +1249,18 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Slider.Value = Utility:Round(Value, Slider.Decimals);
                                         
                                         if Slider.Flag then
-                                                Libary.Flags[Slider.Flag] = Slider.Value;
+                                                Library.Flags[Slider.Flag] = Slider.Value;
                                         end
 
                                         local percentage = (Slider.Value - Slider.Min) / (Slider.Max - Slider.Min);
                                         
                                         -- Update visuals with tweening
-                                        local fillTween = TweenService:Create(Slider.Fill, TweenInfo.new(Libary.Theme.SliderTween), {
+                                        local fillTween = TweenService:Create(Slider.Fill, TweenInfo.new(Library.Theme.SliderTween), {
                                                 Size = UDim2.new(percentage, 0, 1, 0)
                                         });
                                         fillTween:Play();
 
-                                        local handleTween = TweenService:Create(Slider.Handle, TweenInfo.new(Libary.Theme.SliderTween), {
+                                        local handleTween = TweenService:Create(Slider.Handle, TweenInfo.new(Library.Theme.SliderTween), {
                                                 Position = UDim2.new(percentage, -7, 0.5, -7)
                                         });
                                         handleTween:Play();
@@ -1344,19 +1345,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Dropdown.Open = false;
 
                                 if Flag then
-                                        Libary.Flags[Flag] = Dropdown.Selected;
+                                        Library.Flags[Flag] = Dropdown.Selected;
                                 end
 
                                 Dropdown.Frame = Instance.new("Frame", Section.Container);
                                 Dropdown.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                Dropdown.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Dropdown.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 Dropdown.Frame.BorderSizePixel = 0;
 
                                 Dropdown.Corner = Instance.new("UICorner", Dropdown.Frame);
                                 Dropdown.Corner.CornerRadius = UDim.new(0, 4);
 
                                 Dropdown.Stroke = Instance.new("UIStroke", Dropdown.Frame);
-                                Dropdown.Stroke.Color = Libary.Theme.Outline;
+                                Dropdown.Stroke.Color = Library.Theme.Outline;
                                 Dropdown.Stroke.Thickness = 1;
                                 Dropdown.Stroke.ApplyStrokeMode = "Border";
 
@@ -1373,18 +1374,18 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Dropdown.Label.Text = Dropdown.Name;
                                 Dropdown.Label.Font = Enum.Font.Ubuntu;
                                 Dropdown.Label.TextSize = 12;
-                                Dropdown.Label.TextColor3 = Libary.Theme.TextColor;
+                                Dropdown.Label.TextColor3 = Library.Theme.TextColor;
                                 Dropdown.Label.TextXAlignment = Enum.TextXAlignment.Left;
 
-                                Dropdown.Selected = Instance.new("TextLabel", Dropdown.Button);
-                                Dropdown.Selected.Size = UDim2.new(1, -30, 0, 15);
-                                Dropdown.Selected.Position = UDim2.fromOffset(10, 17);
-                                Dropdown.Selected.BackgroundTransparency = 1;
-                                Dropdown.Selected.Text = Dropdown.Selected or "None";
-                                Dropdown.Selected.Font = Enum.Font.Ubuntu;
-                                Dropdown.Selected.TextSize = 13;
-                                Dropdown.Selected.TextColor3 = Libary.Theme.Selected;
-                                Dropdown.Selected.TextXAlignment = Enum.TextXAlignment.Left;
+                                Dropdown.SelectedLabel = Instance.new("TextLabel", Dropdown.Button);
+                                Dropdown.SelectedLabel.Size = UDim2.new(1, -30, 0, 15);
+                                Dropdown.SelectedLabel.Position = UDim2.fromOffset(10, 17);
+                                Dropdown.SelectedLabel.BackgroundTransparency = 1;
+                                Dropdown.SelectedLabel.Text = Dropdown.Selected or "None";
+                                Dropdown.SelectedLabel.Font = Enum.Font.Ubuntu;
+                                Dropdown.SelectedLabel.TextSize = 13;
+                                Dropdown.SelectedLabel.TextColor3 = Library.Theme.Selected;
+                                Dropdown.SelectedLabel.TextXAlignment = Enum.TextXAlignment.Left;
 
                                 -- Arrow indicator
                                 Dropdown.Arrow = Instance.new("TextLabel", Dropdown.Button);
@@ -1394,13 +1395,13 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Dropdown.Arrow.Text = "▼";
                                 Dropdown.Arrow.Font = Enum.Font.Ubuntu;
                                 Dropdown.Arrow.TextSize = 12;
-                                Dropdown.Arrow.TextColor3 = Libary.Theme.TextColor;
+                                Dropdown.Arrow.TextColor3 = Library.Theme.TextColor;
 
                                 -- Options container
                                 Dropdown.OptionsContainer = Instance.new("Frame", Dropdown.Frame);
                                 Dropdown.OptionsContainer.Size = UDim2.new(1, 0, 0, 0);
                                 Dropdown.OptionsContainer.Position = UDim2.fromOffset(0, 35);
-                                Dropdown.OptionsContainer.BackgroundColor3 = Libary.Theme.BackGround2;
+                                Dropdown.OptionsContainer.BackgroundColor3 = Library.Theme.BackGround2;
                                 Dropdown.OptionsContainer.BorderSizePixel = 0;
                                 Dropdown.OptionsContainer.ClipsDescendants = true;
                                 Dropdown.OptionsContainer.Visible = false;
@@ -1409,7 +1410,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Dropdown.OptionsCorner.CornerRadius = UDim.new(0, 4);
 
                                 Dropdown.OptionsStroke = Instance.new("UIStroke", Dropdown.OptionsContainer);
-                                Dropdown.OptionsStroke.Color = Libary.Theme.Outline;
+                                Dropdown.OptionsStroke.Color = Library.Theme.Outline;
                                 Dropdown.OptionsStroke.Thickness = 1;
                                 Dropdown.OptionsStroke.ApplyStrokeMode = "Border";
 
@@ -1428,24 +1429,24 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         for i, option in ipairs(Dropdown.Options) do
                                                 local optionButton = Instance.new("TextButton", Dropdown.OptionsContainer);
                                                 optionButton.Size = UDim2.new(1, 0, 0, 25);
-                                                optionButton.BackgroundColor3 = Libary.Theme.BackGround2;
+                                                optionButton.BackgroundColor3 = Library.Theme.BackGround2;
                                                 optionButton.BorderSizePixel = 0;
                                                 optionButton.Text = option;
                                                 optionButton.Font = Enum.Font.Ubuntu;
                                                 optionButton.TextSize = 13;
-                                                optionButton.TextColor3 = Libary.Theme.TextColor;
+                                                optionButton.TextColor3 = Library.Theme.TextColor;
                                                 optionButton.AutoButtonColor = false;
 
                                                 optionButton.MouseEnter:Connect(function()
                                                         local tween = TweenService:Create(optionButton, TweenInfo.new(0.1), {
-                                                                BackgroundColor3 = Libary.Theme.BackGround3
+                                                                BackgroundColor3 = Library.Theme.BackGround3
                                                         });
                                                         tween:Play();
                                                 end)
 
                                                 optionButton.MouseLeave:Connect(function()
                                                         local tween = TweenService:Create(optionButton, TweenInfo.new(0.1), {
-                                                                BackgroundColor3 = Libary.Theme.BackGround2
+                                                                BackgroundColor3 = Library.Theme.BackGround2
                                                         });
                                                         tween:Play();
                                                 end)
@@ -1467,7 +1468,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Dropdown.SelectedLabel.Text = Option or "None";
                                         
                                         if Dropdown.Flag then
-                                                Libary.Flags[Dropdown.Flag] = Option;
+                                                Library.Flags[Dropdown.Flag] = Option;
                                         end
 
                                         if Dropdown.CallBack then
@@ -1486,13 +1487,13 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         
                                         -- Update frame size
                                         local newFrameHeight = Dropdown.Open and (35 + maxHeight) or 35;
-                                        local frameTween = TweenService:Create(Dropdown.Frame, TweenInfo.new(Libary.Theme.DropdownTween), {
+                                        local frameTween = TweenService:Create(Dropdown.Frame, TweenInfo.new(Library.Theme.DropdownTween), {
                                                 Size = UDim2.new(1, 0, 0, newFrameHeight)
                                         });
                                         frameTween:Play();
 
                                         -- Update options container
-                                        local containerTween = TweenService:Create(Dropdown.OptionsContainer, TweenInfo.new(Libary.Theme.DropdownTween), {
+                                        local containerTween = TweenService:Create(Dropdown.OptionsContainer, TweenInfo.new(Library.Theme.DropdownTween), {
                                                 Size = UDim2.new(1, 0, 0, Dropdown.Open and maxHeight or 0)
                                         });
                                         containerTween:Play();
@@ -1500,7 +1501,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Dropdown.OptionsContainer.Visible = Dropdown.Open;
 
                                         -- Rotate arrow
-                                        local arrowTween = TweenService:Create(Dropdown.Arrow, TweenInfo.new(Libary.Theme.DropdownTween), {
+                                        local arrowTween = TweenService:Create(Dropdown.Arrow, TweenInfo.new(Library.Theme.DropdownTween), {
                                                 Rotation = Dropdown.Open and 180 or 0
                                         });
                                         arrowTween:Play();
@@ -1515,14 +1516,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 -- Button interactions
                                 Dropdown.Button.MouseEnter:Connect(function()
                                         local tween = TweenService:Create(Dropdown.Frame, TweenInfo.new(0.2), {
-                                                BackgroundColor3 = Libary.Theme.BackGround3
+                                                BackgroundColor3 = Library.Theme.BackGround3
                                         });
                                         tween:Play();
                                 end)
 
                                 Dropdown.Button.MouseLeave:Connect(function()
                                         local tween = TweenService:Create(Dropdown.Frame, TweenInfo.new(0.2), {
-                                                BackgroundColor3 = Libary.Theme.BackGround1
+                                                BackgroundColor3 = Library.Theme.BackGround1
                                         });
                                         tween:Play();
                                 end)
@@ -1544,19 +1545,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 ColorPicker.CallBack = CallBack;
 
                                 if Flag then
-                                        Libary.Flags[Flag] = ColorPicker.Color;
+                                        Library.Flags[Flag] = ColorPicker.Color;
                                 end
 
                                 ColorPicker.Frame = Instance.new("Frame", Section.Container);
                                 ColorPicker.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                ColorPicker.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                ColorPicker.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 ColorPicker.Frame.BorderSizePixel = 0;
 
                                 ColorPicker.Corner = Instance.new("UICorner", ColorPicker.Frame);
                                 ColorPicker.Corner.CornerRadius = UDim.new(0, 4);
 
                                 ColorPicker.Stroke = Instance.new("UIStroke", ColorPicker.Frame);
-                                ColorPicker.Stroke.Color = Libary.Theme.Outline;
+                                ColorPicker.Stroke.Color = Library.Theme.Outline;
                                 ColorPicker.Stroke.Thickness = 1;
                                 ColorPicker.Stroke.ApplyStrokeMode = "Border";
 
@@ -1573,7 +1574,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 ColorPicker.Label.Text = ColorPicker.Name;
                                 ColorPicker.Label.Font = Enum.Font.Ubuntu;
                                 ColorPicker.Label.TextSize = 14;
-                                ColorPicker.Label.TextColor3 = Libary.Theme.TextColor;
+                                ColorPicker.Label.TextColor3 = Library.Theme.TextColor;
                                 ColorPicker.Label.TextXAlignment = Enum.TextXAlignment.Left;
 
                                 -- Color preview
@@ -1587,7 +1588,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 ColorPicker.PreviewCorner.CornerRadius = UDim.new(0, 4);
 
                                 ColorPicker.PreviewStroke = Instance.new("UIStroke", ColorPicker.Preview);
-                                ColorPicker.PreviewStroke.Color = Libary.Theme.Outline;
+                                ColorPicker.PreviewStroke.Color = Library.Theme.Outline;
                                 ColorPicker.PreviewStroke.Thickness = 1;
                                 ColorPicker.PreviewStroke.ApplyStrokeMode = "Border";
 
@@ -1596,7 +1597,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         ColorPicker.Preview.BackgroundColor3 = Color;
                                         
                                         if ColorPicker.Flag then
-                                                Libary.Flags[ColorPicker.Flag] = Color;
+                                                Library.Flags[ColorPicker.Flag] = Color;
                                         end
 
                                         if ColorPicker.CallBack then
@@ -1610,14 +1611,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 -- Button interactions
                                 ColorPicker.Button.MouseEnter:Connect(function()
                                         local tween = TweenService:Create(ColorPicker.Frame, TweenInfo.new(0.2), {
-                                                BackgroundColor3 = Libary.Theme.BackGround3
+                                                BackgroundColor3 = Library.Theme.BackGround3
                                         });
                                         tween:Play();
                                 end)
 
                                 ColorPicker.Button.MouseLeave:Connect(function()
                                         local tween = TweenService:Create(ColorPicker.Frame, TweenInfo.new(0.2), {
-                                                BackgroundColor3 = Libary.Theme.BackGround1
+                                                BackgroundColor3 = Library.Theme.BackGround1
                                         });
                                         tween:Play();
                                 end)
@@ -1647,19 +1648,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Textbox.CallBack = CallBack;
 
                                 if Flag then
-                                        Libary.Flags[Flag] = Textbox.Text;
+                                        Library.Flags[Flag] = Textbox.Text;
                                 end
 
                                 Textbox.Frame = Instance.new("Frame", Section.Container);
                                 Textbox.Frame.Size = UDim2.new(1, 0, 0, 50);
-                                Textbox.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Textbox.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 Textbox.Frame.BorderSizePixel = 0;
 
                                 Textbox.Corner = Instance.new("UICorner", Textbox.Frame);
                                 Textbox.Corner.CornerRadius = UDim.new(0, 4);
 
                                 Textbox.Stroke = Instance.new("UIStroke", Textbox.Frame);
-                                Textbox.Stroke.Color = Libary.Theme.Outline;
+                                Textbox.Stroke.Color = Library.Theme.Outline;
                                 Textbox.Stroke.Thickness = 1;
                                 Textbox.Stroke.ApplyStrokeMode = "Border";
 
@@ -1670,20 +1671,20 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Textbox.Label.Text = Textbox.Name;
                                 Textbox.Label.Font = Enum.Font.Ubuntu;
                                 Textbox.Label.TextSize = 14;
-                                Textbox.Label.TextColor3 = Libary.Theme.TextColor;
+                                Textbox.Label.TextColor3 = Library.Theme.TextColor;
                                 Textbox.Label.TextXAlignment = Enum.TextXAlignment.Left;
 
                                 Textbox.Input = Instance.new("TextBox", Textbox.Frame);
                                 Textbox.Input.Size = UDim2.new(1, -20, 0, 20);
                                 Textbox.Input.Position = UDim2.fromOffset(10, 25);
-                                Textbox.Input.BackgroundColor3 = Libary.Theme.BackGround3;
+                                Textbox.Input.BackgroundColor3 = Library.Theme.BackGround3;
                                 Textbox.Input.BorderSizePixel = 0;
                                 Textbox.Input.Text = Textbox.Text;
                                 Textbox.Input.PlaceholderText = Textbox.PlaceholderText;
                                 Textbox.Input.Font = Enum.Font.Ubuntu;
                                 Textbox.Input.TextSize = 13;
-                                Textbox.Input.TextColor3 = Libary.Theme.TextColor;
-                                Textbox.Input.PlaceholderColor3 = Libary.Theme.TextColorDisabled;
+                                Textbox.Input.TextColor3 = Library.Theme.TextColor;
+                                Textbox.Input.PlaceholderColor3 = Library.Theme.TextColorDisabled;
 
                                 Textbox.InputCorner = Instance.new("UICorner", Textbox.Input);
                                 Textbox.InputCorner.CornerRadius = UDim.new(0, 4);
@@ -1693,7 +1694,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Textbox.Input.Text = Text;
                                         
                                         if Textbox.Flag then
-                                                Libary.Flags[Textbox.Flag] = Text;
+                                                Library.Flags[Textbox.Flag] = Text;
                                         end
 
                                         if Textbox.CallBack then
@@ -1711,14 +1712,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                                 Textbox.Input.Focused:Connect(function()
                                         local tween = TweenService:Create(Textbox.Stroke, TweenInfo.new(0.2), {
-                                                Color = Libary.Theme.Selected
+                                                Color = Library.Theme.Selected
                                         });
                                         tween:Play();
                                 end)
 
                                 Textbox.Input.FocusLost:Connect(function()
                                         local tween = TweenService:Create(Textbox.Stroke, TweenInfo.new(0.2), {
-                                                Color = Libary.Theme.Outline
+                                                Color = Library.Theme.Outline
                                         });
                                         tween:Play();
                                 end)
@@ -1737,19 +1738,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Keybind.Binding = false;
 
                                 if Flag then
-                                        Libary.Flags[Flag] = Keybind.Key;
+                                        Library.Flags[Flag] = Keybind.Key;
                                 end
 
                                 Keybind.Frame = Instance.new("Frame", Section.Container);
                                 Keybind.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                Keybind.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Keybind.Frame.BackgroundColor3 = Library.Theme.BackGround1;
                                 Keybind.Frame.BorderSizePixel = 0;
 
                                 Keybind.Corner = Instance.new("UICorner", Keybind.Frame);
                                 Keybind.Corner.CornerRadius = UDim.new(0, 4);
 
                                 Keybind.Stroke = Instance.new("UIStroke", Keybind.Frame);
-                                Keybind.Stroke.Color = Libary.Theme.Outline;
+                                Keybind.Stroke.Color = Library.Theme.Outline;
                                 Keybind.Stroke.Thickness = 1;
                                 Keybind.Stroke.ApplyStrokeMode = "Border";
 
@@ -1766,19 +1767,19 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Keybind.Label.Text = Keybind.Name;
                                 Keybind.Label.Font = Enum.Font.Ubuntu;
                                 Keybind.Label.TextSize = 14;
-                                Keybind.Label.TextColor3 = Libary.Theme.TextColor;
+                                Keybind.Label.TextColor3 = Library.Theme.TextColor;
                                 Keybind.Label.TextXAlignment = Enum.TextXAlignment.Left;
 
                                 -- Key display
                                 Keybind.KeyLabel = Instance.new("TextLabel", Keybind.Button);
                                 Keybind.KeyLabel.Size = UDim2.fromOffset(80, 25);
                                 Keybind.KeyLabel.Position = UDim2.new(1, -90, 0.5, -12);
-                                Keybind.KeyLabel.BackgroundColor3 = Libary.Theme.BackGround3;
+                                Keybind.KeyLabel.BackgroundColor3 = Library.Theme.BackGround3;
                                 Keybind.KeyLabel.BorderSizePixel = 0;
                                 Keybind.KeyLabel.Text = Keybind.Key.Name or "None";
                                 Keybind.KeyLabel.Font = Enum.Font.Ubuntu;
                                 Keybind.KeyLabel.TextSize = 12;
-                                Keybind.KeyLabel.TextColor3 = Libary.Theme.TextColor;
+                                Keybind.KeyLabel.TextColor3 = Library.Theme.TextColor;
 
                                 Keybind.KeyCorner = Instance.new("UICorner", Keybind.KeyLabel);
                                 Keybind.KeyCorner.CornerRadius = UDim.new(0, 4);
@@ -1788,7 +1789,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Keybind.KeyLabel.Text = Key.Name or "None";
                                         
                                         if Keybind.Flag then
-                                                Libary.Flags[Keybind.Flag] = Key;
+                                                Library.Flags[Keybind.Flag] = Key;
                                         end
 
                                         if Keybind.CallBack then
@@ -1806,14 +1807,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         
                                         Keybind.Binding = true;
                                         Keybind.KeyLabel.Text = "Press Key...";
-                                        Keybind.KeyLabel.TextColor3 = Libary.Theme.Selected;
+                                        Keybind.KeyLabel.TextColor3 = Library.Theme.Selected;
 
                                         keybindConnection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
                                                 if gameProcessed then return end;
                                                 
                                                 Keybind:Set(input.KeyCode);
                                                 Keybind.Binding = false;
-                                                Keybind.KeyLabel.TextColor3 = Libary.Theme.TextColor;
+                                                Keybind.KeyLabel.TextColor3 = Library.Theme.TextColor;
                                                 
                                                 if keybindConnection then
                                                         keybindConnection:Disconnect();
@@ -1826,7 +1827,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Keybind.Button.MouseEnter:Connect(function()
                                         if not Keybind.Binding then
                                                 local tween = TweenService:Create(Keybind.Frame, TweenInfo.new(0.2), {
-                                                        BackgroundColor3 = Libary.Theme.BackGround3
+                                                        BackgroundColor3 = Library.Theme.BackGround3
                                                 });
                                                 tween:Play();
                                         end
@@ -1835,7 +1836,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Keybind.Button.MouseLeave:Connect(function()
                                         if not Keybind.Binding then
                                                 local tween = TweenService:Create(Keybind.Frame, TweenInfo.new(0.2), {
-                                                        BackgroundColor3 = Libary.Theme.BackGround1
+                                                        BackgroundColor3 = Library.Theme.BackGround1
                                                 });
                                                 tween:Play();
                                         end
@@ -1874,9 +1875,9 @@ function Library:CreateWindow(Name, Toggle, keybind)
 end
 
 -- Enhanced notification system
-Libary.Notifications = {};
+Library.Notifications = {};
 
-function Libary:CreateNotification(Title, Description, Duration, Type)
+function Library:CreateNotification(Title, Description, Duration, Type)
         local Notification = {};
         Notification.Title = Title or "Notification";
         Notification.Description = Description or "";
@@ -1885,7 +1886,7 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
 
         -- Color based on type
         local typeColors = {
-                Info = Libary.Theme.Selected,
+                Info = Library.Theme.Selected,
                 Success = Color3.fromRGB(46, 204, 113),
                 Warning = Color3.fromRGB(241, 196, 15),
                 Error = Color3.fromRGB(231, 76, 60)
@@ -1909,21 +1910,21 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
         Notification.Frame = Instance.new("Frame", Notification.ScreenGui);
         Notification.Frame.Size = UDim2.fromOffset(300, 80);
         Notification.Frame.Position = UDim2.new(1, -320, 1, -100);
-        Notification.Frame.BackgroundColor3 = Libary.Theme.BackGround2;
+        Notification.Frame.BackgroundColor3 = Library.Theme.BackGround2;
         Notification.Frame.BorderSizePixel = 0;
 
         Notification.Corner = Instance.new("UICorner", Notification.Frame);
         Notification.Corner.CornerRadius = UDim.new(0, 8);
 
         Notification.Stroke = Instance.new("UIStroke", Notification.Frame);
-        Notification.Stroke.Color = typeColors[Notification.Type] or Libary.Theme.Selected;
+        Notification.Stroke.Color = typeColors[Notification.Type] or Library.Theme.Selected;
         Notification.Stroke.Thickness = 2;
         Notification.Stroke.ApplyStrokeMode = "Border";
 
         -- Accent bar
         Notification.Accent = Instance.new("Frame", Notification.Frame);
         Notification.Accent.Size = UDim2.new(0, 4, 1, 0);
-        Notification.Accent.BackgroundColor3 = typeColors[Notification.Type] or Libary.Theme.Selected;
+        Notification.Accent.BackgroundColor3 = typeColors[Notification.Type] or Library.Theme.Selected;
         Notification.Accent.BorderSizePixel = 0;
 
         Notification.AccentCorner = Instance.new("UICorner", Notification.Accent);
@@ -1937,7 +1938,7 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
         Notification.TitleLabel.Text = Notification.Title;
         Notification.TitleLabel.Font = Enum.Font.Ubuntu;
         Notification.TitleLabel.TextSize = 14;
-        Notification.TitleLabel.TextColor3 = Libary.Theme.TextColor;
+        Notification.TitleLabel.TextColor3 = Library.Theme.TextColor;
         Notification.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left;
         Notification.TitleLabel.RichText = true;
 
@@ -1949,7 +1950,7 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
         Notification.DescLabel.Text = Notification.Description;
         Notification.DescLabel.Font = Enum.Font.Ubuntu;
         Notification.DescLabel.TextSize = 12;
-        Notification.DescLabel.TextColor3 = Libary.Theme.TextColorDisabled;
+        Notification.DescLabel.TextColor3 = Library.Theme.TextColorDisabled;
         Notification.DescLabel.TextXAlignment = Enum.TextXAlignment.Left;
         Notification.DescLabel.TextWrapped = true;
         Notification.DescLabel.RichText = true;
@@ -1962,7 +1963,7 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
         Notification.CloseButton.Text = "×";
         Notification.CloseButton.Font = Enum.Font.Ubuntu;
         Notification.CloseButton.TextSize = 18;
-        Notification.CloseButton.TextColor3 = Libary.Theme.TextColor;
+        Notification.CloseButton.TextColor3 = Library.Theme.TextColor;
 
         Notification.CloseButton.MouseEnter:Connect(function()
                 local tween = TweenService:Create(Notification.CloseButton, TweenInfo.new(0.2), {
@@ -1973,14 +1974,14 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
 
         Notification.CloseButton.MouseLeave:Connect(function()
                 local tween = TweenService:Create(Notification.CloseButton, TweenInfo.new(0.2), {
-                        TextColor3 = Libary.Theme.TextColor
+                        TextColor3 = Library.Theme.TextColor
                 });
                 tween:Play();
         end)
 
         -- Show notification with animation
         local showTween = TweenService:Create(Notification.Frame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-                Position = UDim2.new(1, -320, 1, -100 - (#Libary.Notifications * 90))
+                Position = UDim2.new(1, -320, 1, -100 - (#Library.Notifications * 90))
         });
         showTween:Play();
 
@@ -1988,7 +1989,7 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
         local hideTween;
         local hideTimer = task.wait(Notification.Duration, function()
                 hideTween = TweenService:Create(Notification.Frame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-                        Position = UDim2.new(1, 20, 1, -100 - (#Libary.Notifications * 90))
+                        Position = UDim2.new(1, 20, 1, -100 - (#Library.Notifications * 90))
                 });
                 hideTween:Play();
                 
@@ -2007,7 +2008,7 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
                 end
                 
                 local closeTween = TweenService:Create(Notification.Frame, TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
-                        Position = UDim2.new(1, 20, 1, -100 - (#Libary.Notifications * 90))
+                        Position = UDim2.new(1, 20, 1, -100 - (#Library.Notifications * 90))
                 });
                 closeTween:Play();
                 
@@ -2018,15 +2019,15 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
 
         function Notification:Destroy()
                 -- Remove from notifications list
-                for i, notif in ipairs(Libary.Notifications) do
+                for i, notif in ipairs(Library.Notifications) do
                         if notif == Notification then
-                                table.remove(Libary.Notifications, i);
+                                table.remove(Library.Notifications, i);
                                 break;
                         end
                 end
                 
                 -- Reposition remaining notifications
-                for i, notif in ipairs(Libary.Notifications) do
+                for i, notif in ipairs(Library.Notifications) do
                         local repositionTween = TweenService:Create(notif.Frame, TweenInfo.new(0.3), {
                                 Position = UDim2.new(1, -320, 1, -100 - ((i - 1) * 90))
                         });
@@ -2038,21 +2039,21 @@ function Libary:CreateNotification(Title, Description, Duration, Type)
                 end
         end
 
-        table.insert(Libary.Notifications, Notification);
+        table.insert(Library.Notifications, Notification);
         return Notification;
 end
 
 -- Enhanced global flag management
-function Libary:GetFlag(Flag)
-        return Libary.Flags[Flag];
+function Library:GetFlag(Flag)
+        return Library.Flags[Flag];
 end
 
-function Libary:SetFlag(Flag, Value)
-        if Libary.Flags[Flag] ~= nil then
-                Libary.Flags[Flag] = Value;
+function Library:SetFlag(Flag, Value)
+        if Library.Flags[Flag] ~= nil then
+                Library.Flags[Flag] = Value;
                 
                 -- Update associated elements
-                for _, item in pairs(Libary.Items) do
+                for _, item in pairs(Library.Items) do
                         if item.Flag == Flag and item.Set then
                                 item:Set(Value);
                         end
@@ -2061,37 +2062,37 @@ function Libary:SetFlag(Flag, Value)
 end
 
 -- Global cleanup function
-function Libary:Cleanup()
-        for _, notification in ipairs(Libary.Notifications) do
+function Library:Cleanup()
+        for _, notification in ipairs(Library.Notifications) do
                 if notification.Destroy then
                         notification:Destroy();
                 end
         end
-        Libary.Notifications = {};
-        Libary.Flags = {};
-        Libary.Items = {};
+        Library.Notifications = {};
+        Library.Flags = {};
+        Library.Items = {};
 end
 
 -- Performance monitoring
-Libary.Performance = {
+Library.Performance = {
         StartTime = tick(),
         FrameCount = 0,
         LastFPSUpdate = tick()
 };
 
 -- Enhanced error handling wrapper
-function Libary:SafeCall(func, ...)
+function Library:SafeCall(func, ...)
         local success, result = pcall(func, ...);
         if not success then
-                warn("Libary Error: " .. tostring(result));
+                warn("Library Error: " .. tostring(result));
                 return false, result;
         end
         return true, result;
 end
 
 -- Version information
-Libary.Version = "2.1.0";
-Libary.Author = "UI Library";
-Libary.LastUpdated = "2025-01-20";
+Library.Version = "2.1.0";
+Library.Author = "Enhanced UI Library";
+Library.LastUpdated = "2025-01-20";
 
-return Libary;
+return Library;
