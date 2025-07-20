@@ -197,6 +197,47 @@ if not tick then
     tick = function() return os.clock() or os.time() end
 end
 
+-- Drawing compatibility for executor environments
+if not Drawing then
+    Drawing = {
+        new = function(drawingType)
+            local drawing = {
+                Type = drawingType;
+                Visible = false;
+                Color = Color3.fromRGB(255, 255, 255);
+                Position = Vector2.new(0, 0);
+                Size = Vector2.new(0, 0);
+                Thickness = 1;
+                Transparency = 1;
+                Remove = function(self) end;
+                Destroy = function(self) end;
+            }
+            
+            -- Type-specific properties
+            if drawingType == "Square" or drawingType == "Rectangle" then
+                drawing.Size = Vector2.new(100, 100)
+                drawing.Filled = false
+            elseif drawingType == "Circle" then
+                drawing.Radius = 50
+                drawing.NumSides = 16
+                drawing.Filled = false
+            elseif drawingType == "Line" then
+                drawing.From = Vector2.new(0, 0)
+                drawing.To = Vector2.new(100, 100)
+            elseif drawingType == "Text" then
+                drawing.Text = ""
+                drawing.Font = 2
+                drawing.Size = 18
+                drawing.Center = false
+                drawing.Outline = false
+                drawing.OutlineColor = Color3.fromRGB(0, 0, 0)
+            end
+            
+            return drawing
+        end
+    }
+end
+
 -- Executor compatibility layer
 if not Color3 then 
     Color3 = {
@@ -1209,7 +1250,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.UiList = Instance.new("UIListLayout", Window.Tablist);
         Window.UiList.FillDirection = "Vertical";
 
-        -- ESP Preview System Implementation
+        -- ESP Preview System Implementation with Drawing Support
         Window.ESPPreview = {
             Visible = false,
             Size = {X = 0, Y = 0},
@@ -1225,8 +1266,36 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Distance = {Text = nil},
                 Tool = {Text = nil},
                 Flags = {Text = nil}
-            }
+            },
+            DrawingObjects = {}
         };
+        
+        -- ESP Drawing Functions
+        function Window:CreateESPDrawing(drawingType, properties)
+            if not Drawing then return nil end
+            
+            local drawing = Drawing.new(drawingType)
+            if drawing then
+                for property, value in pairs(properties or {}) do
+                    pcall(function()
+                        drawing[property] = value
+                    end)
+                end
+                table.insert(Window.ESPPreview.DrawingObjects, drawing)
+                return drawing
+            end
+            return nil
+        end
+        
+        function Window:ClearESPDrawings()
+            for _, drawing in ipairs(Window.ESPPreview.DrawingObjects) do
+                pcall(function()
+                    if drawing.Remove then drawing:Remove() end
+                    if drawing.Destroy then drawing:Destroy() end
+                end)
+            end
+            Window.ESPPreview.DrawingObjects = {}
+        end
 
         -- ESP Preview Window Frame (positioned to right of main window)
         Window.ESPFrame = Instance.new("Frame", Window.ScreenGui);
@@ -1391,6 +1460,63 @@ function Library:CreateWindow(Name, Toggle, keybind)
         -- Add ESP Preview to Window methods  
         Window.ShowESPPreview = function() Window:ToggleESPPreview(true) end;
         Window.HideESPPreview = function() Window:ToggleESPPreview(false) end;
+        
+        -- ESP Drawing Methods
+        Window.CreateESPBox = function(position, size, color, thickness)
+            return Window:CreateESPDrawing("Square", {
+                Position = position or Vector2.new(100, 100);
+                Size = size or Vector2.new(50, 100);
+                Color = color or Library.Theme.Selected;
+                Thickness = thickness or 2;
+                Visible = true;
+                Filled = false;
+            })
+        end;
+        
+        Window.CreateESPText = function(position, text, color, size)
+            return Window:CreateESPDrawing("Text", {
+                Position = position or Vector2.new(100, 80);
+                Text = text or "Player";
+                Color = color or Library.Theme.TextColor;
+                Size = size or 16;
+                Font = 2;
+                Center = true;
+                Visible = true;
+                Outline = true;
+                OutlineColor = Color3.fromRGB(0, 0, 0);
+            })
+        end;
+        
+        Window.CreateESPLine = function(from, to, color, thickness)
+            return Window:CreateESPDrawing("Line", {
+                From = from or Vector2.new(100, 100);
+                To = to or Vector2.new(150, 200);
+                Color = color or Library.Theme.Selected;
+                Thickness = thickness or 2;
+                Visible = true;
+            })
+        end;
+        
+        Window.CreateESPHealthBar = function(position, size, health, maxHealth)
+            local healthPercent = (health or 100) / (maxHealth or 100)
+            local healthColor
+            
+            if healthPercent > 0.6 then
+                healthColor = Color3.fromRGB(0, 255, 0) -- Green
+            elseif healthPercent > 0.3 then
+                healthColor = Color3.fromRGB(255, 255, 0) -- Yellow  
+            else
+                healthColor = Color3.fromRGB(255, 0, 0) -- Red
+            end
+            
+            return Window:CreateESPDrawing("Square", {
+                Position = position or Vector2.new(90, 100);
+                Size = Vector2.new(4, (size or 100) * healthPercent);
+                Color = healthColor;
+                Filled = true;
+                Visible = true;
+            })
+        end;
 
         -- ESP Toggle Functions
         function Window:ToggleESPPreview(state)
@@ -3832,12 +3958,16 @@ function Library:Cleanup()
     self.Connections = {}
     
     -- Destroy all ESP objects
-    for i, esp in pairs(self.ESP) do
-        if esp and esp.Destroy then
-            esp:Destroy()
+    if self.ESP then
+        for i, esp in pairs(self.ESP) do
+            if esp and esp.Remove then
+                esp:Remove()
+            elseif esp and esp.Destroy then
+                esp:Destroy()
+            end
         end
+        self.ESP = {}
     end
-    self.ESP = {}
     
     -- Restore all hooks
     for i, hook in pairs(self.Hooks) do
@@ -3951,6 +4081,256 @@ if Library.StartPerformanceMonitor then
     pcall(Library.StartPerformanceMonitor, Library)
 end
 
+-- Drawing API Enhancement
+function Library:CreateDrawing(drawingType, properties)
+        if not Drawing then
+                self:Log("WARN", "Drawing API not available in this environment")
+                return nil
+        end
+        
+        local drawing = Drawing.new(drawingType)
+        if drawing then
+                -- Apply properties
+                for property, value in pairs(properties or {}) do
+                        pcall(function()
+                                drawing[property] = value
+                        end)
+                end
+                
+                -- Store drawing object for cleanup
+                if not self.DrawingObjects then self.DrawingObjects = {} end
+                table.insert(self.DrawingObjects, drawing)
+                
+                return drawing
+        end
+        return nil
+end
+
+function Library:CreateESPBox(position, size, color, thickness, filled)
+        return self:CreateDrawing("Square", {
+                Position = position or Vector2.new(100, 100);
+                Size = size or Vector2.new(50, 100);
+                Color = color or self.Theme.Selected;
+                Thickness = thickness or 2;
+                Filled = filled or false;
+                Visible = true;
+        })
+end
+
+function Library:CreateESPText(position, text, color, size, font)
+        return self:CreateDrawing("Text", {
+                Position = position or Vector2.new(100, 80);
+                Text = text or "Player";
+                Color = color or self.Theme.TextColor;
+                Size = size or 16;
+                Font = font or 2;
+                Center = true;
+                Visible = true;
+                Outline = true;
+                OutlineColor = Color3.fromRGB(0, 0, 0);
+        })
+end
+
+function Library:CreateESPLine(from, to, color, thickness)
+        return self:CreateDrawing("Line", {
+                From = from or Vector2.new(100, 100);
+                To = to or Vector2.new(150, 200);
+                Color = color or self.Theme.Selected;
+                Thickness = thickness or 2;
+                Visible = true;
+        })
+end
+
+function Library:CreateESPHealthBar(position, size, health, maxHealth)
+        local healthPercent = (health or 100) / (maxHealth or 100)
+        local healthColor
+        
+        if healthPercent > 0.6 then
+                healthColor = Color3.fromRGB(0, 255, 0) -- Green
+        elseif healthPercent > 0.3 then
+                healthColor = Color3.fromRGB(255, 255, 0) -- Yellow
+        else
+                healthColor = Color3.fromRGB(255, 0, 0) -- Red
+        end
+        
+        return self:CreateDrawing("Square", {
+                Position = position or Vector2.new(90, 100);
+                Size = Vector2.new(4, (size or 100) * healthPercent);
+                Color = healthColor;
+                Filled = true;
+                Visible = true;
+        })
+end
+
+function Library:CreateESPCircle(position, radius, color, thickness, filled)
+        return self:CreateDrawing("Circle", {
+                Position = position or Vector2.new(100, 100);
+                Radius = radius or 25;
+                Color = color or self.Theme.Selected;
+                Thickness = thickness or 2;
+                Filled = filled or false;
+                Visible = true;
+                NumSides = 16;
+        })
+end
+
+-- Comprehensive ESP Management
+function Library:CreateESP(target, options)
+        if not target then return nil end
+        
+        local espObj = {
+                Target = target;
+                Options = options or {};
+                DrawingObjects = {};
+                Enabled = true;
+                
+                -- ESP Object Methods
+                Remove = function(self)
+                        for _, drawing in ipairs(self.DrawingObjects) do
+                                pcall(function()
+                                        if drawing.Remove then drawing:Remove() end
+                                        if drawing.Destroy then drawing:Destroy() end
+                                end)
+                        end
+                        self.DrawingObjects = {}
+                        
+                        -- Remove from library ESP tracking
+                        if Library.ESP and Library.ESP[self.Target] then
+                                Library.ESP[self.Target] = nil
+                        end
+                end;
+                
+                Update = function(self)
+                        -- Update ESP positions and visibility based on target
+                        if not self.Enabled then return end
+                        
+                        -- This would contain the logic to update ESP positions
+                        -- Implementation depends on the specific target type (player, part, etc.)
+                end;
+                
+                SetVisible = function(self, visible)
+                        for _, drawing in ipairs(self.DrawingObjects) do
+                                if drawing and drawing.Visible ~= nil then
+                                        drawing.Visible = visible and self.Enabled
+                                end
+                        end
+                end;
+                
+                SetColor = function(self, color)
+                        for _, drawing in ipairs(self.DrawingObjects) do
+                                if drawing and drawing.Color then
+                                        drawing.Color = color
+                                end
+                        end
+                end;
+        }
+        
+        -- Store ESP object for management
+        if not Library.ESP then Library.ESP = {} end
+        Library.ESP[target] = espObj
+        
+        return espObj
+end
+
+-- ESP Settings Management
+function Library:ToggleESP(enabled)
+        if not self.ESP then self.ESP = {} end
+        if not self.ESP.Settings then
+                self.ESP.Settings = {
+                        Box = true,
+                        Name = true,
+                        Health = true,
+                        Distance = true,
+                        Skeleton = false,
+                        Enabled = true
+                }
+        end
+        
+        self.ESP.Settings.Enabled = enabled ~= nil and enabled or not self.ESP.Settings.Enabled
+        
+        -- Update all ESP objects
+        for _, espObj in pairs(self.ESP) do
+                if espObj and espObj.SetVisible then
+                        espObj:SetVisible(self.ESP.Settings.Enabled)
+                end
+        end
+        
+        self:Log("INFO", "ESP " .. (self.ESP.Settings.Enabled and "enabled" or "disabled"))
+        return self.ESP.Settings.Enabled
+end
+
+function Library:ClearAllESP()
+        if not self.ESP then return end
+        
+        local count = 0
+        for target, espObj in pairs(self.ESP) do
+                if espObj and espObj.Remove then
+                        espObj:Remove()
+                        count = count + 1
+                end
+        end
+        
+        self.ESP = {}
+        self:Log("INFO", "Cleared " .. count .. " ESP objects")
+end
+
+function Library:GetESPSettings()
+        if not self.ESP then self.ESP = {} end
+        if not self.ESP.Settings then
+                self.ESP.Settings = {
+                        Box = true,
+                        Name = true,
+                        Health = true,
+                        Distance = true,
+                        Skeleton = false,
+                        Enabled = true
+                }
+        end
+        return self.ESP.Settings
+end
+
+function Library:SetESPSetting(setting, value)
+        local settings = self:GetESPSettings()
+        if settings[setting] ~= nil then
+                settings[setting] = value
+                self:Log("INFO", "ESP setting " .. setting .. " set to " .. tostring(value))
+                return true
+        end
+        return false
+end
+
+-- Drawing Cleanup Enhancement
+local originalCleanup = Library.Cleanup
+function Library:Cleanup()
+        -- Clean Drawing objects
+        if self.DrawingObjects then
+                local count = 0
+                for _, drawing in ipairs(self.DrawingObjects) do
+                        pcall(function()
+                                if drawing.Remove then drawing:Remove() end
+                                if drawing.Destroy then drawing:Destroy() end
+                                count = count + 1
+                        end)
+                end
+                self.DrawingObjects = {}
+                self:Log("INFO", "Cleaned " .. count .. " Drawing objects")
+        end
+        
+        -- Clean ESP objects
+        if self.ESP then
+                self:ClearAllESP()
+        end
+        
+        -- Clear drawing cache if available
+        if cleardrawcache then
+                pcall(cleardrawcache)
+                self:Log("INFO", "Drawing cache cleared")
+        end
+        
+        -- Call original cleanup
+        return originalCleanup(self)
+end
+
 -- Success message
 print(string.format("[Library] Professional UI Library v%s loaded successfully!", Library.Version or "1.0"))
 if Library.Executor and Library.Executor.Name ~= "Unknown" then
@@ -3958,6 +4338,13 @@ if Library.Executor and Library.Executor.Name ~= "Unknown" then
     for _ in pairs(Library.Executor.Features or {}) do featureCount = featureCount + 1 end
     print(string.format("[Library] Running on %s v%s with %d advanced features", 
         Library.Executor.Name, Library.Executor.Version, featureCount))
+end
+
+-- Drawing API status
+if Drawing then
+    print("[Library] Drawing API detected - ESP rendering available")
+else
+    print("[Library] Drawing API compatibility layer loaded")
 end
 
 return Library;
