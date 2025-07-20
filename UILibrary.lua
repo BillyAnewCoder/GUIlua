@@ -804,7 +804,7 @@ function Library:CreateWindow(options)
                         local SizeY = math.clamp((input.Position.Y - ColorPicker.Hue.AbsolutePosition.Y) / ColorPicker.Hue.AbsoluteSize.Y, 0, 1);
 
                         ColorPicker.HueSelect.Position = UDim2.new(0, 0, SizeY, SizeY * 200 - 1);
-                        Color```tool_code
+                        Colortool_code
 Picker.HuePosition = SizeY;
                         Hue = SizeY;
 
