@@ -50,6 +50,17 @@ if not UserInputService then
     }
 end
 
+-- Mouse compatibility for test environments
+if not Mouse then
+    Mouse = {
+        MouseButton1Down = {Connect = function() return {Disconnect = function() end} end};
+        MouseButton1Up = {Connect = function() return {Disconnect = function() end} end};
+        MouseMoved = {Connect = function() return {Disconnect = function() end} end};
+        Hit = {Position = {X = 0, Y = 0, Z = 0}};
+        Target = nil;
+    }
+end
+
 -- Enhance UserInputService if it exists but is missing methods
 if UserInputService and not UserInputService.InputBegan then
     UserInputService.InputBegan = {Connect = function() return {Disconnect = function() end} end};
@@ -90,7 +101,10 @@ if not Instance then
                 Text = "";
                 Font = "Gotham";
                 TextSize = 14;
-                MouseButton1Click = {Connect = function() end};
+                MouseButton1Click = {Connect = function() return {Disconnect = function() end} end};
+                InputBegan = {Connect = function() return {Disconnect = function() end} end};
+                InputChanged = {Connect = function() return {Disconnect = function() end} end};
+                InputEnded = {Connect = function() return {Disconnect = function() end} end};
                 Name = className .. "_MockObject";
                 GetChildren = function() return {} end;
                 FindFirstChild = function() return nil end;
@@ -147,8 +161,40 @@ if not Enum then
         SortOrder = {
             LayoutOrder = "LayoutOrder";
             Name = "Name";
+        };
+        UserInputState = {
+            Begin = "Begin";
+            Change = "Change";
+            End = "End";
         }
     }
+end
+
+-- ColorSequence compatibility for test environments
+if not ColorSequence then
+    ColorSequence = {
+        new = function(colors)
+            return {
+                Keypoints = colors or {};
+            }
+        end;
+    }
+end
+
+if not ColorSequenceKeypoint then
+    ColorSequenceKeypoint = {
+        new = function(time, color)
+            return {
+                Time = time;
+                Value = color;
+            }
+        end;
+    }
+end
+
+-- tick() compatibility for test environments
+if not tick then
+    tick = function() return os.clock() or os.time() end
 end
 
 -- Executor compatibility layer
