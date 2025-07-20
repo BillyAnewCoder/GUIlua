@@ -23,15 +23,30 @@ local Library = {
         };
 };
 
--- Roblox Services for Executor Environment
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService") 
-local TweenService = game:GetService("TweenService")
-local CoreGui = gethui and gethui() or game:GetService("CoreGui")
-local PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-local LocalPlayer = game:GetService("Players").LocalPlayer
-local Mouse = LocalPlayer:GetMouse()
-local CurrentCamera = workspace.CurrentCamera
+-- Roblox Services for Executor Environment (with test compatibility)
+local UserInputService, RunService, TweenService, CoreGui, PlayerGui, LocalPlayer, Mouse, CurrentCamera
+
+if game then
+    -- Executor environment - use real Roblox services
+    UserInputService = game:GetService("UserInputService")
+    RunService = game:GetService("RunService") 
+    TweenService = game:GetService("TweenService")
+    CoreGui = gethui and gethui() or game:GetService("CoreGui")
+    PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    LocalPlayer = game:GetService("Players").LocalPlayer
+    Mouse = LocalPlayer:GetMouse()
+    CurrentCamera = workspace.CurrentCamera
+else
+    -- Test environment - use fallback values
+    UserInputService = nil
+    RunService = nil
+    TweenService = nil
+    CoreGui = nil
+    PlayerGui = nil
+    LocalPlayer = nil
+    Mouse = nil
+    CurrentCamera = nil
+end
 
 -- Fallbacks for missing services in test environments
 if not UserInputService then
@@ -462,6 +477,16 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
         -- ESP Preview Window with Visual Humanoid Representation
         Window.ESPPreview = {};
+        
+        -- ESP Preview Settings
+        Window.ESPPreview.Settings = {
+            Box = true,
+            Name = true,
+            Health = true,
+            Distance = true,
+            Skeleton = false
+        };
+        
         Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
         Window.ESPPreview.Main.Size = UDim2.fromOffset(380, 520);
         Window.ESPPreview.Main.Position = UDim2.fromScale(0.65, 0.25);
@@ -1280,7 +1305,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.TextLable = Instance.new("TextLabel", Window.Frame);
         Window.TextLable.BackgroundTransparency = 1;
         Window.TextLable.RichText = true;
-        Window.TextLable.Text = "<b>" .. Window.Name .."</b>";
+        Window.TextLable.Text = "<b>" .. tostring(Window.Name or "UI Library") .."</b>";
         Window.TextLable.Font = Library.Theme.Font;
         Window.TextLable.TextSize = 23;
         Window.TextLable.TextColor3 = Library.Theme.TextColor;
