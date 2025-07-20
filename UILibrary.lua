@@ -237,10 +237,13 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
         Window.ScreenGui.DisplayOrder = 999;
         
-        -- Safely parent to CoreGui or PlayerGui
-        local success, err = pcall(function()
-                Window.ScreenGui.Parent = CoreGui or PlayerGui;
-        end)
+        -- Safely parent to CoreGui or PlayerGui with better error handling
+        local success = false;
+        if CoreGui then
+                success = pcall(function()
+                        Window.ScreenGui.Parent = CoreGui;
+                end)
+        end
         
         if not success then
                 Window.ScreenGui.Parent = PlayerGui;
@@ -453,16 +456,17 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 color = color.c or Color3.fromRGB(255, 255, 255);
                         end
 
-                        local success, h, s, v = pcall(function()
-                                return color:ToHSV();
+                        local h, s, v;
+                        local success = pcall(function()
+                                h, s, v = color:ToHSV();
                         end)
 
-                        if not success then
+                        if not success or not h then
                                 h, s, v = 0, 1, 1;
                                 color = Color3.fromRGB(255, 255, 255);
-                        else
-                                Hue, Sat, Val = h, s, v;
                         end
+                        
+                        Hue, Sat, Val = h, s, v;
 
                         ColorPicker.Color = color;
                         ColorPicker.Transparency = transparency;
@@ -533,7 +537,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                 ColorPicker.Saturation.MouseButton1Down:Connect(function()
                         ColorPicker.SlidingSaturation = true;
-                        ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() });
+                        local mouseLocation = UserInputService:GetMouseLocation();
+                        ColorPicker.SlideSaturation({ Position = mouseLocation });
                 end);
 
                 local saturationConnection;
@@ -571,7 +576,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 local hueConnection;
                 ColorPicker.Hue.MouseButton1Down:Connect(function()
                         ColorPicker.SlidingHue = true;
-                        ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() });
+                        local mouseLocation = UserInputService:GetMouseLocation();
+                        ColorPicker.SlideHue({ Position = mouseLocation });
                         
                         hueConnection = UserInputService.InputChanged:Connect(function(input)
                                 if ColorPicker.SlidingHue and input.UserInputType == Enum.UserInputType.MouseMovement then
@@ -911,6 +917,11 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 -- Select first tab automatically
                 if #Window.Tabs == 1 then
                         Tab:Select();
+                end
+
+                -- Enhanced sector creation (for compatibility)
+                function Tab:CreateSector(Name, Side)
+                        return Tab:CreateSection(Name);
                 end
 
                 -- Enhanced section creation
@@ -1276,7 +1287,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 end
 
                                 local function slideUpdate()
-                                        local mousePos = UserInputService:GetMouseLocation().X;
+                                        local mouseLocation = UserInputService:GetMouseLocation();
+                                        local mousePos = mouseLocation.X;
                                         local trackPos = Slider.Track.AbsolutePosition.X;
                                         local trackSize = Slider.Track.AbsoluteSize.X;
                                         
@@ -1899,9 +1911,12 @@ function Library:CreateNotification(Title, Description, Duration, Type)
         Notification.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
         Notification.ScreenGui.DisplayOrder = 1000;
         
-        local success, err = pcall(function()
-                Notification.ScreenGui.Parent = CoreGui or PlayerGui;
-        end);
+        local success = false;
+        if CoreGui then
+                success = pcall(function()
+                        Notification.ScreenGui.Parent = CoreGui;
+                end);
+        end
         
         if not success then
                 Notification.ScreenGui.Parent = PlayerGui;
@@ -1987,7 +2002,7 @@ function Library:CreateNotification(Title, Description, Duration, Type)
 
         -- Auto-hide after duration
         local hideTween;
-        local hideTimer = task.wait(Notification.Duration, function()
+        local hideTimer = task.delay(Notification.Duration, function()
                 hideTween = TweenService:Create(Notification.Frame, TweenInfo.new(0.5, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
                         Position = UDim2.new(1, 20, 1, -100 - (#Library.Notifications * 90))
                 });
