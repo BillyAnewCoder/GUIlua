@@ -43,11 +43,22 @@ end);
 -- Fallbacks for missing services in test environments
 if not UserInputService then
     UserInputService = {
-        InputBegan = {Connect = function() end};
-        InputChanged = {Connect = function() end};
-        InputEnded = {Connect = function() end};
+        InputBegan = {Connect = function() return {Disconnect = function() end} end};
+        InputChanged = {Connect = function() return {Disconnect = function() end} end};
+        InputEnded = {Connect = function() return {Disconnect = function() end} end};
         GetMouseLocation = function() return {X = 0, Y = 0} end;
     }
+end
+
+-- Enhance UserInputService if it exists but is missing methods
+if UserInputService and not UserInputService.InputBegan then
+    UserInputService.InputBegan = {Connect = function() return {Disconnect = function() end} end};
+end
+if UserInputService and not UserInputService.InputChanged then  
+    UserInputService.InputChanged = {Connect = function() return {Disconnect = function() end} end};
+end
+if UserInputService and not UserInputService.InputEnded then
+    UserInputService.InputEnded = {Connect = function() return {Disconnect = function() end} end};
 end
 
 if not RunService then
@@ -59,6 +70,84 @@ end
 if not TweenService then
     TweenService = {
         Create = function() return {Play = function() end, Completed = {Connect = function() end}} end;
+    }
+end
+
+-- Instance compatibility for test environments
+if not Instance then
+    Instance = {
+        new = function(className, parent)
+            local obj = {
+                ClassName = className;
+                Parent = parent;
+                Size = UDim2 and UDim2.fromOffset(0, 0) or {X = {Scale = 0, Offset = 0}, Y = {Scale = 0, Offset = 0}};
+                Position = UDim2 and UDim2.fromOffset(0, 0) or {X = {Scale = 0, Offset = 0}, Y = {Scale = 0, Offset = 0}};
+                BackgroundColor3 = Color3 and Color3.fromRGB(255, 255, 255) or {r = 1, g = 1, b = 1};
+                TextColor3 = Color3 and Color3.fromRGB(255, 255, 255) or {r = 1, g = 1, b = 1};
+                BackgroundTransparency = 0;
+                BorderSizePixel = 0;
+                Visible = true;
+                Text = "";
+                Font = "Gotham";
+                TextSize = 14;
+                MouseButton1Click = {Connect = function() end};
+                Name = className .. "_MockObject";
+                GetChildren = function() return {} end;
+                FindFirstChild = function() return nil end;
+                WaitForChild = function(name) return obj end;
+            }
+            return obj
+        end
+    }
+end
+
+-- Enum compatibility for test environments
+if not Enum then
+    Enum = {
+        KeyCode = {
+            RightShift = "RightShift";
+            LeftShift = "LeftShift";
+            Space = "Space";
+            Tab = "Tab";
+        };
+        EasingStyle = {
+            Sine = "Sine";
+            Linear = "Linear";
+            Quad = "Quad";
+        };
+        EasingDirection = {
+            Out = "Out";
+            In = "In";
+            InOut = "InOut";
+        };
+        ZIndexBehavior = {
+            Global = "Global";
+            Sibling = "Sibling";
+        };
+        TextXAlignment = {
+            Left = "Left";
+            Center = "Center";
+            Right = "Right";
+        };
+        TextYAlignment = {
+            Top = "Top";
+            Center = "Center";
+            Bottom = "Bottom";
+        };
+        Font = {
+            Gotham = "Gotham";
+            SourceSans = "SourceSans";
+            RobotoMono = "RobotoMono";
+        };
+        UserInputType = {
+            MouseButton1 = "MouseButton1";
+            MouseButton2 = "MouseButton2";
+            Keyboard = "Keyboard";
+        };
+        SortOrder = {
+            LayoutOrder = "LayoutOrder";
+            Name = "Name";
+        }
     }
 end
 
@@ -756,18 +845,23 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 local Hue, Sat, Val;
 
                 function ColorPicker:Set(color, transparency, ignore)
-                        transparency = 0;
+                        transparency = transparency or 0;
 
                         if type(color) == "table" then
-                                transparency = color.a;
-                                color = color.c;
+                                transparency = color.a or transparency;
+                                color = color.c or color;
                         end;
+
+                        -- Handle nil color
+                        if not color then
+                                color = Color3.fromRGB(255, 255, 255);
+                        end
 
                         -- Ensure color has ToHSV method
                         if color and type(color) == "table" and not color.ToHSV then
                                 -- Add ToHSV method if missing
                                 color.ToHSV = function(self)
-                                    local r, g, b = self.r or self.R or 0, self.g or self.G or 0, self.b or self.B or 0
+                                    local r, g, b = self.r or self.R or 1, self.g or self.G or 1, self.b or self.B or 1
                                     local max = math.max(r, g, b)
                                     local min = math.min(r, g, b)
                                     local h, s, v = 0, 0, max
@@ -791,7 +885,13 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 end
                         end
 
-                        Hue, Sat, Val = color:ToHSV();
+                        -- Safe ToHSV call with error handling
+                        local success, h, s, v = pcall(function() return color:ToHSV() end)
+                        if success then
+                                Hue, Sat, Val = h, s, v
+                        else
+                                Hue, Sat, Val = 0, 0, 1 -- Default values
+                        end
 
                         ColorPicker.Color = color;
                         ColorPicker.Transparency = transparency;
@@ -832,8 +932,13 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         ColorPicker.Flag = Flag;
                         ColorPicker.CallBack = CallBack;
                         
-                        -- Get flag value or use default color
-                        local flagColor = Library.Flags[Flag] or Color3.fromRGB(255, 255, 255);
+                        -- Get flag value or use default color with safe fallback
+                        local flagColor = Library.Flags and Library.Flags[Flag] or Color3.fromRGB(255, 255, 255);
+                        
+                        -- Handle nil flagColor
+                        if not flagColor then
+                                flagColor = Color3.fromRGB(255, 255, 255);
+                        end
                         
                         -- Ensure flagColor has ToHSV method if it's a table
                         if flagColor and type(flagColor) == "table" and not flagColor.ToHSV then
@@ -862,7 +967,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 end
                         end
                         
-                        ColorPicker:Set(flagColor, 0, false);
+                        -- Safe Set call with error handling  
+                        pcall(function() ColorPicker:Set(flagColor, 0, false) end);
                 end;
 
                 function ColorPicker.SlideSaturation(input)
@@ -1056,6 +1162,202 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
         Window.UiList = Instance.new("UIListLayout", Window.Tablist);
         Window.UiList.FillDirection = "Vertical";
+
+        -- ESP Preview System Implementation
+        Window.ESPPreview = {
+            Visible = false,
+            Size = {X = 0, Y = 0},
+            Color1 = Color3.fromRGB(0, 255, 0),
+            Color2 = Color3.fromRGB(255, 0, 0),
+            HealthBarFade = 0,
+            Fading = false,
+            State = false,
+            Components = {
+                Box = {Outline = nil, Box = nil, Fill = nil},
+                HealthBar = {Outline = nil, Box = nil, Value = nil},
+                Title = {Text = nil},
+                Distance = {Text = nil},
+                Tool = {Text = nil},
+                Flags = {Text = nil}
+            }
+        };
+
+        -- ESP Preview Window Frame
+        Window.ESPFrame = Instance.new("Frame", Window.Main);
+        Window.ESPFrame.Position = UDim2.fromOffset(930, 0);
+        Window.ESPFrame.Size = UDim2.fromOffset(236, 339);
+        Window.ESPFrame.BackgroundColor3 = Library.Theme.Outline;
+        Window.ESPFrame.BorderSizePixel = 0;
+        Window.ESPFrame.Visible = false;
+
+        Window.ESPCorner = Instance.new("UICorner", Window.ESPFrame);
+        Window.ESPCorner.CornerRadius = UDim.new(0, 4);
+
+        -- ESP Inner Frame
+        Window.ESPInner = Instance.new("Frame", Window.ESPFrame);
+        Window.ESPInner.Position = UDim2.fromOffset(1, 1);
+        Window.ESPInner.Size = UDim2.fromOffset(234, 337);
+        Window.ESPInner.BackgroundColor3 = Library.Theme.Selected;
+        Window.ESPInner.BorderSizePixel = 0;
+
+        Window.ESPInnerCorner = Instance.new("UICorner", Window.ESPInner);
+        Window.ESPInnerCorner.CornerRadius = UDim.new(0, 4);
+
+        -- ESP Content Frame
+        Window.ESPContent = Instance.new("Frame", Window.ESPInner);
+        Window.ESPContent.Position = UDim2.fromOffset(1, 1);
+        Window.ESPContent.Size = UDim2.fromOffset(232, 335);
+        Window.ESPContent.BackgroundColor3 = Library.Theme.BackGround1;
+        Window.ESPContent.BorderSizePixel = 0;
+
+        Window.ESPContentCorner = Instance.new("UICorner", Window.ESPContent);
+        Window.ESPContentCorner.CornerRadius = UDim.new(0, 4);
+
+        -- ESP Title
+        Window.ESPTitle = Instance.new("TextLabel", Window.ESPContent);
+        Window.ESPTitle.Position = UDim2.fromOffset(4, 2);
+        Window.ESPTitle.Size = UDim2.fromOffset(150, 16);
+        Window.ESPTitle.BackgroundTransparency = 1;
+        Window.ESPTitle.Text = "ESP Preview";
+        Window.ESPTitle.Font = Library.Theme.Font;
+        Window.ESPTitle.TextSize = Library.Theme.TextSize;
+        Window.ESPTitle.TextColor3 = Library.Theme.TextColor;
+        Window.ESPTitle.TextXAlignment = Enum.TextXAlignment.Left;
+
+        -- ESP Close Button
+        Window.ESPClose = Instance.new("TextButton", Window.ESPContent);
+        Window.ESPClose.Position = UDim2.fromOffset(210, 2);
+        Window.ESPClose.Size = UDim2.fromOffset(16, 16);
+        Window.ESPClose.BackgroundTransparency = 1;
+        Window.ESPClose.Text = "X";
+        Window.ESPClose.Font = Library.Theme.Font;
+        Window.ESPClose.TextSize = Library.Theme.TextSize;
+        Window.ESPClose.TextColor3 = Library.Theme.TextColor;
+
+        -- ESP Preview Area
+        Window.ESPPreviewArea = Instance.new("Frame", Window.ESPContent);
+        Window.ESPPreviewArea.Position = UDim2.fromOffset(4, 22);
+        Window.ESPPreviewArea.Size = UDim2.fromOffset(224, 309);
+        Window.ESPPreviewArea.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreviewArea.BorderSizePixel = 0;
+
+        Window.ESPPreviewCorner = Instance.new("UICorner", Window.ESPPreviewArea);
+        Window.ESPPreviewCorner.CornerRadius = UDim.new(0, 4);
+
+        -- ESP Preview Box (Simulated Player)
+        Window.ESPBox = Instance.new("Frame", Window.ESPPreviewArea);
+        Window.ESPBox.Position = UDim2.fromOffset(160, 50);
+        Window.ESPBox.Size = UDim2.fromOffset(50, 100);
+        Window.ESPBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+        Window.ESPBox.BackgroundTransparency = 1;
+        Window.ESPBox.BorderSizePixel = 2;
+        Window.ESPBox.BorderColor3 = Color3.fromRGB(255, 255, 255);
+
+        -- ESP Health Bar
+        Window.ESPHealthOutline = Instance.new("Frame", Window.ESPPreviewArea);
+        Window.ESPHealthOutline.Position = UDim2.fromOffset(150, 49);
+        Window.ESPHealthOutline.Size = UDim2.fromOffset(4, 102);
+        Window.ESPHealthOutline.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+        Window.ESPHealthOutline.BorderSizePixel = 0;
+
+        Window.ESPHealthBar = Instance.new("Frame", Window.ESPHealthOutline);
+        Window.ESPHealthBar.Position = UDim2.fromOffset(1, 1);
+        Window.ESPHealthBar.Size = UDim2.fromOffset(2, 75);
+        Window.ESPHealthBar.BackgroundColor3 = Color3.fromRGB(0, 255, 0);
+        Window.ESPHealthBar.BorderSizePixel = 0;
+
+        -- ESP Name Label
+        Window.ESPName = Instance.new("TextLabel", Window.ESPPreviewArea);
+        Window.ESPName.Position = UDim2.fromOffset(185, 30);
+        Window.ESPName.Size = UDim2.fromOffset(60, 16);
+        Window.ESPName.BackgroundTransparency = 1;
+        Window.ESPName.Text = "Player";
+        Window.ESPName.Font = Library.Theme.Font;
+        Window.ESPName.TextSize = 12;
+        Window.ESPName.TextColor3 = Library.Theme.TextColor;
+        Window.ESPName.TextXAlignment = Enum.TextXAlignment.Center;
+
+        -- ESP Distance Label
+        Window.ESPDistance = Instance.new("TextLabel", Window.ESPPreviewArea);
+        Window.ESPDistance.Position = UDim2.fromOffset(185, 155);
+        Window.ESPDistance.Size = UDim2.fromOffset(40, 16);
+        Window.ESPDistance.BackgroundTransparency = 1;
+        Window.ESPDistance.Text = "25m";
+        Window.ESPDistance.Font = Library.Theme.Font;
+        Window.ESPDistance.TextSize = 12;
+        Window.ESPDistance.TextColor3 = Library.Theme.TextColor;
+        Window.ESPDistance.TextXAlignment = Enum.TextXAlignment.Center;
+
+        -- ESP Tool Label  
+        Window.ESPTool = Instance.new("TextLabel", Window.ESPPreviewArea);
+        Window.ESPTool.Position = UDim2.fromOffset(185, 175);
+        Window.ESPTool.Size = UDim2.fromOffset(50, 16);
+        Window.ESPTool.BackgroundTransparency = 1;
+        Window.ESPTool.Text = "Tool";
+        Window.ESPTool.Font = Library.Theme.Font;
+        Window.ESPTool.TextSize = 12;
+        Window.ESPTool.TextColor3 = Library.Theme.TextColor;
+        Window.ESPTool.TextXAlignment = Enum.TextXAlignment.Center;
+
+        -- ESP Toggle Functions
+        function Window:ToggleESPPreview(state)
+            Window.ESPPreview.Visible = state;
+            Window.ESPFrame.Visible = state;
+            
+            if state then
+                Library:CreateNotification({
+                    Title = "ESP Preview";
+                    Text = "ESP Preview window opened";
+                    Duration = 2;
+                    Type = "Info";
+                });
+            else
+                Library:CreateNotification({
+                    Title = "ESP Preview";
+                    Text = "ESP Preview window closed";
+                    Duration = 2;
+                    Type = "Info";
+                });
+            end
+        end
+
+        -- ESP Health Bar Animation
+        function Window:UpdateESPHealthBar()
+            if not Window.ESPPreview.Visible then return end
+            
+            Window.ESPPreview.HealthBarFade = Window.ESPPreview.HealthBarFade + 0.015;
+            local smoothened = (math.acos(math.cos(Window.ESPPreview.HealthBarFade * math.pi)) / math.pi);
+            local healthPercent = math.floor(smoothened * 100);
+            local barSize = math.floor(smoothened * 100);
+            
+            -- Update health bar color based on health
+            local healthColor;
+            if healthPercent > 60 then
+                healthColor = Color3.fromRGB(0, 255, 0); -- Green
+            elseif healthPercent > 30 then
+                healthColor = Color3.fromRGB(255, 255, 0); -- Yellow
+            else
+                healthColor = Color3.fromRGB(255, 0, 0); -- Red
+            end
+            
+            Window.ESPHealthBar.BackgroundColor3 = healthColor;
+            Window.ESPHealthBar.Size = UDim2.fromOffset(2, barSize);
+            Window.ESPHealthBar.Position = UDim2.fromOffset(1, 101 - barSize);
+        end
+
+        -- ESP Close Button Functionality
+        Window.ESPClose.MouseButton1Click:Connect(function()
+            Window:ToggleESPPreview(false);
+        end);
+
+        -- Start ESP Health Bar Animation Loop
+        if RunService and RunService.Heartbeat then
+            RunService.Heartbeat:Connect(function()
+                if Window.ESPPreview.Visible then
+                    Window:UpdateESPHealthBar();
+                end
+            end);
+        end
         Window.UiList.HorizontalAlignment = "Left";
         Window.UiList.SortOrder = "LayoutOrder"
         Window.UiList.VerticalAlignment = "Top";
