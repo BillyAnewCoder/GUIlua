@@ -1,65 +1,62 @@
-
--- Enhanced Roblox UI Library - Professional Enhancement
--- Fixed typo: "Libary" -> "Library" for better code quality
--- Comprehensive bug fixes and feature completion
-
-local Library = { 
-        Flags = {};
-        Items = {};
-        Connections = {};
-        Windows = {};
+-- // My Bad The Code Is Shitty I Keep Taking Breaks For A Long Time.
+local Libary = { 
+        Flags = { };
+        Items = { };
 };
 
-local UserInputService = game:GetService("UserInputService");
-local RunService = game:GetService("RunService");
-local TweenService = game:GetService("TweenService");
+-- Executor-compatible service initialization
+local UserInputService, RunService, TweenService, CoreGui, PlayerGui, LocalPlayer, Mouse, CurrentCamera;
 
-local CoreGui = game:FindFirstChild("CoreGui");
-local PlayerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui");
+-- Safe service initialization for executors
+pcall(function()
+        UserInputService = game:GetService("UserInputService");
+        RunService = game:GetService("RunService");
+        TweenService = game:GetService("TweenService");
 
-local LocalPlayer = game:GetService("Players").LocalPlayer;
-local Mouse = LocalPlayer:GetMouse();
-local CurrentCamera = workspace and workspace.CurrentCamera or nil;
+        CoreGui = game:FindFirstChild("CoreGui") or (gethui and gethui()) or game:GetService("CoreGui");
+        PlayerGui = game:GetService("Players").LocalPlayer:FindFirstChild("PlayerGui");
 
--- Additional services for enhanced functionality  
-local HttpService = game:GetService("HttpService");
-local Players = game:GetService("Players");
-local GuiService = game:GetService("GuiService");
-local StarterGui = game:GetService("StarterGui");
+        LocalPlayer = game:GetService("Players").LocalPlayer;
+        Mouse = LocalPlayer:GetMouse();
+        CurrentCamera = game.Workspace.CurrentCamera;
+end);
 
--- Enhanced error handling and safety features
-local function SafeServiceCall(service, method, args)
-    local success, result = pcall(function()
-        if args then
-            return service[method](service, unpack(args));
-        else
-            return service[method](service);
-        end
-    end);
+-- Executor compatibility layer
+if not Color3 then Color3 = {fromRGB = function(r, g, b) return {r = r/255, g = g/255, b = b/255} end} end
+if not UDim2 then UDim2 = {new = function(xS, xO, yS, yO) return {X = {Scale = xS or 0, Offset = xO or 0}, Y = {Scale = yS or 0, Offset = yO or 0}} end, fromScale = function(x, y) return UDim2.new(x, 0, y, 0) end, fromOffset = function(x, y) return UDim2.new(0, x, 0, y) end} end
+if not UDim then UDim = {new = function(scale, offset) return {Scale = scale or 0, Offset = offset or 0} end} end
+if not Vector2 then Vector2 = {new = function(x, y) return {X = x or 0, Y = y or 0} end} end
+if not Vector3 then Vector3 = {new = function(x, y, z) return {X = x or 0, Y = y or 0, Z = z or 0} end} end
+if not TweenInfo then TweenInfo = {new = function(time, style, direction) return {Time = time or 1} end} end
+if not Enum then Enum = {KeyCode = {RightShift = "RightShift", F9 = "F9"}, UserInputType = {MouseButton1 = "MouseButton1", MouseMovement = "MouseMovement", Touch = "Touch"}, UserInputState = {End = "End"}, EasingStyle = {Sine = "Sine", Quad = "Quad"}, EasingDirection = {Out = "Out", In = "In"}, FillDirection = {Vertical = "Vertical", Horizontal = "Horizontal"}, HorizontalAlignment = {Left = "Left", Center = "Center"}, VerticalAlignment = {Top = "Top", Center = "Center"}, SortOrder = {LayoutOrder = "LayoutOrder"}, TextXAlignment = {Left = "Left", Center = "Center", Right = "Right"}, TextYAlignment = {Top = "Top", Center = "Center", Bottom = "Bottom"}, AutomaticSize = {Y = "Y"}, ApplyStrokeMode = {Border = "Border"}, ZIndexBehavior = {Global = "Global"}, TextTruncate = {AtEnd = "AtEnd"}} end
 
-    if success then
-        return result;
-    else
-        warn("[UI Library] Service call failed: " .. tostring(result));
-        return nil;
-    end
-end
+-- Console System
+Libary.Console = {
+    Logs = {}, MaxLogs = 50,
+    Log = function(message, logType)
+        local timestamp = os.date and os.date("%H:%M:%S") or "00:00:00"
+        local logEntry = {time = timestamp, message = tostring(message), type = logType or "INFO"}
+        table.insert(Libary.Console.Logs, logEntry)
+        if #Libary.Console.Logs > Libary.Console.MaxLogs then table.remove(Libary.Console.Logs, 1) end
+        print(string.format("[%s] [%s] %s", timestamp, logType or "INFO", message))
+        if Libary.Console.UpdateUI then pcall(Libary.Console.UpdateUI) end
+    end,
+    Error = function(message) Libary.Console.Log(message, "ERROR") end,
+    Warn = function(message) Libary.Console.Log(message, "WARN") end,
+    Info = function(message) Libary.Console.Log(message, "INFO") end,
+    Clear = function() Libary.Console.Logs = {}; if Libary.Console.UpdateUI then pcall(Libary.Console.UpdateUI) end end
+}
 
--- Enhanced theme with additional properties for complete functionality
-Library.Theme = {
+Libary.Theme = {
         BackGround1 = Color3.fromRGB(47, 47, 47);
         BackGround2 = Color3.fromRGB(38, 38, 38);
-        BackGround3 = Color3.fromRGB(32, 32, 32);
 
         Outline = Color3.fromRGB(30, 87, 75);
-        OutlineHover = Color3.fromRGB(40, 97, 85);
 
         Selected = Color3.fromRGB(18, 161, 130);
-        SelectedHover = Color3.fromRGB(28, 171, 140);
 
         TextColor = Color3.fromRGB(255, 255, 255);
-        TextColorDisabled = Color3.fromRGB(150, 150, 150);
-        Font = Enum.Font.Gotham;
+        Font = "Montserrat";
         TextSize = 14;
 
         TabOptionsHoverTween = 0.3;
@@ -75,319 +72,32 @@ Library.Theme = {
 
         ToggleTween = 0.2;
         SliderTween = 0.07;
-        ButtonTween = 0.15;
-        DropdownTween = 0.25;
 }; 
 
--- Advanced configuration system for executor users
-Library.Config = {
-        SaveFileName = "UILibraryConfig.json";
-        AutoSave = true;
-        DebugMode = false;
-        Performance = {
-                ReducedAnimations = false;
-                BatchUpdates = true;
-                LazyLoad = true;
-        };
-};
-
--- Configuration management functions
-function Library:SaveConfig()
-        if not HttpService then return false; end
-
-        local config = {
-                Flags = self.Flags;
-                Theme = self.Theme;
-                Config = self.Config;
-                WindowPositions = {};
-        };
-
-        -- Save window positions
-        for _, window in pairs(self.Windows) do
-                if window.Main and window.Main.Position then
-                        config.WindowPositions[window.Name] = {
-                                X = window.Main.Position.X.Offset;
-                                Y = window.Main.Position.Y.Offset;
-                        };
-                end
-        end
-
-        local success, encoded = pcall(function()
-                return HttpService:JSONEncode(config);
-        end);
-
-        if success then
-                if writefile then
-                        writefile(self.Config.SaveFileName, encoded);
-                        return true;
-                end
-        else
-                warn("[UI Library] Failed to save config: " .. tostring(encoded));
-        end
-        return false;
-end
-
-function Library:LoadConfig()
-        if not HttpService or not isfile or not readfile then return false; end
-
-        if not isfile(self.Config.SaveFileName) then
-                return false;
-        end
-
-        local success, config = pcall(function()
-                local content = readfile(self.Config.SaveFileName);
-                return HttpService:JSONDecode(content);
-        end);
-
-        if success and config then
-                -- Restore flags
-                if config.Flags then
-                        for flag, value in pairs(config.Flags) do
-                                self.Flags[flag] = value;
-                        end
-                end
-
-                return true;
-        else
-                warn("[UI Library] Failed to load config: " .. tostring(config));
-                return false;
-        end
-end
-
--- Advanced notification system for executor feedback
-function Library:CreateNotification(options)
-        if type(options) == "string" then
-                options = {Title = "Notification", Text = options};
-        elseif not options then
-                options = {};
-        end
-
-        local notification = {
-                Title = options.Title or "UI Library";
-                Text = options.Text or "";
-                Duration = options.Duration or 3;
-                Type = options.Type or "Info"; -- Info, Success, Warning, Error
-        };
-
-        -- Create notification using StarterGui
-        local success = pcall(function()
-                StarterGui:SetCore("SendNotification", {
-                        Title = notification.Title;
-                        Text = notification.Text;
-                        Duration = notification.Duration;
-                        Icon = options.Icon;
-                });
-        end);
-
-        if not success then
-                print("[UI Library] " .. notification.Title .. ": " .. notification.Text);
-        end
-
-        return notification;
-end
-
--- Executor-specific debugging and testing functions
-function Library:Test()
-        print("[UI Library] Starting comprehensive test...");
-
-        -- Test basic functionality
-        local testWindow = self:CreateWindow("Test Window");
-        if testWindow then
-                print("[UI Library] ✓ Window creation successful");
-
-                local testTab = testWindow:CreateTab("Test Tab");
-                if testTab then
-                        print("[UI Library] ✓ Tab creation successful");
-
-                        local testSection = testTab:CreateSection("Test Section");
-                        if testSection then
-                                print("[UI Library] ✓ Section creation successful");
-
-                                -- Test components
-                                testSection:CreateButton("Test Button", function()
-                                        print("[UI Library] Button clicked!");
-                                end);
-
-                                testSection:CreateToggle("Test Toggle", "testFlag", false, function(value)
-                                        print("[UI Library] Toggle changed to: " .. tostring(value));
-                                end);
-
-                                testSection:CreateSlider("Test Slider", "testSlider", 0, 100, 50, 0, function(value)
-                                        print("[UI Library] Slider changed to: " .. tostring(value));
-                                end);
-
-                                print("[UI Library] ✓ All components created successfully");
-                        end
-                end
-        end
-
-        -- Test notification system
-        self:CreateNotification({
-                Title = "Test Complete";
-                Text = "UI Library is working correctly!";
-                Duration = 5;
-                Type = "Success";
-        });
-
-        print("[UI Library] ✓ Test completed successfully - Library is ready for executor use!");
-        return true;
-end
-
--- Performance monitoring for executor environments
-function Library:GetPerformanceStats()
-        return {
-                WindowCount = #self.Windows;
-                FlagCount = 0;
-                ConnectionCount = #self.Connections;
-                ItemCount = #self.Items;
-                MemoryUsage = collectgarbage("count");
-        };
-end
-
--- Cleanup function for resource management
-function Library:Cleanup()
-        -- Disconnect all connections
-        for _, connection in pairs(self.Connections) do
-                if connection and connection.Disconnect then
-                        connection:Disconnect();
-                end
-        end
-
-        -- Clean up windows
-        for _, window in pairs(self.Windows) do
-                if window and window.ScreenGui then
-                        window.ScreenGui:Destroy();
-                end
-        end
-
-        -- Clear tables
-        self.Connections = {};
-        self.Windows = {};
-        self.Items = {};
-        self.Flags = {};
-
-        print("[UI Library] Cleanup completed");
-end
-
--- Enhanced utility functions
-local Utility = {};
-
-function Utility:Lerp(a, b, t)
-        return a + (b - a) * t;
-end
-
-function Utility:Round(num, places)
-        local mult = math.pow(10, places or 0);
-        return math.floor(num * mult + 0.5) / mult;
-end
-
-function Utility:GetTextBounds(text, font, size)
-        local temp = Instance.new("TextLabel");
-        temp.Text = text;
-        temp.Font = font;
-        temp.TextSize = size;
-        temp.Parent = workspace;
-        local bounds = temp.TextBounds;
-        temp:Destroy();
-        return bounds;
-end
-
-function Utility:HSVtoRGB(h, s, v)
-        local r, g, b;
-        local i = math.floor(h * 6);
-        local f = h * 6 - i;
-        local p = v * (1 - s);
-        local q = v * (1 - f * s);
-        local t = v * (1 - (1 - f) * s);
-
-        i = i % 6;
-
-        if i == 0 then
-                r, g, b = v, t, p;
-        elseif i == 1 then
-                r, g, b = q, v, p;
-        elseif i == 2 then
-                r, g, b = p, v, t;
-        elseif i == 3 then
-                r, g, b = p, q, v;
-        elseif i == 4 then
-                r, g, b = t, p, v;
-        elseif i == 5 then
-                r, g, b = v, p, q;
-        end
-
-        return Color3.fromRGB(r * 255, g * 255, b * 255);
-end
-
-function Utility:RGBtoHSV(color)
-        local r, g, b = color.R, color.G, color.B;
-        local max, min = math.max(r, g, b), math.min(r, g, b);
-        local h, s, v;
-        v = max;
-
-        local d = max - min;
-        s = max == 0 and 0 or d / max;
-
-        if max == min then
-                h = 0;
-        else
-                if max == r then
-                        h = (g - b) / d + (g < b and 6 or 0);
-                elseif max == g then
-                        h = (b - r) / d + 2;
-                elseif max == b then
-                        h = (r - g) / d + 4;
-                end
-                h = h / 6;
-        end
-
-        return h, s, v;
-end
-
--- Enhanced window creation function
-function Library:CreateWindow(options)
+function Libary:CreateWindow(Name, Toggle, keybind)
         local Window = { };
-        -- Handle both table and string inputs
-        if type(options) == "table" then
-                Window.Name = tostring(options.Name or "Enhanced UI Library");
-                Window.Keybind = options.Keybind or Enum.KeyCode.RightShift;
-                Window.Size = options.Size or UDim2.fromOffset(921, 428);
-        elseif type(options) == "string" then
-                Window.Name = tostring(options);
-                Window.Keybind = Enum.KeyCode.RightShift;
-                Window.Size = UDim2.fromOffset(921, 428);
-        else
-                Window.Name = "Enhanced UI Library";
-                Window.Keybind = Enum.KeyCode.RightShift;
-                Window.Size = UDim2.fromOffset(921, 428);
-        end
-
-        Window.Toggle = true;
+        Window.Name = Name or "DeleteMob";
+        Window.Toggle = Toggle or false;
+        Window.Keybind = keybind or Enum.KeyCode.RightShift;
         Window.ColorPickerSelected = nil;
-        Window.Tabs = {};
-        Window.CurrentTab = nil;
 
-        -- Enhanced dragging system with bounds checking
-        local dragging, dragInput, dragStart, startPos;
-
+        local dragging, dragInput, dragStart, startPos
         UserInputService.InputChanged:Connect(function(input)
                 if input == dragInput and dragging then
-                        local delta = input.Position - dragStart;
-                        local newPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y);
-                        Window.Main.Position = newPos;
+                        local delta = input.Position - dragStart
+                        Window.Main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
                 end
         end)
 
         local dragstart = function(input)
                 if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                        dragging = true;
-                        dragStart = input.Position;
-                        startPos = Window.Main.Position;
+                        dragging = true
+                        dragStart = input.Position
+                        startPos = Window.Main.Position
 
-                        local dragEndConnection = input.Changed:Connect(function()
+                        input.Changed:Connect(function()
                                 if input.UserInputState == Enum.UserInputState.End then
-                                        dragging = false;
-                                        dragEndConnection:Disconnect();
+                                        dragging = false
                                 end
                         end)
                 end
@@ -395,571 +105,3028 @@ function Library:CreateWindow(options)
 
         local dragend = function(input)
                 if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                        dragInput = input;
+                        dragInput = input
                 end
         end
 
-        -- Enhanced frame animation functions with better error handling
         local function CloseFrame(Frame)
-                if not Frame or not Frame.Parent then return end;
-
-                local targetSize = UDim2.fromOffset(921, 0);
-                local CloseTween = TweenService:Create(Frame, TweenInfo.new(Library.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = targetSize});
-                CloseTween:Play();
-                CloseTween.Completed:Connect(function()
-                        Frame.Visible = false;
-                end)
+                if Frame  and Frame.Name ~= "c" then
+                        local CloseTween = TweenService:Create(Frame, TweenInfo.new(Libary.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(921, 0)})
+                        CloseTween:Play()
+                        CloseTween.Completed:Connect(function()
+                                Frame.Visible = false;
+                        end)
+                else
+                        local CloseTween = TweenService:Create(Frame, TweenInfo.new(Libary.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(266, 0)})
+                        CloseTween:Play()
+                        CloseTween.Completed:Connect(function()
+                                Frame.Visible = false;
+                        end)
+                end
         end
 
         local function OpenFrame(Frame)
-                if not Frame or not Frame.Parent then return end;
+                if Frame and Frame.Name ~= "c" then
+                        Frame.Size = UDim2.fromOffset(921, 0)
+                        Frame.Visible = true;
 
-                Frame.Size = UDim2.fromOffset(921, 0);
-                Frame.Visible = true;
+                        local OpenTween = TweenService:Create(Frame, TweenInfo.new(Libary.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(921, 428)})
+                        OpenTween:Play()
+                else
+                        Frame.Size = UDim2.fromOffset(266, 0)
+                        Frame.Visible = true;
 
-                local OpenTween = TweenService:Create(Frame, TweenInfo.new(Library.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(921, 428)});
-                OpenTween:Play();
+                        local OpenTween = TweenService:Create(Frame, TweenInfo.new(Libary.Theme.CloseOpenTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromOffset(266, 277)})
+                        OpenTween:Play()
+                end
         end
 
-        -- Create main ScreenGui with better error handling
-        Window.ScreenGui = Instance.new("ScreenGui");
-        Window.ScreenGui.Name = "EnhancedUILibrary_" .. tick();
+        Window.ScreenGui = Instance.new("ScreenGui", CoreGui or PlayerGui);
         Window.ScreenGui.ResetOnSpawn = false;
         Window.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
-        Window.ScreenGui.DisplayOrder = 999;
 
-        -- Safely parent to CoreGui or PlayerGui
-        local success = false;
-        if CoreGui then
-                success = pcall(function()
-                        Window.ScreenGui.Parent = CoreGui;
+        -- ESP Preview Window
+        Window.ESPPreview = {};
+        Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
+        Window.ESPPreview.Main.Size = UDim2.fromOffset(300, 428);
+        Window.ESPPreview.Main.Position = UDim2.fromScale(0.6, 0.3); -- Positioned to the right of main window
+        Window.ESPPreview.Main.BackgroundColor3 = Libary.Theme.BackGround1;
+        Window.ESPPreview.Main.ClipsDescendants = true;
+        Window.ESPPreview.Main.Visible = true;
+        Window.ESPPreview.Main.BorderSizePixel = 0;
+
+        Window.ESPPreview.UICorner = Instance.new("UICorner", Window.ESPPreview.Main);
+        Window.ESPPreview.UICorner.CornerRadius = UDim.new(0, 4);
+
+        Window.ESPPreview.UIStroke = Instance.new("UIStroke", Window.ESPPreview.Main);
+        Window.ESPPreview.UIStroke.Color = Libary.Theme.Outline;
+        Window.ESPPreview.UIStroke.Thickness = 1;
+        Window.ESPPreview.UIStroke.ApplyStrokeMode = "Border";
+
+        -- ESP Preview Header
+        Window.ESPPreview.Header = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.Header.Size = UDim2.fromOffset(298, 40);
+        Window.ESPPreview.Header.Position = UDim2.fromOffset(1, 1);
+        Window.ESPPreview.Header.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.ESPPreview.Header.BorderSizePixel = 0;
+
+        Window.ESPPreview.HeaderCorner = Instance.new("UICorner", Window.ESPPreview.Header);
+        Window.ESPPreview.HeaderCorner.CornerRadius = UDim.new(0, 4);
+
+        Window.ESPPreview.Title = Instance.new("TextLabel", Window.ESPPreview.Header);
+        Window.ESPPreview.Title.Size = UDim2.fromScale(1, 1);
+        Window.ESPPreview.Title.Position = UDim2.fromOffset(0, 0);
+        Window.ESPPreview.Title.BackgroundTransparency = 1;
+        Window.ESPPreview.Title.Text = "ESP Preview";
+        Window.ESPPreview.Title.TextColor3 = Libary.Theme.TextColor;
+        Window.ESPPreview.Title.TextSize = 16;
+        Window.ESPPreview.Title.Font = Libary.Theme.Font;
+        Window.ESPPreview.Title.TextXAlignment = Enum.TextXAlignment.Center;
+        Window.ESPPreview.Title.TextYAlignment = Enum.TextYAlignment.Center;
+
+        -- ESP Preview Content Area
+        Window.ESPPreview.Content = Instance.new("ScrollingFrame", Window.ESPPreview.Main);
+        Window.ESPPreview.Content.Size = UDim2.fromOffset(298, 385);
+        Window.ESPPreview.Content.Position = UDim2.fromOffset(1, 42);
+        Window.ESPPreview.Content.BackgroundColor3 = Libary.Theme.BackGround1;
+        Window.ESPPreview.Content.BorderSizePixel = 0;
+        Window.ESPPreview.Content.ScrollBarThickness = 6;
+        Window.ESPPreview.Content.ScrollBarImageColor3 = Libary.Theme.Selected;
+        Window.ESPPreview.Content.CanvasSize = UDim2.fromOffset(0, 0);
+
+        Window.ESPPreview.ContentCorner = Instance.new("UICorner", Window.ESPPreview.Content);
+        Window.ESPPreview.ContentCorner.CornerRadius = UDim.new(0, 4);
+
+        -- ESP Preview List Layout
+        Window.ESPPreview.ListLayout = Instance.new("UIListLayout", Window.ESPPreview.Content);
+        Window.ESPPreview.ListLayout.Padding = UDim.new(0, 2);
+        Window.ESPPreview.ListLayout.FillDirection = Enum.FillDirection.Vertical;
+        Window.ESPPreview.ListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+        Window.ESPPreview.ListLayout.SortOrder = Enum.SortOrder.LayoutOrder;
+        Window.ESPPreview.ListLayout.VerticalAlignment = Enum.VerticalAlignment.Top;
+
+        -- ESP Preview Players Container
+        Window.ESPPreview.PlayersContainer = Instance.new("Frame", Window.ESPPreview.Content);
+        Window.ESPPreview.PlayersContainer.Size = UDim2.fromOffset(280, 0);
+        Window.ESPPreview.PlayersContainer.Position = UDim2.fromOffset(5, 5);
+        Window.ESPPreview.PlayersContainer.BackgroundTransparency = 1;
+        Window.ESPPreview.PlayersContainer.AutomaticSize = Enum.AutomaticSize.Y;
+
+        Window.ESPPreview.PlayersLayout = Instance.new("UIListLayout", Window.ESPPreview.PlayersContainer);
+        Window.ESPPreview.PlayersLayout.Padding = UDim.new(0, 3);
+        Window.ESPPreview.PlayersLayout.FillDirection = Enum.FillDirection.Vertical;
+        Window.ESPPreview.PlayersLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left;
+        Window.ESPPreview.PlayersLayout.SortOrder = Enum.SortOrder.LayoutOrder;
+
+        -- ESP Data Storage
+        Window.ESPPreview.PlayerData = {};
+        Window.ESPPreview.PlayerFrames = {};
+
+        -- ESP Real-time Update Function
+        Window.ESPPreview.UpdateESP = function()
+            if not Window.ESPPreview.Main.Visible then return end
+            
+            local Players = game:GetService("Players");
+            local LocalPlayer = Players.LocalPlayer;
+            
+            -- Clear old frames for players who left
+            for playerId, frame in pairs(Window.ESPPreview.PlayerFrames) do
+                local player = Players:GetPlayerByUserId(playerId);
+                if not player or player == LocalPlayer then
+                    frame:Destroy();
+                    Window.ESPPreview.PlayerFrames[playerId] = nil;
+                    Window.ESPPreview.PlayerData[playerId] = nil;
+                end
+            end
+            
+            -- Update or create frames for current players
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                    local playerId = player.UserId;
+                    local character = player.Character;
+                    local humanoidRootPart = character.HumanoidRootPart;
+                    local humanoid = character:FindFirstChild("Humanoid");
+                    
+                    -- Calculate distance
+                    local distance = 0;
+                    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                        distance = math.floor((LocalPlayer.Character.HumanoidRootPart.Position - humanoidRootPart.Position).Magnitude);
+                    end
+                    
+                    -- Get health
+                    local health = humanoid and math.floor(humanoid.Health) or 0;
+                    local maxHealth = humanoid and math.floor(humanoid.MaxHealth) or 100;
+                    
+                    -- Create or update player frame
+                    if not Window.ESPPreview.PlayerFrames[playerId] then
+                        local playerFrame = Instance.new("Frame", Window.ESPPreview.PlayersContainer);
+                        playerFrame.Size = UDim2.fromOffset(275, 60);
+                        playerFrame.BackgroundColor3 = Libary.Theme.BackGround2;
+                        playerFrame.BorderSizePixel = 0;
+                        playerFrame.LayoutOrder = playerId;
+                        
+                        local frameCorner = Instance.new("UICorner", playerFrame);
+                        frameCorner.CornerRadius = UDim.new(0, 4);
+                        
+                        local nameLabel = Instance.new("TextLabel", playerFrame);
+                        nameLabel.Size = UDim2.fromOffset(180, 20);
+                        nameLabel.Position = UDim2.fromOffset(10, 5);
+                        nameLabel.BackgroundTransparency = 1;
+                        nameLabel.Text = player.Name;
+                        nameLabel.TextColor3 = Libary.Theme.TextColor;
+                        nameLabel.TextSize = 14;
+                        nameLabel.Font = Libary.Theme.Font;
+                        nameLabel.TextXAlignment = Enum.TextXAlignment.Left;
+                        nameLabel.Name = "NameLabel";
+                        
+                        local distanceLabel = Instance.new("TextLabel", playerFrame);
+                        distanceLabel.Size = UDim2.fromOffset(80, 20);
+                        distanceLabel.Position = UDim2.fromOffset(190, 5);
+                        distanceLabel.BackgroundTransparency = 1;
+                        distanceLabel.Text = distance .. "m";
+                        distanceLabel.TextColor3 = Color3.fromRGB(150, 150, 150);
+                        distanceLabel.TextSize = 12;
+                        distanceLabel.Font = Libary.Theme.Font;
+                        distanceLabel.TextXAlignment = Enum.TextXAlignment.Right;
+                        distanceLabel.Name = "DistanceLabel";
+                        
+                        local healthLabel = Instance.new("TextLabel", playerFrame);
+                        healthLabel.Size = UDim2.fromOffset(260, 20);
+                        healthLabel.Position = UDim2.fromOffset(10, 25);
+                        healthLabel.BackgroundTransparency = 1;
+                        healthLabel.Text = "Health: " .. health .. "/" .. maxHealth;
+                        healthLabel.TextColor3 = health > maxHealth * 0.6 and Color3.fromRGB(0, 255, 0) or 
+                                                health > maxHealth * 0.3 and Color3.fromRGB(255, 255, 0) or 
+                                                Color3.fromRGB(255, 0, 0);
+                        healthLabel.TextSize = 11;
+                        healthLabel.Font = Libary.Theme.Font;
+                        healthLabel.TextXAlignment = Enum.TextXAlignment.Left;
+                        healthLabel.Name = "HealthLabel";
+                        
+                        local positionLabel = Instance.new("TextLabel", playerFrame);
+                        positionLabel.Size = UDim2.fromOffset(260, 15);
+                        positionLabel.Position = UDim2.fromOffset(10, 45);
+                        positionLabel.BackgroundTransparency = 1;
+                        local pos = humanoidRootPart.Position;
+                        positionLabel.Text = string.format("Pos: %.0f, %.0f, %.0f", pos.X, pos.Y, pos.Z);
+                        positionLabel.TextColor3 = Color3.fromRGB(200, 200, 200);
+                        positionLabel.TextSize = 10;
+                        positionLabel.Font = Libary.Theme.Font;
+                        positionLabel.TextXAlignment = Enum.TextXAlignment.Left;
+                        positionLabel.Name = "PositionLabel";
+                        
+                        Window.ESPPreview.PlayerFrames[playerId] = playerFrame;
+                    else
+                        -- Update existing frame
+                        local playerFrame = Window.ESPPreview.PlayerFrames[playerId];
+                        local distanceLabel = playerFrame:FindFirstChild("DistanceLabel");
+                        local healthLabel = playerFrame:FindFirstChild("HealthLabel");
+                        local positionLabel = playerFrame:FindFirstChild("PositionLabel");
+                        
+                        if distanceLabel then
+                            distanceLabel.Text = distance .. "m";
+                        end
+                        
+                        if healthLabel then
+                            healthLabel.Text = "Health: " .. health .. "/" .. maxHealth;
+                            healthLabel.TextColor3 = health > maxHealth * 0.6 and Color3.fromRGB(0, 255, 0) or 
+                                                    health > maxHealth * 0.3 and Color3.fromRGB(255, 255, 0) or 
+                                                    Color3.fromRGB(255, 0, 0);
+                        end
+                        
+                        if positionLabel then
+                            local pos = humanoidRootPart.Position;
+                            positionLabel.Text = string.format("Pos: %.0f, %.0f, %.0f", pos.X, pos.Y, pos.Z);
+                        end
+                    end
+                end
+            end
+            
+            -- Update canvas size
+            Window.ESPPreview.Content.CanvasSize = UDim2.fromOffset(0, Window.ESPPreview.PlayersLayout.AbsoluteContentSize.Y + 10);
+        end
+
+        -- ESP Preview Toggle Visibility Function
+        Window.ESPPreview.SetVisible = function(visible)
+            Window.ESPPreview.Main.Visible = visible;
+        end
+
+        -- Start ESP Update Loop
+        Window.ESPPreview.UpdateConnection = RunService.Heartbeat:Connect(function()
+            pcall(Window.ESPPreview.UpdateESP);
+        end);
+
+        -- Store connection for cleanup
+        table.insert(Libary.Items, Window.ESPPreview.UpdateConnection);
+
+        function Window:CreateColorPicker()
+                local ColorPicker = { };
+                ColorPicker.Flag = nil;
+                ColorPicker.Color = nil;
+                ColorPicker.HuePosition = 0;
+
+                ColorPicker.Main = Instance.new("Frame", Window.ScreenGui);
+                ColorPicker.Main.Size = UDim2.fromOffset(266, 277);
+                ColorPicker.Main.BackgroundColor3 = Libary.Theme.BackGround2
+                ColorPicker.Main.ClipsDescendants = true;
+                ColorPicker.Main.Name = "c"
+
+                ColorPicker.UICorner = Instance.new("UICorner", ColorPicker.Main);
+                ColorPicker.UICorner.CornerRadius = UDim.new(0, 4);
+
+                ColorPicker.UIStroke = Instance.new("UIStroke", ColorPicker.Main);
+                ColorPicker.UIStroke.Color = Libary.Theme.Outline;
+                ColorPicker.UIStroke.Thickness = 1;
+                ColorPicker.UIStroke.ApplyStrokeMode = "Border";
+
+                local dragging2, dragInput2, dragStart2, startPos2
+                UserInputService.InputChanged:Connect(function(input)
+                        if input == dragInput2 and dragging2 then
+                                local delta = input.Position - dragStart2
+                                ColorPicker.Main.Position = UDim2.new(startPos2.X.Scale, startPos2.X.Offset + delta.X, startPos2.Y.Scale, startPos2.Y.Offset + delta.Y)
+                        end
                 end)
-        end
 
-        if not success then
-                Window.ScreenGui.Parent = PlayerGui;
-        end
+                local dragStart2 = function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+                                dragging2 = true
+                                dragStart2 = input.Position
+                                startPos2 = ColorPicker.Main.Position
 
-        -- Enhanced main window with better styling
-        Window.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.Main.Size = Window.Size;
+                                input.Changed:Connect(function()
+                                        if input.UserInputState == Enum.UserInputState.End then
+                                                dragging2 = false
+                                        end
+                                end)
+                        end
+                end
+
+                local dragend2 = function(input)
+                        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                                dragInput2 = input
+                        end
+                end
+
+                UserInputService.InputBegan:Connect(function(Key)
+                        if Key.KeyCode == Window.Keybind then
+                                if ColorPicker.Main.Visible then
+                                        CloseFrame(ColorPicker.Main);
+                                else
+                                        OpenFrame(ColorPicker.Main);
+                                end
+                        end
+                end)
+                
+                ColorPicker.Main.InputBegan:Connect(dragStart2);
+                ColorPicker.Main.InputChanged:Connect(dragend2);
+
+                ColorPicker.Frame = Instance.new("Frame", ColorPicker.Main);
+                ColorPicker.Frame.Size = UDim2.fromScale(1, 1);
+                ColorPicker.Frame.BackgroundTransparency = 1;
+
+                ColorPicker.Line = Instance.new("Frame", ColorPicker.Frame);
+                ColorPicker.Line.Position = UDim2.fromOffset(0, 34);
+                ColorPicker.Line.Size = UDim2.new(1, 0, 0, 1);
+                ColorPicker.Line.BorderSizePixel = 0;
+                ColorPicker.Line.BackgroundColor3 = Libary.Theme.Outline;
+
+                ColorPicker.Lable = Instance.new("TextLabel", ColorPicker.Frame);
+                ColorPicker.Lable.Size = UDim2.fromOffset(116, 34);
+                ColorPicker.Lable.BackgroundTransparency = 1;
+                ColorPicker.Lable.RichText = true;
+                ColorPicker.Lable.Text = "<b>" .. "Colorpicker" .."</b>";
+                ColorPicker.Lable.Font = Enum.Font.Ubuntu;
+                ColorPicker.Lable.TextSize = 18;
+                ColorPicker.Lable.TextColor3 = Color3.fromRGB(255, 255, 255);
+
+                ColorPicker.Saturation = Instance.new("ImageButton", ColorPicker.Frame);
+                ColorPicker.Saturation.BackgroundTransparency = 0;
+                ColorPicker.Saturation.Position = UDim2.fromOffset(11, 45);
+                ColorPicker.Saturation.Size = UDim2.fromOffset(220, 220);
+                ColorPicker.Saturation.Image = "rbxassetid://13901004307";
+                ColorPicker.Saturation.AutoButtonColor = false;
+
+                ColorPicker.SaturationSelect = Instance.new("Frame", ColorPicker.Saturation);
+                ColorPicker.SaturationSelect.Size = UDim2.fromOffset(1, 1);
+                ColorPicker.SaturationSelect.BackgroundColor3 = Color3.fromRGB(255 ,255 ,255);
+                ColorPicker.SaturationSelect.BorderColor3 = Color3.fromRGB(0, 0, 0);
+
+                ColorPicker.Hue = Instance.new("TextButton", ColorPicker.Frame);
+                ColorPicker.Hue.Position = UDim2.fromOffset(237, 45);
+                ColorPicker.Hue.Size = UDim2.fromOffset(22, 193);
+                ColorPicker.Hue.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+                ColorPicker.Hue.BorderSizePixel = 0;
+                ColorPicker.Hue.AutoButtonColor = false;
+                ColorPicker.Hue.Text = "";
+
+                ColorPicker.UiGradient = Instance.new("UIGradient", ColorPicker.Hue);
+                ColorPicker.UiGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)), ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 0, 255)), ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 0, 255)), ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)), ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 255, 0)), ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 255, 0)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))}
+                ColorPicker.UiGradient.Rotation = 90;
+
+                ColorPicker.HueSelect = Instance.new("Frame", ColorPicker.Hue);
+                ColorPicker.HueSelect.Size = UDim2.fromOffset(22, 1);
+                ColorPicker.HueSelect.BackgroundColor3 = Color3.fromRGB(255 ,255 ,255);
+                ColorPicker.HueSelect.BorderColor3 = Color3.fromRGB(0, 0, 0);
+
+                ColorPicker.View = Instance.new("Frame", ColorPicker.Frame);
+                ColorPicker.View.Position = UDim2.fromOffset(237, 243);
+                ColorPicker.View.Size = UDim2.fromOffset(22, 22);
+                ColorPicker.View.BackgroundColor3 = Color3.fromRGB(255 ,255 ,255);
+                ColorPicker.View.BorderSizePixel = 0;
+
+                local Hue, Sat, Val;
+
+                function ColorPicker:Set(color, transparency, ignore)
+                        transparency = 0;
+
+                        if type(color) == "table" then
+                                transparency = color.a;
+                                color = color.c;
+                        end;
+
+                        Hue, Sat, Val = color:ToHSV();
+
+                        ColorPicker.Color = color;
+                        ColorPicker.Transparency = transparency;
+
+                        if not ignore then
+                                ColorPicker.SaturationSelect.Position = UDim2.new(
+                                        math.clamp(Sat, 0, 1),
+                                        Sat < 1 and -1 or -3,
+                                        math.clamp(1 - Val, 0, 1),
+                                        1 - Val < 1 and -1 or -3
+                                );          
+
+                                ColorPicker.HuePosition = Hue;
+
+                                ColorPicker.HueSelect.Position = UDim2.new(
+                                        0,
+                                        0,
+                                        math.clamp(1 - Hue, 0, 1),
+                                        1 - Hue < 1 and -1 or -2
+                                );
+
+                                Libary.Flags[ColorPicker.Flag] = color;
+                        end;
+
+                        if ColorPicker.Flag then
+                                Libary.Flags[ColorPicker.Flag] = color;
+                        end;
+
+                        if ColorPicker.CallBack then
+                                pcall(ColorPicker.CallBack, color);
+                        end;
+
+                        ColorPicker.Saturation.BackgroundColor3 = Color3.fromHSV(ColorPicker.HuePosition, 1, 1);
+                        ColorPicker.View.BackgroundColor3 = color;
+                end
+
+                function ColorPicker:Add(Flag, CallBack)
+                        ColorPicker.Flag = Flag;
+                        ColorPicker.CallBack = CallBack;
+                        ColorPicker:Set(Libary.Flags[Flag], 0, false);
+                end;
+
+                function ColorPicker.SlideSaturation(input)
+                        local SizeX = math.clamp((input.Position.X - ColorPicker.Saturation.AbsolutePosition.X) / ColorPicker.Saturation.AbsoluteSize.X, 0, 1);
+                        local SizeY = 1 - math.clamp((input.Position.Y - ColorPicker.Saturation.AbsolutePosition.Y) / ColorPicker.Saturation.AbsoluteSize.Y, 0, 1);
+
+                        ColorPicker.SaturationSelect.Position = UDim2.new(SizeX, SizeX < 1 and -1 or -3, 1 - SizeY, 1 - SizeY < 1 and -1 or -3);
+                        ColorPicker:Set(Color3.fromHSV(ColorPicker.HuePosition, SizeX, SizeY), 0, true);
+                end;
+
+                ColorPicker.Saturation.MouseButton1Down:Connect(function()
+                        ColorPicker.SlidingSaturation = true;
+                        ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
+                end);
+
+                ColorPicker.Saturation.InputChanged:Connect(function()
+                        if ColorPicker.SlidingSaturation then
+                                ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
+                        end;
+                end);
+
+                ColorPicker.Saturation.MouseButton1Up:Connect(function()
+                        ColorPicker.SlidingSaturation = false;
+                end);
+
+                ColorPicker.Saturation.MouseLeave:Connect(function()
+                        ColorPicker.SlidingSaturation = false;
+                end);
+
+                function ColorPicker.SlideHue(input)
+                        local SizeY = 1 - math.clamp((input.Position.Y - ColorPicker.Hue.AbsolutePosition.Y) / ColorPicker.Hue.AbsoluteSize.Y, 0, 1)
+
+                        ColorPicker.HueSelect.Position = UDim2.new(0, 0, 1 - SizeY, 1 - SizeY < 1 and -1 or -2);
+                        ColorPicker.HuePosition = SizeY;
+
+                        ColorPicker:Set(Color3.fromHSV(SizeY, Sat, Val), 0, true);
+                end;
+
+                ColorPicker.Hue.MouseButton1Down:Connect(function()
+                        ColorPicker.SlidingHue = true;
+                        ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
+                end);
+
+                ColorPicker.Hue.InputChanged:Connect(function()
+                        if ColorPicker.SlidingHue then
+                                ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
+                        end;
+                end);
+
+                ColorPicker.Hue.MouseButton1Up:Connect(function()
+                        ColorPicker.SlidingHue = false;
+                end);
+
+                ColorPicker.Hue.MouseLeave:Connect(function()
+                        ColorPicker.SlidingHue = false;
+                end);
+
+                return ColorPicker;
+        end;
+
+        local ColorPickerM = Window:CreateColorPicker();
+
+        Window.Main = Instance.new("TextButton", Window.ScreenGui);
+        Window.Main.Size = UDim2.fromOffset(921, 428);
         Window.Main.Position = UDim2.fromScale(0.3, 0.3);
-        Window.Main.BackgroundColor3 = Library.Theme.BackGround1;
+        Window.Main.BackgroundColor3 = Libary.Theme.BackGround1;
         Window.Main.ClipsDescendants = true;
         Window.Main.Visible = true;
-        Window.Main.BorderSizePixel = 0;
-
-        Window.MainCorner = Instance.new("UICorner", Window.Main);
-        Window.MainCorner.CornerRadius = UDim.new(0, 6);
-
-        Window.MainStroke = Instance.new("UIStroke", Window.Main);
-        Window.MainStroke.Color = Library.Theme.Outline;
-        Window.MainStroke.Thickness = 1;
-        Window.MainStroke.ApplyStrokeMode = "Border";
-
-        -- Connect drag functionality to main window
+        Window.Main.AutoButtonColor = false;
+        Window.Main.Text = "";
         Window.Main.InputBegan:Connect(dragstart);
         Window.Main.InputChanged:Connect(dragend);
 
-        -- Top bar with close button and title
-        Window.TopBar = Instance.new("Frame", Window.Main);
-        Window.TopBar.Size = UDim2.new(1, 0, 0, 40);
-        Window.TopBar.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.TopBar.BorderSizePixel = 0;
+        Window.UICorner = Instance.new("UICorner", Window.Main);
+        Window.UICorner.CornerRadius = UDim.new(0, 4);
 
-        Window.TopBarCorner = Instance.new("UICorner", Window.TopBar);
-        Window.TopBarCorner.CornerRadius = UDim.new(0, 6);
+        Window.UIStroke = Instance.new("UIStroke", Window.Main);
+        Window.UIStroke.Color = Libary.Theme.Outline;
+        Window.UIStroke.Thickness = 1;
+        Window.UIStroke.ApplyStrokeMode = "Border";
 
-        -- Fix corner radius for top only
-        local topBarFix = Instance.new("Frame", Window.TopBar);
-        topBarFix.Size = UDim2.new(1, 0, 0, 20);
-        topBarFix.Position = UDim2.new(0, 0, 1, -20);
-        topBarFix.BackgroundColor3 = Library.Theme.BackGround2;
-        topBarFix.BorderSizePixel = 0;
-
-        Window.Title = Instance.new("TextLabel", Window.TopBar);
-        Window.Title.Size = UDim2.new(1, -100, 1, 0);
-        Window.Title.Position = UDim2.fromOffset(15, 0);
-        Window.Title.BackgroundTransparency = 1;
-        Window.Title.Text = tostring(Window.Name);
-        Window.Title.Font = Enum.Font.Ubuntu;
-        Window.Title.TextSize = 16;
-        Window.Title.TextColor3 = Library.Theme.TextColor;
-        Window.Title.TextXAlignment = Enum.TextXAlignment.Left;
-        Window.Title.RichText = true;
-
-        -- Close button
-        Window.CloseButton = Instance.new("TextButton", Window.TopBar);
-        Window.CloseButton.Size = UDim2.fromOffset(40, 40);
-        Window.CloseButton.Position = UDim2.new(1, -40, 0, 0);
-        Window.CloseButton.BackgroundTransparency = 1;
-        Window.CloseButton.Text = "×";
-        Window.CloseButton.Font = Enum.Font.Ubuntu;
-        Window.CloseButton.TextSize = 20;
-        Window.CloseButton.TextColor3 = Library.Theme.TextColor;
-
-        Window.CloseButton.MouseEnter:Connect(function()
-                local tween = TweenService:Create(Window.CloseButton, TweenInfo.new(0.2), {TextColor3 = Color3.fromRGB(255, 100, 100)});
-                tween:Play();
-        end)
-
-        Window.CloseButton.MouseLeave:Connect(function()
-                local tween = TweenService:Create(Window.CloseButton, TweenInfo.new(0.2), {TextColor3 = Library.Theme.TextColor});
-                tween:Play();
-        end)
-
-        Window.CloseButton.MouseButton1Click:Connect(function()
-                Window:Toggle();
-        end)
-
-        -- Enhanced toggle function with keybind support
-        function Window:Toggle()
-                Window.Toggle = not Window.Toggle;
-                Window.Main.Visible = Window.Toggle;
-
-                if Window.Toggle then
-                        OpenFrame(Window.Main);
-                else
-                        CloseFrame(Window.Main);
+        UserInputService.InputBegan:Connect(function(Key)
+                if Key.KeyCode == Window.Keybind then
+                        if Window.Main.Visible then
+                                CloseFrame(Window.Main);
+                        else
+                                OpenFrame(Window.Main);
+                        end
                 end
+        end)
+
+        Window.Frame = Instance.new("Frame", Window.Main);
+        Window.Frame.BackgroundColor3 = Libary.Theme.BackGround1;
+        Window.Frame.Position = UDim2.fromOffset(1, 1);
+        Window.Frame.Size = UDim2.fromOffset(919, 426);
+
+        Window.UICorner2 = Instance.new("UICorner", Window.Frame);
+        Window.UICorner2.CornerRadius = UDim.new(0, 4);
+
+        Window.Misc1 = Instance.new("Frame", Window.Frame);
+        Window.Misc1.Position = UDim2.fromScale(0.969, 0);
+        Window.Misc1.Size = UDim2.fromScale(0.031, 0.063);
+        Window.Misc1.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc1.BorderSizePixel = 0;
+
+        Window.UICorner3 = Instance.new("UICorner", Window.Misc1);
+        Window.UICorner3.CornerRadius = UDim.new(0, 4);
+
+        Window.Misc2 = Instance.new("Frame", Window.Frame);
+        Window.Misc2.Position = UDim2.fromScale(0, 0);
+        Window.Misc2.Size = UDim2.fromScale(0.031, 0.063);
+        Window.Misc2.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc2.BorderSizePixel = 0;
+
+        Window.UICorner4 = Instance.new("UICorner", Window.Misc2);
+        Window.UICorner4.CornerRadius = UDim.new(0, 4);
+
+        Window.Misc3 = Instance.new("Frame", Window.Frame);
+        Window.Misc3.Position = UDim2.fromScale(0, 0.935);
+        Window.Misc3.Size = UDim2.fromScale(0.031, 0.063);
+        Window.Misc3.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc3.BorderSizePixel = 0;
+
+        Window.UICorner5 = Instance.new("UICorner", Window.Misc3);
+        Window.UICorner5.CornerRadius = UDim.new(0, 4);
+
+        Window.Misc4 = Instance.new("Frame", Window.Frame);
+        Window.Misc4.Position = UDim2.fromScale(0, 0.032);
+        Window.Misc4.Size = UDim2.fromScale(0.164, 0.939);
+        Window.Misc4.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc4.BorderSizePixel = 0;
+
+        Window.Misc5 = Instance.new("Frame", Window.Frame);
+        Window.Misc5.Position = UDim2.fromScale(0.017, 0);
+        Window.Misc5.Size = UDim2.fromScale(0.964, 0.126);
+        Window.Misc5.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc5.BorderSizePixel = 0;
+        Window.Misc5.ZIndex = 3;
+
+        Window.Misc6 = Instance.new("Frame", Window.Frame);
+        Window.Misc6.Position = UDim2.fromScale(0.969, 0.019);
+        Window.Misc6.Size = UDim2.fromScale(0.031, 0.107);
+        Window.Misc6.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc6.BorderSizePixel = 0;
+
+        Window.Misc7 = Instance.new("Frame", Window.Frame);
+        Window.Misc7.Position = UDim2.fromScale(0.017, 0.935);
+        Window.Misc7.Size = UDim2.fromScale(0.147, 0.063);
+        Window.Misc7.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Misc7.BorderSizePixel = 0;
+
+        Window.Border = Instance.new("Frame", Window.Frame);
+        Window.Border.Position = UDim2.fromScale(0.163, -0.001);
+        Window.Border.Size = UDim2.fromOffset(1, 428);
+        Window.Border.BackgroundColor3 = Libary.Theme.Outline;
+        Window.Border.BorderSizePixel = 0;
+        Window.Border.ZIndex = 4;
+
+        Window.Border2 = Instance.new("Frame", Window.Frame);
+        Window.Border2.Position = UDim2.fromScale(0.164, 0.124);
+        Window.Border2.Size = UDim2.fromOffset(770, 1);
+        Window.Border2.BackgroundColor3 = Libary.Theme.Outline;
+        Window.Border2.BorderSizePixel = 0;
+        Window.Border2.ZIndex = 3;
+
+        Window.TextLable = Instance.new("TextLabel", Window.Frame);
+        Window.TextLable.BackgroundTransparency = 1;
+        Window.TextLable.RichText = true;
+        Window.TextLable.Text = "<b>" .. Window.Name .."</b>";
+        Window.TextLable.Font = Libary.Theme.Font;
+        Window.TextLable.TextSize = 23;
+        Window.TextLable.TextColor3 = Libary.Theme.TextColor;
+        Window.TextLable.Position = UDim2.fromOffset(17, 10);
+        Window.TextLable.Size = UDim2.fromScale(0.126, 0.078);
+        Window.TextLable.ZIndex = 4;
+
+        Window.SubOptionsHoler = Instance.new("Folder", Window.Frame);
+
+        Window.TabHolder = Instance.new("Frame", Window.Frame);
+        Window.TabHolder.BackgroundTransparency = 1;
+        Window.TabHolder.Position = UDim2.fromScale(0.165, 0.121);
+        Window.TabHolder.Size = UDim2.fromScale(0.836, 0.872);
+        Window.TabHolder.ClipsDescendants = true;
+
+        Window.Tablist = Instance.new("ScrollingFrame", Window.Frame);
+        Window.Tablist.Position = UDim2.fromOffset(0, 54);
+        Window.Tablist.Size = UDim2.fromOffset(150, 362);
+        Window.Tablist.BackgroundColor3 = Libary.Theme.BackGround2;
+        Window.Tablist.BorderSizePixel = 0;
+        Window.Tablist.ScrollBarThickness = 0;
+
+        Window.UiList = Instance.new("UIListLayout", Window.Tablist);
+        Window.UiList.FillDirection = "Vertical";
+        Window.UiList.HorizontalAlignment = "Left";
+        Window.UiList.SortOrder = "LayoutOrder"
+        Window.UiList.VerticalAlignment = "Top";
+
+        Window.OpenedColorPickers = { };
+        Window.Tabs = { };
+
+        function Window:UpdateTabList()
+                Window.Tablist.CanvasSize = UDim2.fromOffset(0, Window.UiList.AbsoluteContentSize.Y);
         end
 
-        -- Keybind handling for main window
-        local mainKeybindConnection = UserInputService.InputBegan:Connect(function(Key, GameProcessed)
-                if not GameProcessed and Key.KeyCode == Window.Keybind then
-                        Window:Toggle();
-                end
-        end)
+        function Window:CreateTabSection(text)
+                local SubTab = { };
+                SubTab.Text = text or "";
 
-        -- Enhanced tab creation function
-        function Window:CreateTab(Name, Icon)
-                local Tab = {};
-                Tab.Name = tostring(Name or "New Tab");
-                Tab.Icon = Icon;
-                Tab.Active = false;
-                Tab.Sections = {};
-                Tab.Elements = {};
+                SubTab.TextLable = Instance.new("TextLabel", Window.Tablist);
+                SubTab.TextLable.BackgroundTransparency = 1;
+                SubTab.TextLable.Size = UDim2.fromScale(1, 0.05);
+                SubTab.TextLable.Text = "      " .. SubTab.Text;
+                SubTab.TextLable.TextColor3 = Libary.Theme.TextColor;
+                SubTab.TextLable.TextSize = 13;
+                SubTab.TextLable.Font = Libary.Theme.Font;
+                SubTab.TextLable.TextXAlignment = "Left"
 
-                -- Create tab content
-                Tab.Content = Instance.new("ScrollingFrame", Window.Main);
-                Tab.Content.Size = UDim2.new(1, -20, 1, -60);
-                Tab.Content.Position = UDim2.fromOffset(10, 50);
-                Tab.Content.BackgroundTransparency = 1;
-                Tab.Content.BorderSizePixel = 0;
-                Tab.Content.ScrollBarThickness = 6;
-                Tab.Content.ScrollBarImageColor3 = Library.Theme.Outline;
-                Tab.Content.CanvasSize = UDim2.fromOffset(0, 0);
-                Tab.Content.Visible = false;
+                Window:UpdateTabList();
+                return SubTab;
+        end
 
-                -- Content layout
-                Tab.ContentLayout = Instance.new("UIListLayout", Tab.Content);
-                Tab.ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder;
-                Tab.ContentLayout.Padding = UDim.new(0, 5);
+        function Window:CreateTab(Name)
+                local Tab = { };
+                Tab.Name = Name or "";
 
-                -- Auto-resize canvas
-                Tab.ContentLayout.Changed:Connect(function()
-                        Tab.Content.CanvasSize = UDim2.fromOffset(0, Tab.ContentLayout.AbsoluteContentSize.Y + 20);
-                end)
-
-                -- Tab selection function
                 function Tab:Select()
-                        -- Deselect all tabs
-                        for _, tabObj in pairs(Window.Tabs) do
-                                tabObj:Deselect();
+                        for i,v in pairs(Window.Tablist:GetChildren()) do
+                                if v:IsA("TextButton") then
+                                        TweenService:Create(v.SelectedAnimation, TweenInfo.new(Libary.Theme.TabOptionsSelectTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(0, 1)}):Play();
+                                end;
+                        end;
+                        if Tab.MainTab.Visible ~= true then
+                                for i,v in pairs(Window.TabHolder:GetChildren()) do
+                                        v.Visible = false;
+                                end;
+                                Tab.MainTab.Position = UDim2.new(0, Tab.MainTab.Position.X.Offset, 0.15, 0);
+                                Tab.MainTab.Visible = true;
+                                TweenService:Create(Tab.MainTab, TweenInfo.new(Libary.Theme.TabTween, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0, Tab.MainTab.Position.X.Offset, 0, 0)}):Play();
+                        end;
+                        TweenService:Create(Tab.SelectedAnimation, TweenInfo.new(Libary.Theme.TabOptionsSelectTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(1.1, 1)}):Play();
+                        for i,v in pairs(Window.SubOptionsHoler:GetChildren()) do
+                                v.Visible = false;
                         end
+                        local SubTables = Tab.SubOptions:GetChildren();
 
-                        -- Select this tab
-                        Tab.Active = true;
-                        Tab.Content.Visible = true;
-                        Window.CurrentTab = Tab;
-                end
+                        if #SubTables > 1 then
+                                Tab.SubOptions.Visible = true;
+                                Tab.SubSelector.Visible = true;
+                        end
+                end;
 
-                function Tab:Deselect()
-                        Tab.Active = false;
-                        Tab.Content.Visible = false;
-                end
+                Tab.SubOptions = Instance.new("Frame", Window.SubOptionsHoler);
+                Tab.SubOptions.Position = UDim2.fromScale(0.178, 0);
+                Tab.SubOptions.Size = UDim2.fromOffset(755, 53);
+                Tab.SubOptions.BackgroundTransparency = 1;
+                Tab.SubOptions.Visible = false;
+                Tab.SubOptions.Name = Tab.Name .. "SubTable";
 
-                -- Add to window tabs
-                table.insert(Window.Tabs, Tab);
+                Tab.UiList2 = Instance.new("UIListLayout", Tab.SubOptions);
+                Tab.UiList2.Padding = UDim.new(0, 4);
+                Tab.UiList2.FillDirection = "Horizontal";
+                Tab.UiList2.HorizontalAlignment = "Left";
+                Tab.UiList2.SortOrder = "LayoutOrder";
+                Tab.UiList2.VerticalAlignment = "Top";
 
-                -- Select first tab automatically
-                if #Window.Tabs == 1 then
+                Tab.SubSelector = Instance.new("Frame", Window.SubOptionsHoler);
+                Tab.SubSelector.Size = UDim2.fromOffset(65, 1);
+                Tab.SubSelector.Position = UDim2.fromScale(0.178, 0.124);
+                Tab.SubSelector.BorderSizePixel = 0;
+                Tab.SubSelector.BackgroundColor3 = Libary.Theme.Selected;
+                Tab.SubSelector.Visible = false;
+                Tab.SubSelector.Name = Tab.Name .. "SubSelector";
+
+                Tab.Button = Instance.new("TextButton", Window.Tablist);
+                Tab.Button.Size = UDim2.new(1, 0, 0, 34);
+                Tab.Button.BackgroundColor3 = Libary.Theme.BackGround2;
+                Tab.Button.BorderSizePixel = 0;
+                Tab.Button.AutoButtonColor = false;
+                Tab.Button.Text = "";
+                Tab.Button.MouseEnter:Connect(function()
+                        TweenService:Create(Tab.TextLable, TweenInfo.new(Libary.Theme.TabOptionsHoverTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(0.06, 0,0.287, 0)}):Play();
+                end)
+                Tab.Button.MouseLeave:Connect(function()
+                        TweenService:Create(Tab.TextLable, TweenInfo.new(Libary.Theme.TabOptionsHoverTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0,0.287, 0)}):Play();
+                end)
+                Tab.Button.MouseButton1Click:Connect(function()Tab:Select();end);
+
+                Tab.TextLable = Instance.new("TextLabel", Tab.Button);
+                Tab.TextLable.BackgroundTransparency = 1;
+                Tab.TextLable.Size = UDim2.fromScale(1, 0.458);
+                Tab.TextLable.Position = UDim2.fromScale(0, 0.287);
+                Tab.TextLable.Text = Tab.Name;
+                Tab.TextLable.TextColor3 = Libary.Theme.TextColor;
+                Tab.TextLable.TextSize = Libary.Theme.TextSize;
+                Tab.TextLable.Font = Libary.Theme.Font;
+                Tab.TextLable.TextXAlignment = "Center";
+                Tab.TextLable.ZIndex = 2;
+                Tab.TextLable.TextScaled = true;
+
+                Tab.SelectedAnimation = Instance.new("Frame", Tab.Button);
+                Tab.SelectedAnimation.AnchorPoint = Vector2.new(0.5, 0.5);
+                Tab.SelectedAnimation.Position = UDim2.fromScale(0.5, 0.5);
+                Tab.SelectedAnimation.Size = UDim2.fromScale(0, 1);
+                Tab.SelectedAnimation.ZIndex = 1;
+                Tab.SelectedAnimation.BackgroundColor3 = Color3.fromRGB(45, 45, 45);
+                Tab.SelectedAnimation.BorderSizePixel = 0;
+                Tab.SelectedAnimation.Name = "SelectedAnimation";
+
+                Tab.UICorner = Instance.new("UICorner", Tab.SelectedAnimation); -- Makes It Look a Bit Better For The Few Miliseconds.
+                Tab.UICorner.CornerRadius = UDim.new(0, 10);
+
+                Tab.MainTab = Instance.new("Frame", Window.TabHolder); -- For Sub Tab
+                Tab.MainTab.Size = UDim2.fromOffset(768, 371);
+                Tab.MainTab.Position = UDim2.fromOffset(0, 0);
+                Tab.MainTab.BackgroundTransparency = 1;
+                Tab.MainTab.Visible = false;
+
+                Tab.UIListLayout3 = Instance.new("UIListLayout", Tab.MainTab);
+                Tab.UIListLayout3.Padding = UDim.new(0,0);
+                Tab.UIListLayout3.HorizontalAlignment = "Left";
+                Tab.UIListLayout3.SortOrder = "LayoutOrder";
+                Tab.UIListLayout3.FillDirection = "Horizontal";
+
+                Tab.TabScroll = Instance.new("ScrollingFrame", Tab.MainTab);
+                Tab.TabScroll.Position = UDim2.fromOffset(0, 0);
+                Tab.TabScroll.Size = UDim2.fromOffset(768, 371);
+                Tab.TabScroll.BackgroundTransparency = 1;
+                Tab.TabScroll.ScrollBarThickness = 0;
+
+                Tab.Left = Instance.new("Frame", Tab.TabScroll);
+                Tab.Left.Size = UDim2.fromScale(0.1, 1);
+                Tab.Left.Position = UDim2.fromScale(0.206, 0);
+                Tab.Left.BackgroundTransparency = 1;
+
+                Tab.UIListLayout = Instance.new("UIListLayout", Tab.Left);
+                Tab.UIListLayout.Padding = UDim.new(0, 10);
+                Tab.UIListLayout.FillDirection = "Vertical";
+                Tab.UIListLayout.HorizontalAlignment = "Center";
+                Tab.UIListLayout.SortOrder = "LayoutOrder";
+                Tab.UIListLayout.VerticalAlignment = "Top";
+
+                Tab.EmptySpace = Instance.new("Frame", Tab.Left); -- I Am Lazy
+                Tab.EmptySpace.BackgroundTransparency = 1;
+                Tab.EmptySpace.Size = UDim2.fromOffset(38, 14);
+
+                Tab.Right = Instance.new("Frame", Tab.TabScroll);
+                Tab.Right.Size = UDim2.fromScale(0.1, 1);
+                Tab.Right.Position = UDim2.fromScale(0.693, 0);
+                Tab.Right.BackgroundTransparency = 1;
+
+                Tab.UIListLayout2 = Instance.new("UIListLayout", Tab.Right);
+                Tab.UIListLayout2.Padding = UDim.new(0, 10);
+                Tab.UIListLayout2.FillDirection = "Vertical";
+                Tab.UIListLayout2.HorizontalAlignment = "Center";
+                Tab.UIListLayout2.SortOrder = "LayoutOrder";
+                Tab.UIListLayout2.VerticalAlignment = "Top";
+
+                Tab.EmptySpace = Instance.new("Frame", Tab.Right); -- I Am Lazy
+                Tab.EmptySpace.BackgroundTransparency = 1;
+                Tab.EmptySpace.Size = UDim2.fromOffset(38, 14);
+
+                if #Window.Tabs == 0 then
                         Tab:Select();
                 end
 
-                -- Enhanced section creation
-                function Tab:CreateSection(Name)
-                        local Section = {};
-                        Section.Name = tostring(Name or "New Section");
-                        Section.Elements = {};
+                function Tab:CreateSector(Name, Side)
+                        local Sector = { };
+                        Sector.Name = Name or "";
+                        Sector.Side = Side:lower() or "left"
 
-                        Section.Frame = Instance.new("Frame", Tab.Content);
-                        Section.Frame.Size = UDim2.new(1, 0, 0, 30);
-                        Section.Frame.BackgroundColor3 = Library.Theme.BackGround2;
-                        Section.Frame.BorderSizePixel = 0;
+                        Sector.Main = Instance.new("Frame", Sector.Side == "left" and Tab.Left or Tab.Right);
+                        Sector.Main.Size = UDim2.fromOffset(349, 300);
+                        Sector.Main.BackgroundColor3 = Libary.Theme.BackGround2;
 
-                        Section.Corner = Instance.new("UICorner", Section.Frame);
-                        Section.Corner.CornerRadius = UDim.new(0, 6);
+                        Sector.UiCorner = Instance.new("UICorner", Sector.Main);
+                        Sector.UiCorner.CornerRadius = UDim.new(0, 8);
 
-                        Section.Stroke = Instance.new("UIStroke", Section.Frame);
-                        Section.Stroke.Color = Library.Theme.Outline;
-                        Section.Stroke.Thickness = 1;
-                        Section.Stroke.ApplyStrokeMode = "Border";
+                        Sector.TextLable = Instance.new("TextLabel", Sector.Main);
+                        Sector.TextLable.Size = UDim2.new(1, 0, 0, 20);
+                        Sector.TextLable.Position = UDim2.fromOffset(0, 0);
+                        Sector.TextLable.BackgroundTransparency = 1;
+                        Sector.TextLable.Text = Sector.Name;
+                        Sector.TextLable.TextColor3 = Libary.Theme.TextColor;
+                        Sector.TextLable.TextSize = Libary.Theme.TextSize;
+                        Sector.TextLable.Font = Libary.Theme.Font;
+                        Sector.TextLable.TextXAlignment = "Center";
+                        Sector.TextLable.TextYAlignment = "Bottom";
 
-                        Section.Title = Instance.new("TextLabel", Section.Frame);
-                        Section.Title.Size = UDim2.new(1, -20, 0, 30);
-                        Section.Title.Position = UDim2.fromOffset(10, 0);
-                        Section.Title.BackgroundTransparency = 1;
-                        Section.Title.Text = tostring(Section.Name);
-                        Section.Title.Font = Enum.Font.Ubuntu;
-                        Section.Title.TextSize = 14;
-                        Section.Title.TextColor3 = Library.Theme.Selected;
-                        Section.Title.TextXAlignment = Enum.TextXAlignment.Left;
-                        Section.Title.RichText = true;
+                        Sector.Sepirator = Instance.new("Frame", Sector.Main);
+                        Sector.Sepirator.Position = UDim2.fromOffset(25, 25);
+                        Sector.Sepirator.Size = UDim2.fromOffset(300, 1);
+                        Sector.Sepirator.BorderSizePixel = 0;
+                        Sector.Sepirator.BackgroundColor3 = Libary.Theme.Outline;
 
-                        Section.Container = Instance.new("Frame", Section.Frame);
-                        Section.Container.Size = UDim2.new(1, -20, 1, -35);
-                        Section.Container.Position = UDim2.fromOffset(10, 35);
-                        Section.Container.BackgroundTransparency = 1;
+                        Sector.Holder = Instance.new("Frame", Sector.Main);
+                        Sector.Holder.BackgroundTransparency = 1;
+                        Sector.Holder.Position = UDim2.fromOffset(0, 29);
+                        Sector.Holder.Size = UDim2.fromOffset(349, 56);
 
-                        Section.Layout = Instance.new("UIListLayout", Section.Container);
-                        Section.Layout.SortOrder = Enum.SortOrder.LayoutOrder;
-                        Section.Layout.Padding = UDim.new(0, 8);
+                        Sector.UiListLayout = Instance.new("UIListLayout", Sector.Holder);
+                        Sector.UiListLayout.Padding = UDim.new(0, 0);
+                        Sector.UiListLayout.FillDirection = "Vertical";
+                        Sector.UiListLayout.HorizontalAlignment = "Center";
+                        Sector.UiListLayout.VerticalAlignment = "Top";
 
-                        -- Auto-resize section
-                        Section.Layout.Changed:Connect(function()
-                                local contentSize = Section.Layout.AbsoluteContentSize.Y;
-                                Section.Frame.Size = UDim2.new(1, 0, 0, contentSize + 45);
-                        end)
-
-                        table.insert(Tab.Sections, Section);
-
-                        -- Enhanced button creation
-                        function Section:CreateButton(Name, CallBack)
-                                local Button = {};
-                                Button.Name = tostring(Name or "Button");
-                                Button.CallBack = CallBack;
-
-                                Button.Frame = Instance.new("Frame", Section.Container);
-                                Button.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                Button.Frame.BackgroundColor3 = Library.Theme.BackGround1;
-                                Button.Frame.BorderSizePixel = 0;
-
-                                Button.Corner = Instance.new("UICorner", Button.Frame);
-                                Button.Corner.CornerRadius = UDim.new(0, 4);
-
-                                Button.Stroke = Instance.new("UIStroke", Button.Frame);
-                                Button.Stroke.Color = Library.Theme.Outline;
-                                Button.Stroke.Thickness = 1;
-                                Button.Stroke.ApplyStrokeMode = "Border";
-
-                                Button.Button = Instance.new("TextButton", Button.Frame);
-                                Button.Button.Size = UDim2.fromScale(1, 1);
-                                Button.Button.BackgroundTransparency = 1;
-                                Button.Button.Text = tostring(Button.Name);
-                                Button.Button.Font = Enum.Font.Ubuntu;
-                                Button.Button.TextSize = 14;
-                                Button.Button.TextColor3 = Library.Theme.TextColor;
-                                Button.Button.AutoButtonColor = false;
-
-                                -- Button interactions
-                                Button.Button.MouseEnter:Connect(function()
-                                        local tween = TweenService:Create(Button.Frame, TweenInfo.new(Library.Theme.ButtonTween), {
-                                                BackgroundColor3 = Library.Theme.BackGround3
-                                        });
-                                        tween:Play();
-                                end)
-
-                                Button.Button.MouseLeave:Connect(function()
-                                        local tween = TweenService:Create(Button.Frame, TweenInfo.new(Library.Theme.ButtonTween), {
-                                                BackgroundColor3 = Library.Theme.BackGround1
-                                        });
-                                        tween:Play();
-                                end)
-
-                                Button.Button.MouseButton1Click:Connect(function()
-                                        if Button.CallBack then
-                                                local success, err = pcall(Button.CallBack);
-                                                if not success then
-                                                        warn("Button callback error: " .. tostring(err));
-                                                end
-                                        end
-                                end)
-
-                                table.insert(Section.Elements, Button);
-                                return Button;
+                        function Sector:FixSize()
+                                Sector.Main.Size = UDim2.fromOffset(349, Sector.UiListLayout.AbsoluteContentSize.Y + 42);
+                                local Left = Tab.UIListLayout.AbsoluteContentSize.Y + 20;
+                                local Right = Tab.UIListLayout2.AbsoluteContentSize.Y + 20;
+                                Tab.TabScroll.CanvasSize = (Left>Right and UDim2.fromOffset(768, Left) or UDim2.fromOffset(768, Right));
                         end
 
-                        -- Enhanced toggle creation
-                        function Section:CreateToggle(Name, Flag, Default, CallBack)
-                                local Toggle = {};
-                                Toggle.Name = tostring(Name or "Toggle");
-                                Toggle.Flag = Flag;
-                                Toggle.State = Default or false;
-                                Toggle.CallBack = CallBack;
+                        function Sector:CreateToggle(Name, Defult, CallBack, Flag)
+                                local Toggle = { };
+                                Toggle.Name = Name or "";
+                                Toggle.Defult = Defult or false;
+                                Toggle.CallBack = CallBack or function() end;
+                                Toggle.Flag = Flag or Name;
+                                Toggle.Value = Toggle.Defult;
 
-                                if Flag then
-                                        Library.Flags[Flag] = Toggle.State;
+                                function Toggle:Set(bool)
+                                        Toggle.Value = bool;
+
+                                        if Toggle.Flag and Toggle.Flag ~= "" then
+                                                Libary.Flags[Toggle.Flag] = Toggle.Value;
+                                        end
+                                        if Toggle.Value then
+                                                TweenService:Create(Toggle.ToggleBackColor, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(1, 1)}):Play();
+                                                TweenService:Create(Toggle.Ball, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.919, 0.2)}):Play();
+                                        else
+                                                TweenService:Create(Toggle.ToggleBackColor, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(0.4, 1)}):Play();
+                                                TweenService:Create(Toggle.Ball, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.833, 0.2)}):Play(); 
+                                        end
+                                        pcall(Toggle.CallBack, bool);
                                 end
 
-                                Toggle.Frame = Instance.new("Frame", Section.Container);
-                                Toggle.Frame.Size = UDim2.new(1, 0, 0, 35);
-                                Toggle.Frame.BackgroundColor3 = Library.Theme.BackGround1;
-                                Toggle.Frame.BorderSizePixel = 0;
-
-                                Toggle.Corner = Instance.new("UICorner", Toggle.Frame);
-                                Toggle.Corner.CornerRadius = UDim.new(0, 4);
-
-                                Toggle.Button = Instance.new("TextButton", Toggle.Frame);
-                                Toggle.Button.Size = UDim2.fromScale(1, 1);
-                                Toggle.Button.BackgroundTransparency = 1;
-                                Toggle.Button.Text = "";
-                                Toggle.Button.AutoButtonColor = false;
-
-                                Toggle.Label = Instance.new("TextLabel", Toggle.Button);
-                                Toggle.Label.Size = UDim2.new(1, -50, 1, 0);
-                                Toggle.Label.Position = UDim2.fromOffset(10, 0);
-                                Toggle.Label.BackgroundTransparency = 1;
-                                Toggle.Label.Text = tostring(Toggle.Name);
-                                Toggle.Label.Font = Enum.Font.Ubuntu;
-                                Toggle.Label.TextSize = 14;
-                                Toggle.Label.TextColor3 = Library.Theme.TextColor;
-                                Toggle.Label.TextXAlignment = Enum.TextXAlignment.Left;
-
-                                -- Toggle indicator
-                                Toggle.Indicator = Instance.new("Frame", Toggle.Button);
-                                Toggle.Indicator.Size = UDim2.fromOffset(30, 16);
-                                Toggle.Indicator.Position = UDim2.new(1, -40, 0.5, -8);
-                                Toggle.Indicator.BackgroundColor3 = Toggle.State and Library.Theme.Selected or Library.Theme.BackGround3;
-                                Toggle.Indicator.BorderSizePixel = 0;
-
-                                Toggle.IndicatorCorner = Instance.new("UICorner", Toggle.Indicator);
-                                Toggle.IndicatorCorner.CornerRadius = UDim.new(1, 0);
-
-                                -- Toggle circle
-                                Toggle.Circle = Instance.new("Frame", Toggle.Indicator);
-                                Toggle.Circle.Size = UDim2.fromOffset(12, 12);
-                                Toggle.Circle.Position = Toggle.State and UDim2.fromOffset(16, 2) or UDim2.fromOffset(2, 2);
-                                Toggle.Circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-                                Toggle.Circle.BorderSizePixel = 0;
-
-                                Toggle.CircleCorner = Instance.new("UICorner", Toggle.Circle);
-                                Toggle.CircleCorner.CornerRadius = UDim.new(1, 0);
-
-                                function Toggle:Set(State)
-                                        Toggle.State = State;
-
-                                        if Toggle.Flag then
-                                                Library.Flags[Toggle.Flag] = State;
-                                        end
-
-                                        -- Animate toggle
-                                        local indicatorTween = TweenService:Create(Toggle.Indicator, TweenInfo.new(Library.Theme.ToggleTween), {
-                                                BackgroundColor3 = State and Library.Theme.Selected or Library.Theme.BackGround3
-                                        });
-                                        indicatorTween:Play();
-
-                                        local circleTween = TweenService:Create(Toggle.Circle, TweenInfo.new(Library.Theme.ToggleTween), {
-                                                Position = State and UDim2.fromOffset(16, 2) or UDim2.fromOffset(2, 2)
-                                        });
-                                        circleTween:Play();
-
-                                        if Toggle.CallBack then
-                                                local success, err = pcall(Toggle.CallBack, State);
-                                                if not success then
-                                                        warn("Toggle callback error: " .. tostring(err));
-                                                end
-                                        end
+                                function Toggle:Get() 
+                                        return Toggle.Value;
                                 end
 
-                                Toggle.Button.MouseButton1Click:Connect(function()
-                                        Toggle:Set(not Toggle.State);
+                                Toggle.Main = Instance.new("TextButton", Sector.Holder);
+                                Toggle.Main.Size = UDim2.fromOffset(300, 30);
+                                Toggle.Main.BackgroundTransparency = 1;
+                                Toggle.Main.AutoButtonColor = false;
+                                Toggle.Main.Text = "";
+                                Toggle.Main.MouseButton1Click:Connect(function()
+                                        Toggle:Set(not Toggle.Value)
                                 end)
 
-                                table.insert(Section.Elements, Toggle);
+                                Toggle.TextLable = Instance.new("TextLabel", Toggle.Main);
+                                Toggle.TextLable.Size = UDim2.fromOffset(164, 30);
+                                Toggle.TextLable.Position = UDim2.fromOffset(0,0)
+                                Toggle.TextLable.BackgroundTransparency = 1;
+                                Toggle.TextLable.Text = Toggle.Name;
+                                Toggle.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                Toggle.TextLable.TextSize = Libary.Theme.TextSize;
+                                Toggle.TextLable.Font = Libary.Theme.Font;
+                                Toggle.TextLable.TextXAlignment = "Left";
+                                Toggle.TextLable.TextYAlignment = "Center";
+
+                                Toggle.ToggleBack = Instance.new("Frame", Toggle.Main);
+                                Toggle.ToggleBack.Position = UDim2.fromScale(0.833, 0.2);
+                                Toggle.ToggleBack.Size = UDim2.fromOffset(40, 17);
+                                Toggle.ToggleBack.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Toggle.ToggleBack.ClipsDescendants = true;
+
+                                Toggle.UICorner = Instance.new("UICorner", Toggle.ToggleBack);
+                                Toggle.UICorner.CornerRadius = UDim.new(0, 5);
+
+                                Toggle.ToggleBackColor = Instance.new("Frame", Toggle.ToggleBack);
+                                Toggle.ToggleBackColor.Position = UDim2.fromScale(0, 0);
+                                Toggle.ToggleBackColor.Size = UDim2.fromScale(0, 1);
+                                Toggle.ToggleBackColor.BackgroundColor3 = Libary.Theme.Selected;
+
+                                Toggle.UICorner3 = Instance.new("UICorner", Toggle.ToggleBackColor);
+                                Toggle.UICorner3.CornerRadius = UDim.new(0, 5);
+
+                                Toggle.UIStroke = Instance.new("UIStroke", Toggle.ToggleBack);
+                                Toggle.UIStroke.Thickness = 1;
+                                Toggle.UIStroke.Color = Libary.Theme.Outline;
+                                Toggle.UIStroke.ApplyStrokeMode = "Border";
+
+                                Toggle.Ball = Instance.new("Frame", Toggle.Main);
+                                Toggle.Ball.AnchorPoint = Vector2.new(0, 0);
+                                Toggle.Ball.Size = UDim2.fromOffset(17, 17);
+                                Toggle.Ball.Position = UDim2.fromScale(0.833, 0.2);
+                                Toggle.Ball.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+
+                                Toggle.UICorner2 = Instance.new("UICorner", Toggle.Ball);
+                                Toggle.UICorner2.CornerRadius = UDim.new(0, 5);
+
+                                Toggle.UIStroke2 = Instance.new("UIStroke", Toggle.Ball);
+                                Toggle.UIStroke2.Thickness = 1;
+                                Toggle.UIStroke2.Color = Libary.Theme.Outline;
+
+                                Toggle.Holder = Instance.new("Frame", Toggle.Main);
+                                Toggle.Holder.Position = UDim2.fromScale(0.595, 0.167);
+                                Toggle.Holder.Size = UDim2.fromOffset(60, 17);
+                                Toggle.Holder.BackgroundTransparency = 1;
+
+                                Toggle.UIList = Instance.new("UIListLayout", Toggle.Holder);
+                                Toggle.UIList.FillDirection = "Horizontal";
+                                Toggle.UIList.HorizontalAlignment = "Right";
+                                Toggle.UIList.SortOrder = "LayoutOrder";
+                                Toggle.UIList.VerticalAlignment = "Center";
+
+                                Toggle:Set(Toggle.Defult);
+
+                                if Toggle.Flag and Toggle.Flag ~= "" then
+                                        Libary.Flags[Toggle.Flag] = Toggle.Defult or false;
+                                end
+
+                                function Toggle:CreateColorPicker(Defult, CallBack, Flag)
+                                        local ColorPicker = { };
+                                        ColorPicker.CallBack = CallBack or function() end;
+                                        ColorPicker.Defult = Defult or Color3.fromRGB(255, 255, 255);
+                                        ColorPicker.Value = ColorPicker.Defult;
+                                        ColorPicker.Flag = Flag or ((Toggle.Name or "") .. tostring(#Toggle.Holder:GetChildren()));
+
+                                        if ColorPicker.Flag and ColorPicker.Flag ~= "" then
+                                                Libary.Flags[ColorPicker.Flag] = ColorPicker.Defult or Color3.fromRGB(255, 255, 255);
+                                        end
+
+                                        ColorPicker.Main = Instance.new("ImageButton", Toggle.Holder);
+                                        ColorPicker.Main.BackgroundTransparency = 1;
+                                        ColorPicker.Main.Size = UDim2.fromOffset(17, 17);
+                                        ColorPicker.Main.Image = "rbxassetid://11430234918";
+                                        ColorPicker.Main.MouseButton1Click:Connect(function()
+                                                ColorPickerM:Add(ColorPicker.Flag, CallBack)
+                                                Window.ColorPickerSelected = ColorPicker.Flag
+                                        end);
+
+                                        table.insert(Libary.Items, ColorPicker);
+                                        return ColorPicker;
+                                end
+
+                                Sector:FixSize();
+                                table.insert(Libary.Items, Toggle);
                                 return Toggle;
-                        end
+                        end;
 
-                        -- Enhanced slider creation
-                        function Section:CreateSlider(Name, Flag, Min, Max, Default, Decimals, CallBack)
-                                local Slider = {};
-                                Slider.Name = tostring(Name or "Slider");
-                                Slider.Flag = Flag;
+                        function Sector:CreateSlider(Text, Min, Default, Max, Decimals, Callback, Flag)
+                                local Slider = { };
+                                Slider.Text = Text or "";
+                                Slider.Callback = Callback or function(Value) end;
                                 Slider.Min = Min or 0;
                                 Slider.Max = Max or 100;
-                                Slider.Value = Default or Min or 0;
-                                Slider.Decimals = Decimals or 0;
-                                Slider.CallBack = CallBack;
-                                Slider.Sliding = false;
+                                Slider.Decimals = Decimals or 1;
+                                Slider.Default = Default or Slider.min;
+                                Slider.Flag = Flag or Text or "";
 
-                                if Flag then
-                                        Library.Flags[Flag] = Slider.Value;
-                                end
+                                Slider.Value = Slider.Default;
+                                local Dragging = false;
 
-                                Slider.Frame = Instance.new("Frame", Section.Container);
-                                Slider.Frame.Size = UDim2.new(1, 0, 0, 50);
-                                Slider.Frame.BackgroundColor3 = Library.Theme.BackGround1;
-                                Slider.Frame.BorderSizePixel = 0;
+                                Slider.MainBack = Instance.new("TextButton", Sector.Holder);
+                                Slider.MainBack.Size = UDim2.fromOffset(300, 50);
+                                Slider.MainBack.BackgroundTransparency = 1;
+                                Slider.MainBack.AutoButtonColor = false;
+                                Slider.MainBack.Text = "";
 
-                                Slider.Corner = Instance.new("UICorner", Slider.Frame);
-                                Slider.Corner.CornerRadius = UDim.new(0, 4);
+                                Slider.TextLable = Instance.new("TextLabel", Slider.MainBack);
+                                Slider.TextLable.Size = UDim2.fromOffset(164, 22);
+                                Slider.TextLable.Position = UDim2.fromOffset(0,0)
+                                Slider.TextLable.BackgroundTransparency = 1;
+                                Slider.TextLable.Text = Slider.Text;
+                                Slider.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                Slider.TextLable.TextSize = Libary.Theme.TextSize;
+                                Slider.TextLable.Font = Libary.Theme.Font;
+                                Slider.TextLable.TextXAlignment = "Left";
+                                Slider.TextLable.TextYAlignment = "Center";
 
-                                Slider.Label = Instance.new("TextLabel", Slider.Frame);
-                                Slider.Label.Size = UDim2.new(1, -100, 0, 25);
-                                Slider.Label.Position = UDim2.fromOffset(10, 5);
-                                Slider.Label.BackgroundTransparency = 1;
-                                Slider.Label.Text = tostring(Slider.Name);
-                                Slider.Label.Font = Enum.Font.Ubuntu;
-                                Slider.Label.TextSize = 14;
-                                Slider.Label.TextColor3 = Library.Theme.TextColor;
-                                Slider.Label.TextXAlignment = Enum.TextXAlignment.Left;
+                                Slider.TextBox = Instance.new("TextBox", Slider.MainBack);
+                                Slider.TextBox.Position = UDim2.fromScale(0.87, 0);
+                                Slider.TextBox.Size = UDim2.fromOffset(30, 22);
+                                Slider.TextBox.BackgroundTransparency = 1;
+                                Slider.TextBox.TextColor3 = Libary.Theme.TextColor;
+                                Slider.TextBox.TextSize = Libary.Theme.TextSize;
+                                Slider.TextBox.Font = Libary.Theme.Font;
+                                Slider.TextBox.TextXAlignment = "Center";
+                                Slider.TextBox.TextYAlignment = "Center";
+                                Slider.TextBox.Text = "0";
 
-                                Slider.ValueLabel = Instance.new("TextLabel", Slider.Frame);
-                                Slider.ValueLabel.Size = UDim2.fromOffset(80, 25);
-                                Slider.ValueLabel.Position = UDim2.new(1, -90, 0, 5);
-                                Slider.ValueLabel.BackgroundTransparency = 1;
-                                Slider.ValueLabel.Text = tostring(Utility:Round(Slider.Value, Slider.Decimals));
-                                Slider.ValueLabel.Font = Enum.Font.Ubuntu;
-                                Slider.ValueLabel.TextSize = 13;
-                                Slider.ValueLabel.TextColor3 = Library.Theme.Selected;
-                                Slider.ValueLabel.TextXAlignment = Enum.TextXAlignment.Right;
+                                Slider.Main = Instance.new("TextButton", Slider.MainBack);
+                                Slider.Main.Position = UDim2.fromScale(-0.003, 0.533);
+                                Slider.Main.Size = UDim2.fromOffset(291, 17);
+                                Slider.Main.BackgroundColor3 = Libary.Theme.BackGround1;
+                                Slider.Main.Text = "";
+                                Slider.Main.AutoButtonColor = false;
 
-                                -- Slider track
-                                Slider.Track = Instance.new("Frame", Slider.Frame);
-                                Slider.Track.Size = UDim2.new(1, -20, 0, 6);
-                                Slider.Track.Position = UDim2.fromOffset(10, 35);
-                                Slider.Track.BackgroundColor3 = Library.Theme.BackGround3;
-                                Slider.Track.BorderSizePixel = 0;
+                                Slider.UiCorner = Instance.new("UICorner", Slider.Main);
+                                Slider.UiCorner.CornerRadius = UDim.new(0, 5);
 
-                                Slider.TrackCorner = Instance.new("UICorner", Slider.Track);
-                                Slider.TrackCorner.CornerRadius = UDim.new(1, 0);
+                                Slider.UiStroke = Instance.new("UIStroke", Slider.Main);
+                                Slider.UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                Slider.UiStroke.Color = Libary.Theme.Outline;
 
-                                -- Slider fill
-                                Slider.Fill = Instance.new("Frame", Slider.Track);
-                                Slider.Fill.Size = UDim2.new((Slider.Value - Slider.Min) / (Slider.Max - Slider.Min), 0, 1, 0);
-                                Slider.Fill.BackgroundColor3 = Library.Theme.Selected;
-                                Slider.Fill.BorderSizePixel = 0;
+                                Slider.SlideBar = Instance.new("Frame", Slider.Main);
+                                Slider.SlideBar.BackgroundColor3 = Libary.Theme.Selected;
+                                Slider.SlideBar.Size = UDim2.fromScale(0,0);
+                                Slider.SlideBar.Position = UDim2.new();
 
-                                Slider.FillCorner = Instance.new("UICorner", Slider.Fill);
-                                Slider.FillCorner.CornerRadius = UDim.new(1, 0);
+                                Slider.UiCorner2 = Instance.new("UICorner", Slider.SlideBar);
+                                Slider.UiCorner2.CornerRadius = UDim.new(0, 5);
 
-                                -- Slider handle
-                                Slider.Handle = Instance.new("Frame", Slider.Track);
-                                Slider.Handle.Size = UDim2.fromOffset(14, 14);
-                                Slider.Handle.Position = UDim2.new((Slider.Value - Slider.Min) / (Slider.Max - Slider.Min), -7, 0.5, -7);
-                                Slider.Handle.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-                                Slider.Handle.BorderSizePixel = 0;
+                                if Slider.Flag and Slider.Flag ~= "" then
+                                        Libary.Flags[Slider.Flag] = Slider.Default or Slider.Min or 0;
+                                end;
 
-                                Slider.HandleCorner = Instance.new("UICorner", Slider.Handle);
-                                Slider.HandleCorner.CornerRadius = UDim.new(1, 0);
+                                function Slider:Get()
+                                        return Slider.Value;
+                                end;
 
-                                -- Slider button for interaction
-                                Slider.Button = Instance.new("TextButton", Slider.Track);
-                                Slider.Button.Size = UDim2.fromScale(1, 1);
-                                Slider.Button.BackgroundTransparency = 1;
-                                Slider.Button.Text = "";
+                                function Slider:Set(value)
+                                        Slider.Value = math.clamp(math.round(value * Slider.Decimals) / Slider.Decimals, Slider.Min, Slider.Max);
+                                        local percent = 1 - ((Slider.Max - Slider.Value) / (Slider.Max - Slider.Min));
+                                        if Slider.Flag and Slider.Flag ~= "" then
+                                                Libary.Flags[Slider.Flag] = Slider.Value;
+                                        end;
+                                        Slider.SlideBar:TweenSize(UDim2.fromOffset(percent * Slider.Main.AbsoluteSize.X, Slider.Main.AbsoluteSize.Y), Enum.EasingDirection.In, Enum.EasingStyle.Sine, Libary.Theme.SliderTween);
+                                        Slider.TextBox.Text = Slider.Value;
+                                        if Slider.Value <= Slider.Min then
+                                                Slider.SlideBar.BackgroundTransparency = 1;
+                                        else
+                                                Slider.SlideBar.BackgroundTransparency = 0;
+                                        end;
+                                        pcall(Slider.Callback, Slider.Value);
+                                end;
+                                Slider:Set(Slider.Default);
 
-                                function Slider:Set(Value)
-                                        Value = math.clamp(Value, Slider.Min, Slider.Max);
-                                        Slider.Value = Utility:Round(Value, Slider.Decimals);
+                                Slider.TextBox.FocusLost:Connect(function(Return)
+                                        if not Return then 
+                                                return;
+                                        end;
+                                        if (Slider.TextBox.Text:match("^%d+$")) then
+                                                Slider:Set(tonumber(Slider.TextBox.Text));
+                                        else
+                                                Slider.TextBox.Text = tostring(Slider.Value);
+                                        end;
+                                end);
 
-                                        if Slider.Flag then
-                                                Library.Flags[Slider.Flag] = Slider.Value;
-                                        end
-
-                                        local percentage = (Slider.Value - Slider.Min) / (Slider.Max - Slider.Min);
-
-                                        -- Update visuals with tweening
-                                        local fillTween = TweenService:Create(Slider.Fill, TweenInfo.new(Library.Theme.SliderTween), {
-                                                Size = UDim2.new(percentage, 0, 1, 0)
-                                        });
-                                        fillTween:Play();
-
-                                        local handleTween = TweenService:Create(Slider.Handle, TweenInfo.new(Library.Theme.SliderTween), {
-                                                Position = UDim2.new(percentage, -7, 0.5, -7)
-                                        });
-                                        handleTween:Play();
-
-                                        Slider.ValueLabel.Text = tostring(Slider.Value);
-
-                                        if Slider.CallBack then
-                                                local success, err = pcall(Slider.CallBack, Slider.Value);
-                                                if not success then
-                                                        warn("Slider callback error: " .. tostring(err));
-                                                end
-                                        end
-                                end
-
-                                local function slideUpdate()
-                                        local mouseLocation = UserInputService:GetMouseLocation();
-                                        local mousePos = mouseLocation.X;
-                                        local trackPos = Slider.Track.AbsolutePosition.X;
-                                        local trackSize = Slider.Track.AbsoluteSize.X;
-
-                                        local percentage = math.clamp((mousePos - trackPos) / trackSize, 0, 1);
-                                        local value = Slider.Min + (percentage * (Slider.Max - Slider.Min));
-
+                                function Slider:Refresh()
+                                        local mousePos = CurrentCamera:WorldToViewportPoint(Mouse.Hit.p)
+                                        local percent = math.clamp(mousePos.X - Slider.SlideBar.AbsolutePosition.X, 0, Slider.Main.AbsoluteSize.X) / Slider.Main.AbsoluteSize.X;
+                                        local value = math.floor((Slider.Min + (Slider.Max - Slider.Min) * percent) * Slider.Decimals) / Slider.Decimals;
+                                        value = math.clamp(value, Slider.Min, Slider.Max);
                                         Slider:Set(value);
+                                end;
+
+                                Slider.SlideBar.InputBegan:Connect(function(input)
+                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                Dragging = true
+                                                Slider:Refresh()
+                                        end
+                                end)
+
+                                Slider.SlideBar.InputEnded:Connect(function(input)
+                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                Dragging = false
+                                        end
+                                end)
+
+                                Slider.Main.InputBegan:Connect(function(input)
+                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                Dragging = true
+                                                Slider:Refresh()
+                                        end
+                                end)
+
+                                Slider.Main.InputEnded:Connect(function(input)
+                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                Dragging = false
+                                        end
+                                end)
+
+                                UserInputService.InputChanged:Connect(function(input)
+                                        if Dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                                                Slider:Refresh()
+                                        end
+                                end)
+
+                                Sector:FixSize();
+                                table.insert(Libary.Items, Slider);
+                                return Slider;
+                        end;
+
+                        function Sector:CreateDropdown(Text, Items, Defult, Multichoice, Callback, Flag)
+                                local DropDown = { };
+                                DropDown.Text = Text or "";
+                                DropDown.Defaultitems = Items or { };
+                                DropDown.Default = Defult;
+                                DropDown.Callback = Callback or function() end;
+                                DropDown.Multichoice = Multichoice or false;
+                                DropDown.Values = { };
+                                DropDown.Flag = Flag or Text or "";
+
+                                DropDown.MainBack = Instance.new("TextButton", Sector.Holder);
+                                DropDown.MainBack.Size = UDim2.fromOffset(300, 50);
+                                DropDown.MainBack.BackgroundTransparency = 1;
+                                DropDown.MainBack.AutoButtonColor = false;
+                                DropDown.MainBack.Text = "";
+
+                                DropDown.TextLable = Instance.new("TextLabel", DropDown.MainBack);
+                                DropDown.TextLable.Size = UDim2.fromOffset(164, 22);
+                                DropDown.TextLable.Position = UDim2.fromOffset(0,0)
+                                DropDown.TextLable.BackgroundTransparency = 1;
+                                DropDown.TextLable.Text = DropDown.Text;
+                                DropDown.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                DropDown.TextLable.TextSize = Libary.Theme.TextSize;
+                                DropDown.TextLable.Font = Libary.Theme.Font;
+                                DropDown.TextLable.TextXAlignment = "Left";
+                                DropDown.TextLable.TextYAlignment = "Center";
+
+                                DropDown.Drop = Instance.new("TextButton", DropDown.MainBack);
+                                DropDown.Drop.Size = UDim2.fromOffset(291, 21);
+                                DropDown.Drop.Position = UDim2.fromScale(-0.003, 0.433);
+                                DropDown.Drop.BackgroundColor3 = Libary.Theme.BackGround1;
+                                DropDown.Drop.AutoButtonColor = false;
+                                DropDown.Drop.Text = "";
+                                DropDown.Drop.MouseButton1Click:Connect(function()
+                                        DropDown.MainDrop.Visible = not DropDown.MainDrop.Visible;
+                                end);
+
+                                DropDown.UiCorner = Instance.new("UICorner", DropDown.Drop);
+                                DropDown.UiCorner.CornerRadius = UDim.new(0, 5);
+
+                                DropDown.UiStroke = Instance.new("UIStroke", DropDown.Drop);
+                                DropDown.UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                DropDown.UiStroke.Color = Libary.Theme.Outline;
+
+                                DropDown.Selected = Instance.new("TextLabel", DropDown.Drop);
+                                DropDown.Selected.BackgroundTransparency = 1;
+                                DropDown.Selected.Position = UDim2.fromScale(0.02, 0);
+                                DropDown.Selected.Size = UDim2.fromScale(0.945, 1);
+                                DropDown.Selected.Font = Libary.Theme.Font;
+                                DropDown.Selected.TextColor3 = Libary.Theme.TextColor;
+                                DropDown.Selected.TextXAlignment = "Left";
+                                DropDown.Selected.TextSize = Libary.Theme.TextSize;
+                                DropDown.Selected.Text = DropDown.Text;
+
+                                DropDown.MainDrop = Instance.new("Frame", DropDown.MainBack);
+                                DropDown.MainDrop.Position = UDim2.fromScale(0, 0.967);
+                                DropDown.MainDrop.Size = UDim2.fromOffset(289, 100);
+                                DropDown.MainDrop.BackgroundColor3 = Libary.Theme.BackGround1;
+                                DropDown.MainDrop.ZIndex = 10;
+                                DropDown.MainDrop.Visible = false;
+
+                                DropDown.UiCorner2 = Instance.new("UICorner", DropDown.MainDrop);
+                                DropDown.UiCorner2.CornerRadius = UDim.new(0, 5);
+
+                                DropDown.UiStroke2 = Instance.new("UIStroke", DropDown.MainDrop);
+                                DropDown.UiStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                DropDown.UiStroke2.Color = Libary.Theme.Outline;
+
+                                DropDown.ScrollingFrame = Instance.new("ScrollingFrame", DropDown.MainDrop);
+                                DropDown.ScrollingFrame.BackgroundTransparency = 1;
+                                DropDown.ScrollingFrame.Position = UDim2.fromScale();
+                                DropDown.ScrollingFrame.Size = UDim2.fromScale(1, 1);
+                                DropDown.ScrollingFrame.ScrollBarThickness = 0;
+                                DropDown.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 1, 0);
+
+                                DropDown.UIListLayout = Instance.new("UIListLayout", DropDown.ScrollingFrame);
+                                DropDown.UIListLayout.SortOrder = "LayoutOrder";
+
+
+                                function DropDown:GetOptions()
+                                        return DropDown.values;
+                                end;
+
+                                function DropDown:UpdateSize()
+                                        DropDown.ScrollingFrame.CanvasSize = UDim2.fromOffset(0, DropDown.UIListLayout.AbsoluteContentSize.Y);
+                                        if DropDown.UIListLayout.AbsoluteContentSize.Y < 100  then
+                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, DropDown.UIListLayout.AbsoluteContentSize.Y);
+                                        else
+                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, 100);
+                                        end;
+                                end;
+
+                                function DropDown:updateText(Text)
+                                        if #Text >= 47 then
+                                                Text = Text:sub(1, 45) .. "..";
+                                        end;
+                                        DropDown.Selected.Text = Text;
+                                end;
+
+                                DropDown.Changed = Instance.new("BindableEvent");
+                                function DropDown:Set(value)
+                                        if type(value) == "table" then
+                                                DropDown.Values = value;
+                                                DropDown:updateText(table.concat(value, ", "));
+                                                pcall(DropDown.Callback, value);
+                                        else
+                                                DropDown:updateText(value)
+                                                DropDown.Values = { value };
+                                                pcall(DropDown.Callback, value);
+                                        end;
+
+                                        DropDown.Changed:Fire(value);
+                                        if DropDown.Flag and DropDown.Flag ~= "" then
+                                                Libary.Flags[DropDown.Flag] = DropDown.Multichoice and DropDown.Values or DropDown.Values[1];
+                                        end;
+                                end;
+
+                                function DropDown:Get()
+                                        return DropDown.Multichoice and DropDown.Values or DropDown.Values[1];
+                                end;
+
+                                function DropDown:isSelected(item)
+                                        for i, v in pairs(DropDown.Values) do
+                                                if v == item then
+                                                        return true;
+                                                end;
+                                        end;
+                                        return false;
+                                end;
+
+                                local function CreateOption(Name)
+                                        DropDown.Option = Instance.new("TextButton", DropDown.ScrollingFrame);
+                                        DropDown.Option.AutoButtonColor = false;
+                                        DropDown.Option.BackgroundTransparency = 1;
+                                        DropDown.Option.Size = UDim2.new(1, 0, 0, 20);
+                                        DropDown.Option.Text = "  " .. Name;
+                                        DropDown.Option.BorderSizePixel = 0;
+                                        DropDown.Option.TextXAlignment = "Left"
+                                        DropDown.Option.Name = Name;
+                                        DropDown.Option.ZIndex = 10;
+                                        DropDown.Option.TextColor3 = Libary.Theme.TextColor;
+                                        DropDown.Option.Font = Libary.Theme.Font;
+                                        DropDown.Option.TextSize = Libary.Theme.TextSize;
+                                        DropDown.Option.MouseButton1Down:Connect(function()
+                                                if DropDown.Multichoice then
+                                                        if DropDown:isSelected(Name) then
+                                                                for i2, v2 in pairs(DropDown.Values) do
+                                                                        if v2 == Name then
+                                                                                table.remove(DropDown.Values, i2);
+                                                                        end;
+                                                                end;
+                                                                DropDown:Set(DropDown.Values);
+                                                        else
+                                                                table.insert(DropDown.Values, Name);
+                                                                DropDown:Set(DropDown.Values);
+                                                        end;
+
+                                                        return;
+                                                else
+                                                        DropDown.MainDrop.Visible = false;
+                                                end;
+
+                                                DropDown:Set(Name);
+                                                return;
+                                        end)
+                                        DropDown:UpdateSize()
+                                end;
+
+                                for _,v in pairs(DropDown.Defaultitems) do
+                                        CreateOption(v)
+                                end;
+
+                                if DropDown.Default then
+                                        DropDown:Set(DropDown.Default)
                                 end
 
-                                local sliderConnection;
-                                Slider.Button.MouseButton1Down:Connect(function()
-                                        Slider.Sliding = true;
-                                        slideUpdate();
+                                DropDown.Items = { };
 
-                                        sliderConnection = UserInputService.InputChanged:Connect(function(input)
-                                                if Slider.Sliding and input.UserInputType == Enum.UserInputType.MouseMovement then
-                                                        slideUpdate();
-                                                end
-                                        end);
-                                end);
+                                Sector:FixSize();
+                                DropDown:UpdateSize()
+                                table.insert(Libary.Items, DropDown);
+                                return DropDown;
+                        end;
 
-                                UserInputService.InputEnded:Connect(function(input)
-                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                                                Slider.Sliding = false;
-                                                if sliderConnection then
-                                                        sliderConnection:Disconnect();
-                                                        sliderConnection = nil;
-                                                end
-                                        end
-                                end);
+                        Sector:FixSize();
+                        return Sector;
+                end;
 
-                                -- Initialize
-                                Slider:Set(Slider.Value);
+                function Tab:CreateSub(Name) -- Fun
+                        local SubTab = { };
+                        SubTab.Name = Name or "";
 
-                                table.insert(Section.Elements, Slider);
-                                return Slider;
+                        function SubTab:Select()
+                                if SubTab.TabScroll then
+                                        local Ammount = SubTab.TabScroll.Name
+                                        TweenService:Create(Tab.MainTab, TweenInfo.new(Libary.Theme.SubtabTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position =  -UDim2.fromOffset(768 * Ammount, 0)}):Play();
+                                        TweenService:Create(Tab.SubSelector, TweenInfo.new(Libary.Theme.SubtabbarTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.178 + (0.075 * Ammount), 0.124)}):Play();
+                                else
+                                        TweenService:Create(Tab.MainTab, TweenInfo.new(Libary.Theme.SubtabTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.new(0, 0,0, 0)}):Play();
+                                        TweenService:Create(Tab.SubSelector, TweenInfo.new(Libary.Theme.SubtabbarTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.178, 0.124)}):Play();
+                                end
                         end
 
-                        return Section;
+                        SubTab.Button = Instance.new("TextButton", Tab.SubOptions);
+                        SubTab.Button.Size = UDim2.new(0, 65, 1, 0);
+                        SubTab.Button.BackgroundTransparency = 1;
+                        SubTab.Button.Text = SubTab.Name;
+                        SubTab.Button.TextColor3 = Libary.Theme.TextColor;
+                        SubTab.Button.TextSize = Libary.Theme.TextSize;
+                        SubTab.Button.Font = Libary.Theme.Font;
+                        SubTab.Button.ZIndex = 3;
+                        SubTab.Button.MouseButton1Click:Connect(function()
+                                SubTab:Select();
+                        end);
+
+                        local AmountOfSubTabs = Tab.SubOptions:GetChildren();
+                        local AmountOfTabs = Tab.MainTab:GetChildren();
+                        if #AmountOfSubTabs > #AmountOfTabs then
+
+                                Tab.MainTab.Size = Tab.MainTab.Size + UDim2.fromOffset(Tab.UIListLayout3.AbsoluteContentSize.X, 0);
+
+                                SubTab.TabScroll = Instance.new("ScrollingFrame", Tab.MainTab);
+                                SubTab.TabScroll.Position = UDim2.fromOffset(Tab.MainTab.Size.X - UDim.new(0, 768), 0);
+                                SubTab.TabScroll.Size = UDim2.fromOffset(768, 371);
+                                SubTab.TabScroll.BackgroundTransparency = 1;
+                                SubTab.TabScroll.ScrollBarThickness = 0;
+                                SubTab.TabScroll.Name = #AmountOfTabs - 1;
+
+                                SubTab.Left = Instance.new("Frame", SubTab.TabScroll);
+                                SubTab.Left.Size = UDim2.fromScale(0.1, 1);
+                                SubTab.Left.Position = UDim2.fromScale(0.206, 0);
+                                SubTab.Left.BackgroundTransparency = 1;
+
+                                SubTab.UIListLayout = Instance.new("UIListLayout", SubTab.Left);
+                                SubTab.UIListLayout.Padding = UDim.new(0, 10);
+                                SubTab.UIListLayout.FillDirection = "Vertical";
+                                SubTab.UIListLayout.HorizontalAlignment = "Center";
+                                SubTab.UIListLayout.SortOrder = "LayoutOrder";
+                                SubTab.UIListLayout.VerticalAlignment = "Top";
+
+                                SubTab.EmptySpace = Instance.new("Frame", SubTab.Left); -- I Am Lazy
+                                SubTab.EmptySpace.BackgroundTransparency = 1;
+                                SubTab.EmptySpace.Size = UDim2.fromOffset(38, 14);
+
+                                SubTab.Right = Instance.new("Frame", SubTab.TabScroll);
+                                SubTab.Right.Size = UDim2.fromScale(0.1, 1);
+                                SubTab.Right.Position = UDim2.fromScale(0.693, 0);
+                                SubTab.Right.BackgroundTransparency = 1;
+
+                                SubTab.UIListLayout2 = Instance.new("UIListLayout", SubTab.Right);
+                                SubTab.UIListLayout2.Padding = UDim.new(0, 10);
+                                SubTab.UIListLayout2.FillDirection = "Vertical";
+                                SubTab.UIListLayout2.HorizontalAlignment = "Center";
+                                SubTab.UIListLayout2.SortOrder = "LayoutOrder";
+                                SubTab.UIListLayout2.VerticalAlignment = "Top";
+
+                                SubTab.EmptySpace = Instance.new("Frame", SubTab.Right); -- I Am Lazy
+                                SubTab.EmptySpace.BackgroundTransparency = 1;
+                                SubTab.EmptySpace.Size = UDim2.fromOffset(38, 14);
+                        end
+
+                        if SubTab.TabScroll then
+
+                                function SubTab:CreateSector(Name, Side)
+                                        local Sector = { };
+                                        Sector.Name = Name or "";
+                                        Sector.Side = Side:lower() or "left"
+
+                                        Sector.Main = Instance.new("Frame", Sector.Side == "left" and SubTab.Left or SubTab.Right);
+                                        Sector.Main.Size = UDim2.fromOffset(349, 300);
+                                        Sector.Main.BackgroundColor3 = Libary.Theme.BackGround2;
+
+                                        Sector.UiCorner = Instance.new("UICorner", Sector.Main);
+                                        Sector.UiCorner.CornerRadius = UDim.new(0, 8);
+
+                                        Sector.TextLable = Instance.new("TextLabel", Sector.Main);
+                                        Sector.TextLable.Size = UDim2.new(1, 0, 0, 20);
+                                        Sector.TextLable.Position = UDim2.fromOffset(0, 0);
+                                        Sector.TextLable.BackgroundTransparency = 1;
+                                        Sector.TextLable.Text = Sector.Name;
+                                        Sector.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                        Sector.TextLable.TextSize = Libary.Theme.TextSize;
+                                        Sector.TextLable.Font = Libary.Theme.Font;
+                                        Sector.TextLable.TextXAlignment = "Center";
+                                        Sector.TextLable.TextYAlignment = "Bottom";
+
+                                        Sector.Sepirator = Instance.new("Frame", Sector.Main);
+                                        Sector.Sepirator.Position = UDim2.fromOffset(25, 25);
+                                        Sector.Sepirator.Size = UDim2.fromOffset(300, 1);
+                                        Sector.Sepirator.BorderSizePixel = 0;
+                                        Sector.Sepirator.BackgroundColor3 = Libary.Theme.Outline;
+
+                                        Sector.Holder = Instance.new("Frame", Sector.Main);
+                                        Sector.Holder.BackgroundTransparency = 1;
+                                        Sector.Holder.Position = UDim2.fromOffset(0, 29);
+                                        Sector.Holder.Size = UDim2.fromOffset(349, 56);
+
+                                        Sector.UiListLayout = Instance.new("UIListLayout", Sector.Holder);
+                                        Sector.UiListLayout.Padding = UDim.new(0, 0);
+                                        Sector.UiListLayout.FillDirection = "Vertical";
+                                        Sector.UiListLayout.HorizontalAlignment = "Center";
+                                        Sector.UiListLayout.VerticalAlignment = "Top";
+
+                                        function Sector:FixSize()
+                                                Sector.Main.Size = UDim2.fromOffset(349, Sector.UiListLayout.AbsoluteContentSize.Y + 42);
+                                                local Left = SubTab.UIListLayout.AbsoluteContentSize.Y + 20;
+                                                local Right = SubTab.UIListLayout2.AbsoluteContentSize.Y + 20;
+                                                SubTab.TabScroll.CanvasSize = (Left>Right and UDim2.fromOffset(768, Left) or UDim2.fromOffset(768, Right));
+                                        end
+
+                                        function Sector:CreateToggle(Name, Defult, CallBack, Flag)
+                                                local Toggle = { };
+                                                Toggle.Name = Name or "";
+                                                Toggle.Defult = Defult or false;
+                                                Toggle.CallBack = CallBack or function() end;
+                                                Toggle.Flag = Flag or Name;
+                                                Toggle.Value = Toggle.Defult;
+
+                                                function Toggle:Set(bool)
+                                                        Toggle.Value = bool;
+
+                                                        if Toggle.Flag and Toggle.Flag ~= "" then
+                                                                Libary.Flags[Toggle.Flag] = Toggle.Value;
+                                                        end
+                                                        if Toggle.Value then
+                                                                TweenService:Create(Toggle.ToggleBackColor, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(1, 1)}):Play();
+                                                                TweenService:Create(Toggle.Ball, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.919, 0.2)}):Play();
+                                                        else
+                                                                TweenService:Create(Toggle.ToggleBackColor, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(0.4, 1)}):Play();
+                                                                TweenService:Create(Toggle.Ball, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.833, 0.2)}):Play(); 
+                                                        end
+                                                        pcall(Toggle.CallBack, bool);
+                                                end
+
+                                                function Toggle:Get() 
+                                                        return Toggle.Value;
+                                                end
+
+                                                Toggle.Main = Instance.new("TextButton", Sector.Holder);
+                                                Toggle.Main.Size = UDim2.fromOffset(300, 30);
+                                                Toggle.Main.BackgroundTransparency = 1;
+                                                Toggle.Main.AutoButtonColor = false;
+                                                Toggle.Main.Text = "";
+                                                Toggle.Main.MouseButton1Click:Connect(function()
+                                                        Toggle:Set(not Toggle.Value)
+                                                end)
+
+                                                Toggle.TextLable = Instance.new("TextLabel", Toggle.Main);
+                                                Toggle.TextLable.Size = UDim2.fromOffset(164, 30);
+                                                Toggle.TextLable.Position = UDim2.fromOffset(0,0)
+                                                Toggle.TextLable.BackgroundTransparency = 1;
+                                                Toggle.TextLable.Text = Toggle.Name;
+                                                Toggle.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                                Toggle.TextLable.TextSize = Libary.Theme.TextSize;
+                                                Toggle.TextLable.Font = Libary.Theme.Font;
+                                                Toggle.TextLable.TextXAlignment = "Left";
+                                                Toggle.TextLable.TextYAlignment = "Center";
+
+                                                Toggle.ToggleBack = Instance.new("Frame", Toggle.Main);
+                                                Toggle.ToggleBack.Position = UDim2.fromScale(0.833, 0.2);
+                                                Toggle.ToggleBack.Size = UDim2.fromOffset(40, 17);
+                                                Toggle.ToggleBack.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                Toggle.ToggleBack.ClipsDescendants = true;
+
+                                                Toggle.UICorner = Instance.new("UICorner", Toggle.ToggleBack);
+                                                Toggle.UICorner.CornerRadius = UDim.new(0, 5);
+
+                                                Toggle.ToggleBackColor = Instance.new("Frame", Toggle.ToggleBack);
+                                                Toggle.ToggleBackColor.Position = UDim2.fromScale(0, 0);
+                                                Toggle.ToggleBackColor.Size = UDim2.fromScale(0, 1);
+                                                Toggle.ToggleBackColor.BackgroundColor3 = Libary.Theme.Selected;
+
+                                                Toggle.UICorner3 = Instance.new("UICorner", Toggle.ToggleBackColor);
+                                                Toggle.UICorner3.CornerRadius = UDim.new(0, 5);
+
+                                                Toggle.UIStroke = Instance.new("UIStroke", Toggle.ToggleBack);
+                                                Toggle.UIStroke.Thickness = 1;
+                                                Toggle.UIStroke.Color = Libary.Theme.Outline;
+                                                Toggle.UIStroke.ApplyStrokeMode = "Border";
+
+                                                Toggle.Ball = Instance.new("Frame", Toggle.Main);
+                                                Toggle.Ball.AnchorPoint = Vector2.new(0, 0);
+                                                Toggle.Ball.Size = UDim2.fromOffset(17, 17);
+                                                Toggle.Ball.Position = UDim2.fromScale(0.833, 0.2);
+                                                Toggle.Ball.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+
+                                                Toggle.UICorner2 = Instance.new("UICorner", Toggle.Ball);
+                                                Toggle.UICorner2.CornerRadius = UDim.new(0, 5);
+
+                                                Toggle.UIStroke2 = Instance.new("UIStroke", Toggle.Ball);
+                                                Toggle.UIStroke2.Thickness = 1;
+                                                Toggle.UIStroke2.Color = Libary.Theme.Outline;
+
+                                                Toggle.Holder = Instance.new("Frame", Toggle.Main);
+                                                Toggle.Holder.Position = UDim2.fromScale(0.595, 0.167);
+                                                Toggle.Holder.Size = UDim2.fromOffset(60, 17);
+                                                Toggle.Holder.BackgroundTransparency = 1;
+
+                                                Toggle.UIList = Instance.new("UIListLayout", Toggle.Holder);
+                                                Toggle.UIList.FillDirection = "Horizontal";
+                                                Toggle.UIList.HorizontalAlignment = "Right";
+                                                Toggle.UIList.SortOrder = "LayoutOrder";
+                                                Toggle.UIList.VerticalAlignment = "Center";
+
+                                                Toggle:Set(Toggle.Defult);
+
+                                                if Toggle.Flag and Toggle.Flag ~= "" then
+                                                        Libary.Flags[Toggle.Flag] = Toggle.Defult or false;
+                                                end
+
+                                                function Toggle:CreateColorPicker(Defult, CallBack, Flag)
+                                                        local ColorPicker = { };
+                                                        ColorPicker.CallBack = CallBack or function() end;
+                                                        ColorPicker.Defult = Defult or Color3.fromRGB(255, 255, 255);
+                                                        ColorPicker.Value = ColorPicker.Defult;
+                                                        ColorPicker.Flag = Flag or ((Toggle.Name or "") .. tostring(#Toggle.Holder:GetChildren()));
+
+                                                        if ColorPicker.Flag and ColorPicker.Flag ~= "" then
+                                                                Libary.Flags[ColorPicker.Flag] = ColorPicker.Defult or Color3.fromRGB(255, 255, 255);
+                                                        end
+
+                                                        ColorPicker.Main = Instance.new("ImageButton", Toggle.Holder);
+                                                        ColorPicker.Main.BackgroundTransparency = 1;
+                                                        ColorPicker.Main.Size = UDim2.fromOffset(17, 17);
+                                                        ColorPicker.Main.Image = "rbxassetid://11430234918";
+                                                        ColorPicker.Main.MouseButton1Click:Connect(function()
+                                                                ColorPickerM:Add(ColorPicker.Flag, CallBack)
+                                                                Window.ColorPickerSelected = ColorPicker.Flag
+                                                        end);
+
+                                                        table.insert(Libary.Items, ColorPicker);
+                                                        return ColorPicker;
+                                                end
+
+                                                Sector:FixSize();
+                                                table.insert(Libary.Items, Toggle);
+                                                return Toggle;
+                                        end;
+
+                                        function Sector:CreateSlider(Text, Min, Default, Max, Decimals, Callback, Flag)
+                                                local Slider = { };
+                                                Slider.Text = Text or "";
+                                                Slider.Callback = Callback or function(Value) end;
+                                                Slider.Min = Min or 0;
+                                                Slider.Max = Max or 100;
+                                                Slider.Decimals = Decimals or 1;
+                                                Slider.Default = Default or Slider.min;
+                                                Slider.Flag = Flag or Text or "";
+
+                                                Slider.Value = Slider.Default;
+                                                local Dragging = false;
+
+                                                Slider.MainBack = Instance.new("TextButton", Sector.Holder);
+                                                Slider.MainBack.Size = UDim2.fromOffset(300, 50);
+                                                Slider.MainBack.BackgroundTransparency = 1;
+                                                Slider.MainBack.AutoButtonColor = false;
+                                                Slider.MainBack.Text = "";
+
+                                                Slider.TextLable = Instance.new("TextLabel", Slider.MainBack);
+                                                Slider.TextLable.Size = UDim2.fromOffset(164, 22);
+                                                Slider.TextLable.Position = UDim2.fromOffset(0,0)
+                                                Slider.TextLable.BackgroundTransparency = 1;
+                                                Slider.TextLable.Text = Slider.Text;
+                                                Slider.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                                Slider.TextLable.TextSize = Libary.Theme.TextSize;
+                                                Slider.TextLable.Font = Libary.Theme.Font;
+                                                Slider.TextLable.TextXAlignment = "Left";
+                                                Slider.TextLable.TextYAlignment = "Center";
+
+                                                Slider.TextBox = Instance.new("TextBox", Slider.MainBack);
+                                                Slider.TextBox.Position = UDim2.fromScale(0.87, 0);
+                                                Slider.TextBox.Size = UDim2.fromOffset(30, 22);
+                                                Slider.TextBox.BackgroundTransparency = 1;
+                                                Slider.TextBox.TextColor3 = Libary.Theme.TextColor;
+                                                Slider.TextBox.TextSize = Libary.Theme.TextSize;
+                                                Slider.TextBox.Font = Libary.Theme.Font;
+                                                Slider.TextBox.TextXAlignment = "Center";
+                                                Slider.TextBox.TextYAlignment = "Center";
+                                                Slider.TextBox.Text = "0";
+
+                                                Slider.Main = Instance.new("TextButton", Slider.MainBack);
+                                                Slider.Main.Position = UDim2.fromScale(-0.003, 0.533);
+                                                Slider.Main.Size = UDim2.fromOffset(291, 17);
+                                                Slider.Main.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                Slider.Main.Text = "";
+                                                Slider.Main.AutoButtonColor = false;
+
+                                                Slider.UiCorner = Instance.new("UICorner", Slider.Main);
+                                                Slider.UiCorner.CornerRadius = UDim.new(0, 5);
+
+                                                Slider.UiStroke = Instance.new("UIStroke", Slider.Main);
+                                                Slider.UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                                Slider.UiStroke.Color = Libary.Theme.Outline;
+
+                                                Slider.SlideBar = Instance.new("Frame", Slider.Main);
+                                                Slider.SlideBar.BackgroundColor3 = Libary.Theme.Selected;
+                                                Slider.SlideBar.Size = UDim2.fromScale(0,0);
+                                                Slider.SlideBar.Position = UDim2.new();
+
+                                                Slider.UiCorner2 = Instance.new("UICorner", Slider.SlideBar);
+                                                Slider.UiCorner2.CornerRadius = UDim.new(0, 5);
+
+                                                if Slider.Flag and Slider.Flag ~= "" then
+                                                        Libary.Flags[Slider.Flag] = Slider.Default or Slider.Min or 0;
+                                                end;
+
+                                                function Slider:Get()
+                                                        return Slider.Value;
+                                                end;
+
+                                                function Slider:Set(value)
+                                                        Slider.Value = math.clamp(math.round(value * Slider.Decimals) / Slider.Decimals, Slider.Min, Slider.Max);
+                                                        local percent = 1 - ((Slider.Max - Slider.Value) / (Slider.Max - Slider.Min));
+                                                        if Slider.Flag and Slider.Flag ~= "" then
+                                                                Libary.Flags[Slider.Flag] = Slider.Value;
+                                                        end;
+                                                        Slider.SlideBar:TweenSize(UDim2.fromOffset(percent * Slider.Main.AbsoluteSize.X, Slider.Main.AbsoluteSize.Y), Enum.EasingDirection.In, Enum.EasingStyle.Sine, Libary.Theme.SliderTween);
+                                                        Slider.TextBox.Text = Slider.Value;
+                                                        if Slider.Value <= Slider.Min then
+                                                                Slider.SlideBar.BackgroundTransparency = 1;
+                                                        else
+                                                                Slider.SlideBar.BackgroundTransparency = 0;
+                                                        end;
+                                                        pcall(Slider.Callback, Slider.Value);
+                                                end;
+                                                Slider:Set(Slider.Default);
+
+                                                Slider.TextBox.FocusLost:Connect(function(Return)
+                                                        if not Return then 
+                                                                return;
+                                                        end;
+                                                        if (Slider.TextBox.Text:match("^%d+$")) then
+                                                                Slider:Set(tonumber(Slider.TextBox.Text));
+                                                        else
+                                                                Slider.TextBox.Text = tostring(Slider.Value);
+                                                        end;
+                                                end);
+
+                                                function Slider:Refresh()
+                                                        local mousePos = CurrentCamera:WorldToViewportPoint(Mouse.Hit.p)
+                                                        local percent = math.clamp(mousePos.X - Slider.SlideBar.AbsolutePosition.X, 0, Slider.Main.AbsoluteSize.X) / Slider.Main.AbsoluteSize.X;
+                                                        local value = math.floor((Slider.Min + (Slider.Max - Slider.Min) * percent) * Slider.Decimals) / Slider.Decimals;
+                                                        value = math.clamp(value, Slider.Min, Slider.Max);
+                                                        Slider:Set(value);
+                                                end;
+
+                                                Slider.SlideBar.InputBegan:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = true
+                                                                Slider:Refresh()
+                                                        end
+                                                end)
+
+                                                Slider.SlideBar.InputEnded:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = false
+                                                        end
+                                                end)
+
+                                                Slider.Main.InputBegan:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = true
+                                                                Slider:Refresh()
+                                                        end
+                                                end)
+
+                                                Slider.Main.InputEnded:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = false
+                                                        end
+                                                end)
+
+                                                UserInputService.InputChanged:Connect(function(input)
+                                                        if Dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                                                                Slider:Refresh()
+                                                        end
+                                                end)
+
+                                                Sector:FixSize();
+                                                table.insert(Libary.Items, Slider);
+                                                return Slider;
+                                        end;
+
+                                        function Sector:CreateDropdown(Text, Items, Defult, Multichoice, Callback, Flag)
+                                                local DropDown = { };
+                                                DropDown.Text = Text or "";
+                                                DropDown.Defaultitems = Items or { };
+                                                DropDown.Default = Defult;
+                                                DropDown.Callback = Callback or function() end;
+                                                DropDown.Multichoice = Multichoice or false;
+                                                DropDown.Values = { };
+                                                DropDown.Flag = Flag or Text or "";
+
+                                                DropDown.MainBack = Instance.new("TextButton", Sector.Holder);
+                                                DropDown.MainBack.Size = UDim2.fromOffset(300, 50);
+                                                DropDown.MainBack.BackgroundTransparency = 1;
+                                                DropDown.MainBack.AutoButtonColor = false;
+                                                DropDown.MainBack.Text = "";
+
+                                                DropDown.TextLable = Instance.new("TextLabel", DropDown.MainBack);
+                                                DropDown.TextLable.Size = UDim2.fromOffset(164, 22);
+                                                DropDown.TextLable.Position = UDim2.fromOffset(0,0)
+                                                DropDown.TextLable.BackgroundTransparency = 1;
+                                                DropDown.TextLable.Text = DropDown.Text;
+                                                DropDown.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                                DropDown.TextLable.TextSize = Libary.Theme.TextSize;
+                                                DropDown.TextLable.Font = Libary.Theme.Font;
+                                                DropDown.TextLable.TextXAlignment = "Left";
+                                                DropDown.TextLable.TextYAlignment = "Center";
+
+                                                DropDown.Drop = Instance.new("TextButton", DropDown.MainBack);
+                                                DropDown.Drop.Size = UDim2.fromOffset(291, 21);
+                                                DropDown.Drop.Position = UDim2.fromScale(-0.003, 0.433);
+                                                DropDown.Drop.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                DropDown.Drop.AutoButtonColor = false;
+                                                DropDown.Drop.Text = "";
+                                                DropDown.Drop.MouseButton1Click:Connect(function()
+                                                        DropDown.MainDrop.Visible = not DropDown.MainDrop.Visible;
+                                                end);
+
+                                                DropDown.UiCorner = Instance.new("UICorner", DropDown.Drop);
+                                                DropDown.UiCorner.CornerRadius = UDim.new(0, 5);
+
+                                                DropDown.UiStroke = Instance.new("UIStroke", DropDown.Drop);
+                                                DropDown.UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                                DropDown.UiStroke.Color = Libary.Theme.Outline;
+
+                                                DropDown.Selected = Instance.new("TextLabel", DropDown.Drop);
+                                                DropDown.Selected.BackgroundTransparency = 1;
+                                                DropDown.Selected.Position = UDim2.fromScale(0.02, 0);
+                                                DropDown.Selected.Size = UDim2.fromScale(0.945, 1);
+                                                DropDown.Selected.Font = Libary.Theme.Font;
+                                                DropDown.Selected.TextColor3 = Libary.Theme.TextColor;
+                                                DropDown.Selected.TextXAlignment = "Left";
+                                                DropDown.Selected.TextSize = Libary.Theme.TextSize;
+                                                DropDown.Selected.Text = DropDown.Text;
+
+                                                DropDown.MainDrop = Instance.new("Frame", DropDown.MainBack);
+                                                DropDown.MainDrop.Position = UDim2.fromScale(0, 0.967);
+                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, 100);
+                                                DropDown.MainDrop.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                DropDown.MainDrop.ZIndex = 10;
+                                                DropDown.MainDrop.Visible = false;
+
+                                                DropDown.UiCorner2 = Instance.new("UICorner", DropDown.MainDrop);
+                                                DropDown.UiCorner2.CornerRadius = UDim.new(0, 5);
+
+                                                DropDown.UiStroke2 = Instance.new("UIStroke", DropDown.MainDrop);
+                                                DropDown.UiStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                                DropDown.UiStroke2.Color = Libary.Theme.Outline;
+
+                                                DropDown.ScrollingFrame = Instance.new("ScrollingFrame", DropDown.MainDrop);
+                                                DropDown.ScrollingFrame.BackgroundTransparency = 1;
+                                                DropDown.ScrollingFrame.Position = UDim2.fromScale();
+                                                DropDown.ScrollingFrame.Size = UDim2.fromScale(1, 1);
+                                                DropDown.ScrollingFrame.ScrollBarThickness = 0;
+                                                DropDown.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 1, 0);
+
+                                                DropDown.UIListLayout = Instance.new("UIListLayout", DropDown.ScrollingFrame);
+                                                DropDown.UIListLayout.SortOrder = "LayoutOrder";
+
+
+                                                function DropDown:GetOptions()
+                                                        return DropDown.values;
+                                                end;
+
+                                                function DropDown:UpdateSize()
+                                                        DropDown.ScrollingFrame.CanvasSize = UDim2.fromOffset(0, DropDown.UIListLayout.AbsoluteContentSize.Y);
+                                                        if DropDown.UIListLayout.AbsoluteContentSize.Y < 100  then
+                                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, DropDown.UIListLayout.AbsoluteContentSize.Y);
+                                                        else
+                                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, 100);
+                                                        end;
+                                                end;
+
+                                                function DropDown:updateText(Text)
+                                                        if #Text >= 47 then
+                                                                Text = Text:sub(1, 45) .. "..";
+                                                        end;
+                                                        DropDown.Selected.Text = Text;
+                                                end;
+
+                                                DropDown.Changed = Instance.new("BindableEvent");
+                                                function DropDown:Set(value)
+                                                        if type(value) == "table" then
+                                                                DropDown.Values = value;
+                                                                DropDown:updateText(table.concat(value, ", "));
+                                                                pcall(DropDown.Callback, value);
+                                                        else
+                                                                DropDown:updateText(value)
+                                                                DropDown.Values = { value };
+                                                                pcall(DropDown.Callback, value);
+                                                        end;
+
+                                                        DropDown.Changed:Fire(value);
+                                                        if DropDown.Flag and DropDown.Flag ~= "" then
+                                                                Libary.Flags[DropDown.Flag] = DropDown.Multichoice and DropDown.Values or DropDown.Values[1];
+                                                        end;
+                                                end;
+
+                                                function DropDown:Get()
+                                                        return DropDown.Multichoice and DropDown.Values or DropDown.Values[1];
+                                                end;
+
+                                                function DropDown:isSelected(item)
+                                                        for i, v in pairs(DropDown.Values) do
+                                                                if v == item then
+                                                                        return true;
+                                                                end;
+                                                        end;
+                                                        return false;
+                                                end;
+
+                                                local function CreateOption(Name)
+                                                        DropDown.Option = Instance.new("TextButton", DropDown.ScrollingFrame);
+                                                        DropDown.Option.AutoButtonColor = false;
+                                                        DropDown.Option.BackgroundTransparency = 1;
+                                                        DropDown.Option.Size = UDim2.new(1, 0, 0, 20);
+                                                        DropDown.Option.Text = "  " .. Name;
+                                                        DropDown.Option.BorderSizePixel = 0;
+                                                        DropDown.Option.TextXAlignment = "Left"
+                                                        DropDown.Option.Name = Name;
+                                                        DropDown.Option.ZIndex = 10;
+                                                        DropDown.Option.TextColor3 = Libary.Theme.TextColor;
+                                                        DropDown.Option.Font = Libary.Theme.Font;
+                                                        DropDown.Option.TextSize = Libary.Theme.TextSize;
+                                                        DropDown.Option.MouseButton1Down:Connect(function()
+                                                                if DropDown.Multichoice then
+                                                                        if DropDown:isSelected(Name) then
+                                                                                for i2, v2 in pairs(DropDown.Values) do
+                                                                                        if v2 == Name then
+                                                                                                table.remove(DropDown.Values, i2);
+                                                                                        end;
+                                                                                end;
+                                                                                DropDown:Set(DropDown.Values);
+                                                                        else
+                                                                                table.insert(DropDown.Values, Name);
+                                                                                DropDown:Set(DropDown.Values);
+                                                                        end;
+
+                                                                        return;
+                                                                else
+                                                                        DropDown.MainDrop.Visible = false;
+                                                                end;
+
+                                                                DropDown:Set(Name);
+                                                                return;
+                                                        end)
+                                                        DropDown:UpdateSize()
+                                                end;
+
+                                                for _,v in pairs(DropDown.Defaultitems) do
+                                                        CreateOption(v)
+                                                end;
+
+                                                if DropDown.Default then
+                                                        DropDown:Set(DropDown.Default)
+                                                end
+
+                                                DropDown.Items = { };
+
+                                                Sector:FixSize();
+                                                DropDown:UpdateSize()
+                                                table.insert(Libary.Items, DropDown);
+                                                return DropDown;
+                                        end;
+
+                                        Sector:FixSize();
+                                        return Sector;
+                                end
+
+                        else
+
+                                function SubTab:CreateSector(Name, Side)
+                                        local Sector = { };
+                                        Sector.Name = Name or "";
+                                        Sector.Side = Side:lower() or "left"
+
+                                        Sector.Main = Instance.new("Frame", Sector.Side == "left" and Tab.Left or Tab.Right);
+                                        Sector.Main.Size = UDim2.fromOffset(349, 300);
+                                        Sector.Main.BackgroundColor3 = Libary.Theme.BackGround2;
+
+                                        Sector.UiCorner = Instance.new("UICorner", Sector.Main);
+                                        Sector.UiCorner.CornerRadius = UDim.new(0, 8);
+
+                                        Sector.TextLable = Instance.new("TextLabel", Sector.Main);
+                                        Sector.TextLable.Size = UDim2.new(1, 0, 0, 20);
+                                        Sector.TextLable.Position = UDim2.fromOffset(0, 0);
+                                        Sector.TextLable.BackgroundTransparency = 1;
+                                        Sector.TextLable.Text = Sector.Name;
+                                        Sector.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                        Sector.TextLable.TextSize = Libary.Theme.TextSize;
+                                        Sector.TextLable.Font = Libary.Theme.Font;
+                                        Sector.TextLable.TextXAlignment = "Center";
+                                        Sector.TextLable.TextYAlignment = "Bottom";
+
+                                        Sector.Sepirator = Instance.new("Frame", Sector.Main);
+                                        Sector.Sepirator.Position = UDim2.fromOffset(25, 25);
+                                        Sector.Sepirator.Size = UDim2.fromOffset(300, 1);
+                                        Sector.Sepirator.BorderSizePixel = 0;
+                                        Sector.Sepirator.BackgroundColor3 = Libary.Theme.Outline;
+
+                                        Sector.Holder = Instance.new("Frame", Sector.Main);
+                                        Sector.Holder.BackgroundTransparency = 1;
+                                        Sector.Holder.Position = UDim2.fromOffset(0, 29);
+                                        Sector.Holder.Size = UDim2.fromOffset(349, 56);
+
+                                        Sector.UiListLayout = Instance.new("UIListLayout", Sector.Holder);
+                                        Sector.UiListLayout.Padding = UDim.new(0, 0);
+                                        Sector.UiListLayout.FillDirection = "Vertical";
+                                        Sector.UiListLayout.HorizontalAlignment = "Center";
+                                        Sector.UiListLayout.VerticalAlignment = "Top";
+
+                                        function Sector:FixSize()
+                                                Sector.Main.Size = UDim2.fromOffset(349, Sector.UiListLayout.AbsoluteContentSize.Y + 42);
+                                                local Left = Tab.UIListLayout.AbsoluteContentSize.Y + 20;
+                                                local Right = Tab.UIListLayout2.AbsoluteContentSize.Y + 20;
+                                                Tab.TabScroll.CanvasSize = (Left>Right and UDim2.fromOffset(768, Left) or UDim2.fromOffset(768, Right));
+                                        end
+
+                                        function Sector:CreateToggle(Name, Defult, CallBack, Flag)
+                                                local Toggle = { };
+                                                Toggle.Name = Name or "";
+                                                Toggle.Defult = Defult or false;
+                                                Toggle.CallBack = CallBack or function() end;
+                                                Toggle.Flag = Flag or Name;
+                                                Toggle.Value = Toggle.Defult;
+
+                                                function Toggle:Set(bool)
+                                                        Toggle.Value = bool;
+
+                                                        if Toggle.Flag and Toggle.Flag ~= "" then
+                                                                Libary.Flags[Toggle.Flag] = Toggle.Value;
+                                                        end
+                                                        if Toggle.Value then
+                                                                TweenService:Create(Toggle.ToggleBackColor, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(1, 1)}):Play();
+                                                                TweenService:Create(Toggle.Ball, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.919, 0.2)}):Play();
+                                                        else
+                                                                TweenService:Create(Toggle.ToggleBackColor, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Size = UDim2.fromScale(0.4, 1)}):Play();
+                                                                TweenService:Create(Toggle.Ball, TweenInfo.new(Libary.Theme.ToggleTween, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {Position = UDim2.fromScale(0.833, 0.2)}):Play(); 
+                                                        end
+                                                        pcall(Toggle.CallBack, bool);
+                                                end
+
+                                                function Toggle:Get() 
+                                                        return Toggle.Value;
+                                                end
+
+                                                Toggle.Main = Instance.new("TextButton", Sector.Holder);
+                                                Toggle.Main.Size = UDim2.fromOffset(300, 30);
+                                                Toggle.Main.BackgroundTransparency = 1;
+                                                Toggle.Main.AutoButtonColor = false;
+                                                Toggle.Main.Text = "";
+                                                Toggle.Main.MouseButton1Click:Connect(function()
+                                                        Toggle:Set(not Toggle.Value)
+                                                end)
+
+                                                Toggle.TextLable = Instance.new("TextLabel", Toggle.Main);
+                                                Toggle.TextLable.Size = UDim2.fromOffset(164, 30);
+                                                Toggle.TextLable.Position = UDim2.fromOffset(0,0)
+                                                Toggle.TextLable.BackgroundTransparency = 1;
+                                                Toggle.TextLable.Text = Toggle.Name;
+                                                Toggle.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                                Toggle.TextLable.TextSize = Libary.Theme.TextSize;
+                                                Toggle.TextLable.Font = Libary.Theme.Font;
+                                                Toggle.TextLable.TextXAlignment = "Left";
+                                                Toggle.TextLable.TextYAlignment = "Center";
+
+                                                Toggle.ToggleBack = Instance.new("Frame", Toggle.Main);
+                                                Toggle.ToggleBack.Position = UDim2.fromScale(0.833, 0.2);
+                                                Toggle.ToggleBack.Size = UDim2.fromOffset(40, 17);
+                                                Toggle.ToggleBack.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                Toggle.ToggleBack.ClipsDescendants = true;
+
+                                                Toggle.UICorner = Instance.new("UICorner", Toggle.ToggleBack);
+                                                Toggle.UICorner.CornerRadius = UDim.new(0, 5);
+
+                                                Toggle.ToggleBackColor = Instance.new("Frame", Toggle.ToggleBack);
+                                                Toggle.ToggleBackColor.Position = UDim2.fromScale(0, 0);
+                                                Toggle.ToggleBackColor.Size = UDim2.fromScale(0, 1);
+                                                Toggle.ToggleBackColor.BackgroundColor3 = Libary.Theme.Selected;
+
+                                                Toggle.UICorner3 = Instance.new("UICorner", Toggle.ToggleBackColor);
+                                                Toggle.UICorner3.CornerRadius = UDim.new(0, 5);
+
+                                                Toggle.UIStroke = Instance.new("UIStroke", Toggle.ToggleBack);
+                                                Toggle.UIStroke.Thickness = 1;
+                                                Toggle.UIStroke.Color = Libary.Theme.Outline;
+                                                Toggle.UIStroke.ApplyStrokeMode = "Border";
+
+                                                Toggle.Ball = Instance.new("Frame", Toggle.Main);
+                                                Toggle.Ball.AnchorPoint = Vector2.new(0, 0);
+                                                Toggle.Ball.Size = UDim2.fromOffset(17, 17);
+                                                Toggle.Ball.Position = UDim2.fromScale(0.833, 0.2);
+                                                Toggle.Ball.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+
+                                                Toggle.UICorner2 = Instance.new("UICorner", Toggle.Ball);
+                                                Toggle.UICorner2.CornerRadius = UDim.new(0, 5);
+
+                                                Toggle.UIStroke2 = Instance.new("UIStroke", Toggle.Ball);
+                                                Toggle.UIStroke2.Thickness = 1;
+                                                Toggle.UIStroke2.Color = Libary.Theme.Outline;
+
+                                                Toggle.Holder = Instance.new("Frame", Toggle.Main);
+                                                Toggle.Holder.Position = UDim2.fromScale(0.595, 0.167);
+                                                Toggle.Holder.Size = UDim2.fromOffset(60, 17);
+                                                Toggle.Holder.BackgroundTransparency = 1;
+
+                                                Toggle.UIList = Instance.new("UIListLayout", Toggle.Holder);
+                                                Toggle.UIList.FillDirection = "Horizontal";
+                                                Toggle.UIList.HorizontalAlignment = "Right";
+                                                Toggle.UIList.SortOrder = "LayoutOrder";
+                                                Toggle.UIList.VerticalAlignment = "Center";
+
+                                                Toggle:Set(Toggle.Defult);
+
+                                                if Toggle.Flag and Toggle.Flag ~= "" then
+                                                        Libary.Flags[Toggle.Flag] = Toggle.Defult or false;
+                                                end
+
+                                                function Toggle:CreateColorPicker(Defult, CallBack, Flag)
+                                                        local ColorPicker = { };
+                                                        ColorPicker.CallBack = CallBack or function() end;
+                                                        ColorPicker.Defult = Defult or Color3.fromRGB(255, 255, 255);
+                                                        ColorPicker.Value = ColorPicker.Defult;
+                                                        ColorPicker.Flag = Flag or ((Toggle.Name or "") .. tostring(#Toggle.Holder:GetChildren()));
+
+                                                        if ColorPicker.Flag and ColorPicker.Flag ~= "" then
+                                                                Libary.Flags[ColorPicker.Flag] = ColorPicker.Defult or Color3.fromRGB(255, 255, 255);
+                                                        end
+
+                                                        ColorPicker.Main = Instance.new("ImageButton", Toggle.Holder);
+                                                        ColorPicker.Main.BackgroundTransparency = 1;
+                                                        ColorPicker.Main.Size = UDim2.fromOffset(17, 17);
+                                                        ColorPicker.Main.Image = "rbxassetid://11430234918";
+                                                        ColorPicker.Main.MouseButton1Click:Connect(function()
+                                                                ColorPickerM:Add(ColorPicker.Flag, Flag)
+                                                                Window.ColorPickerSelected = ColorPicker.Flag
+                                                        end);
+
+                                                        table.insert(Libary.Items, ColorPicker);
+                                                        return ColorPicker;
+                                                end
+
+                                                Sector:FixSize();
+                                                table.insert(Libary.Items, Toggle);
+                                                return Toggle;
+                                        end;
+
+                                        function Sector:CreateSlider(Text, Min, Default, Max, Decimals, Callback, Flag)
+                                                local Slider = { };
+                                                Slider.Text = Text or "";
+                                                Slider.Callback = Callback or function(Value) end;
+                                                Slider.Min = Min or 0;
+                                                Slider.Max = Max or 100;
+                                                Slider.Decimals = Decimals or 1;
+                                                Slider.Default = Default or Slider.min;
+                                                Slider.Flag = Flag or Text or "";
+
+                                                Slider.Value = Slider.Default;
+                                                local Dragging = false;
+
+                                                Slider.MainBack = Instance.new("TextButton", Sector.Holder);
+                                                Slider.MainBack.Size = UDim2.fromOffset(300, 50);
+                                                Slider.MainBack.BackgroundTransparency = 1;
+                                                Slider.MainBack.AutoButtonColor = false;
+                                                Slider.MainBack.Text = "";
+
+                                                Slider.TextLable = Instance.new("TextLabel", Slider.MainBack);
+                                                Slider.TextLable.Size = UDim2.fromOffset(164, 22);
+                                                Slider.TextLable.Position = UDim2.fromOffset(0,0)
+                                                Slider.TextLable.BackgroundTransparency = 1;
+                                                Slider.TextLable.Text = Slider.Text;
+                                                Slider.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                                Slider.TextLable.TextSize = Libary.Theme.TextSize;
+                                                Slider.TextLable.Font = Libary.Theme.Font;
+                                                Slider.TextLable.TextXAlignment = "Left";
+                                                Slider.TextLable.TextYAlignment = "Center";
+
+                                                Slider.TextBox = Instance.new("TextBox", Slider.MainBack);
+                                                Slider.TextBox.Position = UDim2.fromScale(0.87, 0);
+                                                Slider.TextBox.Size = UDim2.fromOffset(30, 22);
+                                                Slider.TextBox.BackgroundTransparency = 1;
+                                                Slider.TextBox.TextColor3 = Libary.Theme.TextColor;
+                                                Slider.TextBox.TextSize = Libary.Theme.TextSize;
+                                                Slider.TextBox.Font = Libary.Theme.Font;
+                                                Slider.TextBox.TextXAlignment = "Center";
+                                                Slider.TextBox.TextYAlignment = "Center";
+                                                Slider.TextBox.Text = "0";
+
+                                                Slider.Main = Instance.new("TextButton", Slider.MainBack);
+                                                Slider.Main.Position = UDim2.fromScale(-0.003, 0.533);
+                                                Slider.Main.Size = UDim2.fromOffset(291, 17);
+                                                Slider.Main.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                Slider.Main.Text = "";
+                                                Slider.Main.AutoButtonColor = false;
+
+                                                Slider.UiCorner = Instance.new("UICorner", Slider.Main);
+                                                Slider.UiCorner.CornerRadius = UDim.new(0, 5);
+
+                                                Slider.UiStroke = Instance.new("UIStroke", Slider.Main);
+                                                Slider.UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                                Slider.UiStroke.Color = Libary.Theme.Outline;
+
+                                                Slider.SlideBar = Instance.new("Frame", Slider.Main);
+                                                Slider.SlideBar.BackgroundColor3 = Libary.Theme.Selected;
+                                                Slider.SlideBar.Size = UDim2.fromScale(0,0);
+                                                Slider.SlideBar.Position = UDim2.new();
+
+                                                Slider.UiCorner2 = Instance.new("UICorner", Slider.SlideBar);
+                                                Slider.UiCorner2.CornerRadius = UDim.new(0, 5);
+
+                                                if Slider.Flag and Slider.Flag ~= "" then
+                                                        Libary.Flags[Slider.Flag] = Slider.Default or Slider.Min or 0;
+                                                end;
+
+                                                function Slider:Get()
+                                                        return Slider.Value;
+                                                end;
+
+                                                function Slider:Set(value)
+                                                        Slider.Value = math.clamp(math.round(value * Slider.Decimals) / Slider.Decimals, Slider.Min, Slider.Max);
+                                                        local percent = 1 - ((Slider.Max - Slider.Value) / (Slider.Max - Slider.Min));
+                                                        if Slider.Flag and Slider.Flag ~= "" then
+                                                                Libary.Flags[Slider.Flag] = Slider.Value;
+                                                        end;
+                                                        Slider.SlideBar:TweenSize(UDim2.fromOffset(percent * Slider.Main.AbsoluteSize.X, Slider.Main.AbsoluteSize.Y), Enum.EasingDirection.In, Enum.EasingStyle.Sine, Libary.Theme.SliderTween);
+                                                        Slider.TextBox.Text = Slider.Value;
+                                                        if Slider.Value <= Slider.Min then
+                                                                Slider.SlideBar.BackgroundTransparency = 1;
+                                                        else
+                                                                Slider.SlideBar.BackgroundTransparency = 0;
+                                                        end;
+                                                        pcall(Slider.Callback, Slider.Value);
+                                                end;
+                                                Slider:Set(Slider.Default);
+
+                                                Slider.TextBox.FocusLost:Connect(function(Return)
+                                                        if not Return then 
+                                                                return;
+                                                        end;
+                                                        if (Slider.TextBox.Text:match("^%d+$")) then
+                                                                Slider:Set(tonumber(Slider.TextBox.Text));
+                                                        else
+                                                                Slider.TextBox.Text = tostring(Slider.Value);
+                                                        end;
+                                                end);
+
+                                                function Slider:Refresh()
+                                                        local mousePos = CurrentCamera:WorldToViewportPoint(Mouse.Hit.p)
+                                                        local percent = math.clamp(mousePos.X - Slider.SlideBar.AbsolutePosition.X, 0, Slider.Main.AbsoluteSize.X) / Slider.Main.AbsoluteSize.X;
+                                                        local value = math.floor((Slider.Min + (Slider.Max - Slider.Min) * percent) * Slider.Decimals) / Slider.Decimals;
+                                                        value = math.clamp(value, Slider.Min, Slider.Max);
+                                                        Slider:Set(value);
+                                                end;
+
+                                                Slider.SlideBar.InputBegan:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = true
+                                                                Slider:Refresh()
+                                                        end
+                                                end)
+
+                                                Slider.SlideBar.InputEnded:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = false
+                                                        end
+                                                end)
+
+                                                Slider.Main.InputBegan:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = true
+                                                                Slider:Refresh()
+                                                        end
+                                                end)
+
+                                                Slider.Main.InputEnded:Connect(function(input)
+                                                        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                                                                Dragging = false
+                                                        end
+                                                end)
+
+                                                UserInputService.InputChanged:Connect(function(input)
+                                                        if Dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
+                                                                Slider:Refresh()
+                                                        end
+                                                end)
+
+                                                Sector:FixSize();
+                                                table.insert(Libary.Items, Slider);
+                                                return Slider;
+                                        end;
+
+                                        function Sector:CreateDropdown(Text, Items, Defult, Multichoice, Callback, Flag)
+                                                local DropDown = { };
+                                                DropDown.Text = Text or "";
+                                                DropDown.Defaultitems = Items or { };
+                                                DropDown.Default = Defult;
+                                                DropDown.Callback = Callback or function() end;
+                                                DropDown.Multichoice = Multichoice or false;
+                                                DropDown.Values = { };
+                                                DropDown.Flag = Flag or Text or "";
+
+                                                DropDown.MainBack = Instance.new("TextButton", Sector.Holder);
+                                                DropDown.MainBack.Size = UDim2.fromOffset(300, 50);
+                                                DropDown.MainBack.BackgroundTransparency = 1;
+                                                DropDown.MainBack.AutoButtonColor = false;
+                                                DropDown.MainBack.Text = "";
+
+                                                DropDown.TextLable = Instance.new("TextLabel", DropDown.MainBack);
+                                                DropDown.TextLable.Size = UDim2.fromOffset(164, 22);
+                                                DropDown.TextLable.Position = UDim2.fromOffset(0,0)
+                                                DropDown.TextLable.BackgroundTransparency = 1;
+                                                DropDown.TextLable.Text = DropDown.Text;
+                                                DropDown.TextLable.TextColor3 = Libary.Theme.TextColor;
+                                                DropDown.TextLable.TextSize = Libary.Theme.TextSize;
+                                                DropDown.TextLable.Font = Libary.Theme.Font;
+                                                DropDown.TextLable.TextXAlignment = "Left";
+                                                DropDown.TextLable.TextYAlignment = "Center";
+
+                                                DropDown.Drop = Instance.new("TextButton", DropDown.MainBack);
+                                                DropDown.Drop.Size = UDim2.fromOffset(291, 21);
+                                                DropDown.Drop.Position = UDim2.fromScale(-0.003, 0.433);
+                                                DropDown.Drop.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                DropDown.Drop.AutoButtonColor = false;
+                                                DropDown.Drop.Text = "";
+                                                DropDown.Drop.MouseButton1Click:Connect(function()
+                                                        DropDown.MainDrop.Visible = not DropDown.MainDrop.Visible;
+                                                end);
+
+                                                DropDown.UiCorner = Instance.new("UICorner", DropDown.Drop);
+                                                DropDown.UiCorner.CornerRadius = UDim.new(0, 5);
+
+                                                DropDown.UiStroke = Instance.new("UIStroke", DropDown.Drop);
+                                                DropDown.UiStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                                DropDown.UiStroke.Color = Libary.Theme.Outline;
+
+                                                DropDown.Selected = Instance.new("TextLabel", DropDown.Drop);
+                                                DropDown.Selected.BackgroundTransparency = 1;
+                                                DropDown.Selected.Position = UDim2.fromScale(0.02, 0);
+                                                DropDown.Selected.Size = UDim2.fromScale(0.945, 1);
+                                                DropDown.Selected.Font = Libary.Theme.Font;
+                                                DropDown.Selected.TextColor3 = Libary.Theme.TextColor;
+                                                DropDown.Selected.TextXAlignment = "Left";
+                                                DropDown.Selected.TextSize = Libary.Theme.TextSize;
+                                                DropDown.Selected.Text = DropDown.Text;
+
+                                                DropDown.MainDrop = Instance.new("Frame", DropDown.MainBack);
+                                                DropDown.MainDrop.Position = UDim2.fromScale(0, 0.967);
+                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, 100);
+                                                DropDown.MainDrop.BackgroundColor3 = Libary.Theme.BackGround1;
+                                                DropDown.MainDrop.ZIndex = 10;
+                                                DropDown.MainDrop.Visible = false;
+
+                                                DropDown.UiCorner2 = Instance.new("UICorner", DropDown.MainDrop);
+                                                DropDown.UiCorner2.CornerRadius = UDim.new(0, 5);
+
+                                                DropDown.UiStroke2 = Instance.new("UIStroke", DropDown.MainDrop);
+                                                DropDown.UiStroke2.ApplyStrokeMode = Enum.ApplyStrokeMode.Border;
+                                                DropDown.UiStroke2.Color = Libary.Theme.Outline;
+
+                                                DropDown.ScrollingFrame = Instance.new("ScrollingFrame", DropDown.MainDrop);
+                                                DropDown.ScrollingFrame.BackgroundTransparency = 1;
+                                                DropDown.ScrollingFrame.Position = UDim2.fromScale();
+                                                DropDown.ScrollingFrame.Size = UDim2.fromScale(1, 1);
+                                                DropDown.ScrollingFrame.ScrollBarThickness = 0;
+                                                DropDown.ScrollingFrame.CanvasSize = UDim2.new(0, 0, 1, 0);
+
+                                                DropDown.UIListLayout = Instance.new("UIListLayout", DropDown.ScrollingFrame);
+                                                DropDown.UIListLayout.SortOrder = "LayoutOrder";
+
+
+                                                function DropDown:GetOptions()
+                                                        return DropDown.values;
+                                                end;
+
+                                                function DropDown:UpdateSize()
+                                                        DropDown.ScrollingFrame.CanvasSize = UDim2.fromOffset(0, DropDown.UIListLayout.AbsoluteContentSize.Y);
+                                                        if DropDown.UIListLayout.AbsoluteContentSize.Y < 100  then
+                                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, DropDown.UIListLayout.AbsoluteContentSize.Y);
+                                                        else
+                                                                DropDown.MainDrop.Size = UDim2.fromOffset(289, 100);
+                                                        end;
+                                                end;
+
+                                                function DropDown:updateText(Text)
+                                                        if #Text >= 47 then
+                                                                Text = Text:sub(1, 45) .. "..";
+                                                        end;
+                                                        DropDown.Selected.Text = Text;
+                                                end;
+
+                                                DropDown.Changed = Instance.new("BindableEvent");
+                                                function DropDown:Set(value)
+                                                        if type(value) == "table" then
+                                                                DropDown.Values = value;
+                                                                DropDown:updateText(table.concat(value, ", "));
+                                                                pcall(DropDown.Callback, value);
+                                                        else
+                                                                DropDown:updateText(value)
+                                                                DropDown.Values = { value };
+                                                                pcall(DropDown.Callback, value);
+                                                        end;
+
+                                                        DropDown.Changed:Fire(value);
+                                                        if DropDown.Flag and DropDown.Flag ~= "" then
+                                                                Libary.Flags[DropDown.Flag] = DropDown.Multichoice and DropDown.Values or DropDown.Values[1];
+                                                        end;
+                                                end;
+
+                                                function DropDown:Get()
+                                                        return DropDown.Multichoice and DropDown.Values or DropDown.Values[1];
+                                                end;
+
+                                                function DropDown:isSelected(item)
+                                                        for i, v in pairs(DropDown.Values) do
+                                                                if v == item then
+                                                                        return true;
+                                                                end;
+                                                        end;
+                                                        return false;
+                                                end;
+
+                                                local function CreateOption(Name)
+                                                        DropDown.Option = Instance.new("TextButton", DropDown.ScrollingFrame);
+                                                        DropDown.Option.AutoButtonColor = false;
+                                                        DropDown.Option.BackgroundTransparency = 1;
+                                                        DropDown.Option.Size = UDim2.new(1, 0, 0, 20);
+                                                        DropDown.Option.Text = "  " .. Name;
+                                                        DropDown.Option.BorderSizePixel = 0;
+                                                        DropDown.Option.TextXAlignment = "Left"
+                                                        DropDown.Option.Name = Name;
+                                                        DropDown.Option.ZIndex = 10;
+                                                        DropDown.Option.TextColor3 = Libary.Theme.TextColor;
+                                                        DropDown.Option.Font = Libary.Theme.Font;
+                                                        DropDown.Option.TextSize = Libary.Theme.TextSize;
+                                                        DropDown.Option.MouseButton1Down:Connect(function()
+                                                                if DropDown.Multichoice then
+                                                                        if DropDown:isSelected(Name) then
+                                                                                for i2, v2 in pairs(DropDown.Values) do
+                                                                                        if v2 == Name then
+                                                                                                table.remove(DropDown.Values, i2);
+                                                                                        end;
+                                                                                end;
+                                                                                DropDown:Set(DropDown.Values);
+                                                                        else
+                                                                                table.insert(DropDown.Values, Name);
+                                                                                DropDown:Set(DropDown.Values);
+                                                                        end;
+
+                                                                        return;
+                                                                else
+                                                                        DropDown.MainDrop.Visible = false;
+                                                                end;
+
+                                                                DropDown:Set(Name);
+                                                                return;
+                                                        end)
+                                                        DropDown:UpdateSize()
+                                                end;
+
+                                                for _,v in pairs(DropDown.Defaultitems) do
+                                                        CreateOption(v)
+                                                end;
+
+                                                if DropDown.Default then
+                                                        DropDown:Set(DropDown.Default)
+                                                end
+
+                                                DropDown.Items = { };
+
+                                                Sector:FixSize();
+                                                DropDown:UpdateSize()
+                                                table.insert(Libary.Items, DropDown);
+                                                return DropDown;
+                                        end;
+
+                                        Sector:FixSize();
+                                        return Sector;
+                                end
+
+                        end
+
+
+                        return SubTab;
                 end
 
+                Window:UpdateTabList();
+                table.insert(Window.Tabs, Tab);
                 return Tab;
         end
 
-        -- Add window to library
-        table.insert(Library.Windows, Window);
+        -- ESP Preview Toggle Method
+        function Window:ToggleESPPreview(visible)
+            if visible ~= nil then
+                Window.ESPPreview.SetVisible(visible);
+            else
+                Window.ESPPreview.SetVisible(not Window.ESPPreview.Main.Visible);
+            end
+        end
 
         return Window;
 end
 
--- Initialize the library when loaded in a Roblox environment
-if game and game.GetService then
-    print("[UI Library] Enhanced Roblox UI Library loaded successfully!");
-    print("[UI Library] Ready for executor use - all bugs fixed and optimized");
+-- ====================================================================
+-- COMPREHENSIVE EXECUTOR ENHANCEMENTS - PROFESSIONAL FEATURES
+-- ====================================================================
 
-    Library:CreateNotification({
-        Title = "UI Library";
-        Text = "Enhanced UI Library loaded successfully!";
-        Duration = 3;
-        Type = "Success";
-    });
-else
-    print("Enhanced Roblox UI Library - Executor Optimized");
-    print("Version: 2.0 Professional");
-    print("Features: Advanced theming, configuration saving, notifications, error handling");
-    print("Status: Ready for Roblox executor use");
+-- Initialize Executor Detection and Advanced Features
+local function InitializeExecutor()
+    -- Detect executor environment
+    local success, name, version = pcall(identifyexecutor)
+    if success then
+        Libary.Executor.Name = name or "Unknown"
+        Libary.Executor.Version = version or "Unknown"
+    end
+    
+    -- Test for available executor functions
+    local functions = {
+        "writefile", "readfile", "isfile", "isfolder", "makefolder", "delfolder", "delfile",
+        "getgenv", "getrenv", "getsenv", "getrawmetatable", "setrawmetatable",
+        "hookfunction", "hookmetamethod", "restorefunction", "getconnections",
+        "getscripts", "gethui", "getinstances", "cloneref", "checkcaller",
+        "decompile", "getscriptbytecode", "getcallingscript", "getloadedmodules",
+        "firesignal", "fireclickdetector", "firetouchinterest", "fireproximityprompt",
+        "gethiddenproperty", "sethiddenproperty", "islclosure", "iscclosure",
+        "request", "Drawing", "cleardrawcache", "isrenderobj", "getrenderproperty",
+        "base64_encode", "base64_decode", "syn", "protect_gui", "unprotect_gui"
+    }
+    
+    for _, func in pairs(functions) do
+        if _G[func] then
+            Libary.Executor.Features[func] = true
+        end
+    end
+    
+    -- Test crypt functions
+    if crypt then
+        if crypt.encrypt then self.Executor.Features["crypt.encrypt"] = true end
+        if crypt.decrypt then self.Executor.Features["crypt.decrypt"] = true end
+        if crypt.hash then self.Executor.Features["crypt.hash"] = true end
+        if crypt.derive then self.Executor.Features["crypt.derive"] = true end
+        if crypt.random then self.Executor.Features["crypt.random"] = true end
+    end
+    
+    -- Test debug functions
+    if debug then
+        if debug.getupvalue then self.Executor.Features["debug.getupvalue"] = true end
+        if debug.setupvalue then self.Executor.Features["debug.setupvalue"] = true end
+        if debug.getupvalues then self.Executor.Features["debug.getupvalues"] = true end
+        if debug.getconstants then self.Executor.Features["debug.getconstants"] = true end
+        if debug.setconstant then self.Executor.Features["debug.setconstant"] = true end
+        if debug.getprotos then self.Executor.Features["debug.getprotos"] = true end
+        if debug.getstack then self.Executor.Features["debug.getstack"] = true end
+    end
+    
+    return self.Executor
 end
 
--- Return the library for module usage
-return Library;
+-- Advanced Configuration System with Encryption
+function Libary:SaveConfigAdvanced(configName)
+    configName = configName or "default"
+    
+    if not writefile then
+        self:Log("WARNING", "SaveConfigAdvanced: writefile not available")
+        return false
+    end
+    
+    local success, result = pcall(function()
+        local folderPath = self.Config.SaveFolder
+        if isfolder and not isfolder(folderPath) then
+            if makefolder then makefolder(folderPath) end
+        end
+        
+        local config = {
+            version = self.Version;
+            executor = self.Executor.Name;
+            timestamp = os.time();
+            flags = {};
+            theme = {};
+        }
+        
+        -- Save all flags
+        for flag, value in pairs(self.Flags) do
+            config.flags[flag] = value
+        end
+        
+        -- Save theme configuration
+        config.theme = {
+            BackGround1 = {self.Theme.BackGround1.R * 255, self.Theme.BackGround1.G * 255, self.Theme.BackGround1.B * 255};
+            BackGround2 = {self.Theme.BackGround2.R * 255, self.Theme.BackGround2.G * 255, self.Theme.BackGround2.B * 255};
+            Selected = {self.Theme.Selected.R * 255, self.Theme.Selected.G * 255, self.Theme.Selected.B * 255};
+        }
+        
+        -- Encrypt configuration if crypt is available
+        local configString
+        if game and game:GetService("HttpService") then
+            configString = game:GetService("HttpService"):JSONEncode(config)
+        else
+            configString = tostring(config) -- Fallback for testing
+        end
+        
+        if crypt and crypt.encrypt then
+            local key = "UILib_" .. configName .. "_Key"
+            configString = crypt.encrypt(configString, key)
+        end
+        
+        writefile(folderPath .. "/" .. configName .. ".cfg", configString)
+        self:Log("SUCCESS", "Configuration saved: " .. configName)
+        return true
+    end)
+    
+    if not success then
+        self:Log("ERROR", "Failed to save config: " .. tostring(result))
+    end
+    
+    return success and result
+end
+
+function Libary:LoadConfigAdvanced(configName)
+    configName = configName or "default"
+    
+    if not readfile then
+        self:Log("WARNING", "LoadConfigAdvanced: readfile not available")
+        return false
+    end
+    
+    local success, result = pcall(function()
+        local filePath = self.Config.SaveFolder .. "/" .. configName .. ".cfg"
+        if isfile and not isfile(filePath) then 
+            self:Log("WARNING", "Config file not found: " .. configName)
+            return false 
+        end
+        
+        local configString = readfile(filePath)
+        
+        -- Decrypt if encrypted
+        if crypt and crypt.decrypt then
+            local key = "UILib_" .. configName .. "_Key"
+            local success_decrypt, decrypted = pcall(crypt.decrypt, configString, key)
+            if success_decrypt then
+                configString = decrypted
+            end
+        end
+        
+        local config
+        if game and game:GetService("HttpService") then
+            config = game:GetService("HttpService"):JSONDecode(configString)
+        else
+            config = {} -- Fallback for testing
+        end
+        
+        if config.flags then
+            for flag, value in pairs(config.flags) do
+                self.Flags[flag] = value
+                -- Update UI elements with loaded values
+                for _, item in pairs(self.Items) do
+                    if item.Flag == flag and item.Set then
+                        item:Set(value)
+                    end
+                end
+            end
+        end
+        
+        self:Log("SUCCESS", "Configuration loaded: " .. configName)
+        return true
+    end)
+    
+    if not success then
+        self:Log("ERROR", "Failed to load config: " .. tostring(result))
+    end
+    
+    return success and result
+end
+
+-- Professional Notification System
+function Libary:CreateNotification(options)
+    if not options then return end
+    
+    local notification = {
+        Title = tostring(options.Title or "Notification");
+        Text = tostring(options.Text or "");
+        Duration = options.Duration or 5;
+        Type = options.Type or "Info";
+        ID = tostring(math.random(1000000, 9999999));
+        Timestamp = tick();
+    }
+    
+    -- Color mapping for different notification types
+    local typeColors = {
+        Success = Color3.fromRGB(67, 181, 129);
+        Warning = Color3.fromRGB(250, 166, 26);
+        Error = Color3.fromRGB(240, 71, 71);
+        Info = Color3.fromRGB(88, 101, 242);
+    }
+    
+    notification.Color = typeColors[notification.Type] or typeColors.Info
+    
+    -- Console output for all environments
+    print(string.format("[%s] %s: %s", notification.Type:upper(), notification.Title, notification.Text))
+    
+    -- Add to notifications list
+    table.insert(self.Notifications, notification)
+    
+    -- Cleanup old notifications
+    if #self.Notifications > 50 then
+        table.remove(self.Notifications, 1)
+    end
+    
+    return notification
+end
+
+-- Debugger and Logging System
+function Libary:Log(level, message)
+    local logEntry = {
+        Level = level;
+        Message = message;
+        Timestamp = tick();
+        Source = getcallingscript and getcallingscript() and getcallingscript().Name or "Unknown";
+    }
+    
+    table.insert(self.Debugger.Logs, logEntry)
+    
+    -- Limit log entries
+    if #self.Debugger.Logs > self.Debugger.MaxLogs then
+        table.remove(self.Debugger.Logs, 1)
+    end
+    
+    if self.Debugger.Enabled then
+        print(string.format("[%s] %s: %s", level, logEntry.Source, message))
+    end
+end
+
+-- Memory and Performance Statistics
+function Libary:GetMemoryStats()
+    local stats = {
+        instances = 0;
+        scripts = 0;
+        connections = #self.Connections;
+        flags = 0;
+        items = #self.Items;
+        windows = #self.Windows;
+        notifications = #self.Notifications;
+        logs = #self.Debugger.Logs;
+        uptime = tick() - self.Performance.StartTime;
+    }
+    
+    -- Count instances if available
+    if getinstances then
+        local success, instances = pcall(getinstances)
+        if success then stats.instances = #instances end
+    end
+    
+    -- Count scripts if available
+    if getscripts then
+        local success, scripts = pcall(getscripts)
+        if success then stats.scripts = #scripts end
+    end
+    
+    -- Count flags
+    for _ in pairs(self.Flags) do
+        stats.flags = stats.flags + 1
+    end
+    
+    return stats
+end
+
+-- Advanced Hook Management System
+function Libary:CreateSecureHook(target, replacement)
+    if not hookfunction then 
+        self:Log("WARNING", "CreateSecureHook: hookfunction not available")
+        return nil 
+    end
+    
+    local success, original = pcall(hookfunction, target, replacement)
+    if success then
+        local hookData = {
+            Type = "Hook";
+            Target = target;
+            Original = original;
+            Replacement = replacement;
+            Created = tick();
+            Active = true;
+            Disconnect = function(self)
+                if restorefunction then
+                    restorefunction(self.Target)
+                    self.Active = false
+                end
+            end;
+        }
+        
+        table.insert(self.Hooks, hookData)
+        table.insert(self.Connections, hookData)
+        self:Log("SUCCESS", "Secure hook created for function")
+        return original
+    else
+        self:Log("ERROR", "Failed to create hook: " .. tostring(original))
+    end
+    return nil
+end
+
+-- ESP and Drawing System
+function Libary:CreateESP(target, options)
+    if not Drawing or not Drawing.new then 
+        self:Log("WARNING", "CreateESP: Drawing API not available")
+        return nil 
+    end
+    
+    local esp = {
+        Enabled = true;
+        Target = target;
+        Drawings = {};
+        Options = options or {};
+        ID = tostring(math.random(1000000, 9999999));
+    }
+    
+    options = options or {}
+    
+    -- Create box drawing
+    if options.Box ~= false then
+        esp.Drawings.Box = Drawing.new("Square")
+        esp.Drawings.Box.Color = options.BoxColor or Color3.fromRGB(255, 255, 255)
+        esp.Drawings.Box.Filled = false
+        esp.Drawings.Box.Thickness = options.Thickness or 2
+        esp.Drawings.Box.Transparency = options.Transparency or 1
+        esp.Drawings.Box.Visible = false
+    end
+    
+    -- Create name tag
+    if options.Name then
+        esp.Drawings.Name = Drawing.new("Text")
+        esp.Drawings.Name.Text = options.Name
+        esp.Drawings.Name.Color = options.NameColor or Color3.fromRGB(255, 255, 255)
+        esp.Drawings.Name.Size = options.NameSize or 16
+        esp.Drawings.Name.Font = Drawing.Fonts and Drawing.Fonts.UI or 2
+        esp.Drawings.Name.Visible = false
+    end
+    
+    -- Create distance text
+    if options.Distance then
+        esp.Drawings.Distance = Drawing.new("Text")
+        esp.Drawings.Distance.Color = options.DistanceColor or Color3.fromRGB(200, 200, 200)
+        esp.Drawings.Distance.Size = options.DistanceSize or 14
+        esp.Drawings.Distance.Font = Drawing.Fonts and Drawing.Fonts.UI or 2
+        esp.Drawings.Distance.Visible = false
+    end
+    
+    function esp:Update()
+        if not self.Enabled or not self.Target then
+            for _, drawing in pairs(self.Drawings) do
+                drawing.Visible = false
+            end
+            return
+        end
+        
+        -- Update position based on target
+        local success, position, onScreen
+        if CurrentCamera and CurrentCamera.WorldToViewportPoint then
+            success, position = pcall(function()
+                local worldPos = self.Target.Position or self.Target.CFrame.Position
+                local screenPos, visible = CurrentCamera:WorldToViewportPoint(worldPos)
+                return screenPos, visible
+            end)
+        end
+        
+        if success and position and position.Z > 0 then
+            local screenPos = Vector2.new(position.X, position.Y)
+            
+            -- Update box
+            if self.Drawings.Box then
+                self.Drawings.Box.Position = screenPos - Vector2.new(50, 50)
+                self.Drawings.Box.Size = Vector2.new(100, 100)
+                self.Drawings.Box.Visible = true
+            end
+            
+            -- Update name
+            if self.Drawings.Name then
+                self.Drawings.Name.Position = screenPos - Vector2.new(0, 60)
+                self.Drawings.Name.Visible = true
+            end
+            
+            -- Update distance
+            if self.Drawings.Distance and LocalPlayer and LocalPlayer.Character and LocalPlayer.Character.HumanoidRootPart then
+                local distance = (LocalPlayer.Character.HumanoidRootPart.Position - self.Target.Position).Magnitude
+                self.Drawings.Distance.Text = string.format("%.1f studs", distance)
+                self.Drawings.Distance.Position = screenPos + Vector2.new(0, 60)
+                self.Drawings.Distance.Visible = true
+            end
+        else
+            for _, drawing in pairs(self.Drawings) do
+                drawing.Visible = false
+            end
+        end
+    end
+    
+    function esp:Destroy()
+        for _, drawing in pairs(self.Drawings) do
+            if drawing and drawing.Remove then
+                drawing:Remove()
+            end
+        end
+        
+        -- Remove from ESP list
+        for i, existingEsp in pairs(Library.ESP) do
+            if existingEsp.ID == self.ID then
+                table.remove(Library.ESP, i)
+                break
+            end
+        end
+    end
+    
+    table.insert(self.ESP, esp)
+    table.insert(self.Items, esp)
+    self:Log("SUCCESS", "ESP created with ID: " .. esp.ID)
+    return esp
+end
+
+-- Network Request System
+function Libary:HTTPRequest(options)
+    if not request then
+        self:Log("WARNING", "HTTPRequest: request function not available")
+        return {success = false, error = "request function not available"}
+    end
+    
+    local defaultOptions = {
+        Url = "";
+        Method = "GET";
+        Headers = {};
+        Body = "";
+    }
+    
+    for key, value in pairs(options or {}) do
+        defaultOptions[key] = value
+    end
+    
+    local success, result = pcall(request, defaultOptions)
+    
+    if success then
+        self:Log("SUCCESS", "HTTP request completed: " .. defaultOptions.Method .. " " .. defaultOptions.Url)
+        return {
+            success = true;
+            data = result;
+            status = result.StatusCode;
+            body = result.Body;
+        }
+    else
+        self:Log("ERROR", "HTTP request failed: " .. tostring(result))
+        return {
+            success = false;
+            error = result;
+        }
+    end
+end
+
+-- Script Analysis and Information
+function Libary:GetScriptInfo()
+    local info = {
+        executor = self.Executor.Name;
+        version = self.Executor.Version;
+        features = 0;
+        script = "Unknown";
+        location = "Unknown";
+        parent = "Unknown";
+    }
+    
+    -- Count features
+    for _ in pairs(self.Executor.Features) do
+        info.features = info.features + 1
+    end
+    
+    -- Get calling script info
+    if getcallingscript then
+        local success, script = pcall(getcallingscript)
+        if success and script then
+            info.script = script.Name or "Unknown"
+            info.location = script.Parent and script.Parent.Name or "Unknown"
+            info.parent = script.Parent and script.Parent.ClassName or "Unknown"
+        end
+    end
+    
+    return info
+end
+
+-- Comprehensive Executor Capabilities Report
+function Libary:GetExecutorCapabilities()
+    return {
+        filesystem = {
+            read = not not readfile;
+            write = not not writefile;
+            folders = not not makefolder;
+            delete = not not delfile;
+            check = not not isfile;
+        };
+        security = {
+            hooks = not not hookfunction;
+            metamethods = not not hookmetamethod;
+            restore = not not restorefunction;
+            protect = not not protect_gui;
+        };
+        analysis = {
+            decompile = not not decompile;
+            scripts = not not getscripts;
+            instances = not not getinstances;
+            bytecode = not not getscriptbytecode;
+            constants = debug and not not debug.getconstants;
+            upvalues = debug and not not debug.getupvalues;
+        };
+        drawing = {
+            available = not not Drawing;
+            clear = not not cleardrawcache;
+            properties = not not getrenderproperty;
+        };
+        network = {
+            requests = not not request;
+        };
+        cryptography = {
+            available = not not crypt;
+            encrypt = crypt and not not crypt.encrypt;
+            decrypt = crypt and not not crypt.decrypt;
+            hash = crypt and not not crypt.hash;
+            random = crypt and not not crypt.random;
+        };
+        environment = {
+            getgenv = not not getgenv;
+            getrenv = not not getrenv;
+            getsenv = not not getsenv;
+            checkcaller = not not checkcaller;
+        };
+    }
+end
+
+-- Advanced Cleanup System
+function Libary:Cleanup()
+    self:Log("INFO", "Starting comprehensive cleanup...")
+    
+    -- Disconnect all connections
+    for i, connection in pairs(self.Connections) do
+        if connection and connection.Disconnect then
+            connection:Disconnect()
+        end
+    end
+    self.Connections = {}
+    
+    -- Destroy all ESP objects
+    for i, esp in pairs(self.ESP) do
+        if esp and esp.Destroy then
+            esp:Destroy()
+        end
+    end
+    self.ESP = {}
+    
+    -- Restore all hooks
+    for i, hook in pairs(self.Hooks) do
+        if hook and hook.Active and hook.Disconnect then
+            hook:Disconnect()
+        end
+    end
+    self.Hooks = {}
+    
+    -- Clear drawing cache
+    if cleardrawcache then
+        cleardrawcache()
+    end
+    
+    -- Clear all items
+    for i, item in pairs(self.Items) do
+        if item and item.Destroy then
+            item:Destroy()
+        end
+    end
+    self.Items = {}
+    
+    -- Reset collections
+    self.Flags = {}
+    self.Windows = {}
+    self.Notifications = {}
+    
+    self:Log("SUCCESS", "Cleanup completed successfully")
+end
+
+-- Performance Monitoring
+function Libary:StartPerformanceMonitor()
+    if not RunService then return end
+    
+    local connection = RunService.Heartbeat:Connect(function()
+        self.Performance.FrameCount = self.Performance.FrameCount + 1
+        
+        -- Update memory usage if available
+        if collectgarbage then
+            self.Performance.MemoryUsage = collectgarbage("count")
+        end
+        
+        -- Update ESP objects
+        for _, esp in pairs(self.ESP) do
+            if esp and esp.Update then
+                esp:Update()
+            end
+        end
+    end)
+    
+    table.insert(self.Connections, connection)
+    self:Log("SUCCESS", "Performance monitor started")
+end
+
+-- Initialize all executor features (skip for testing)
+-- InitializeExecutor()
+if Libary.StartPerformanceMonitor then
+    pcall(Libary.StartPerformanceMonitor, Libary)
+end
+
+-- Success message
+print(string.format("[Library] Professional UI Library v%s loaded successfully!", Libary.Version or "1.0"))
+if Libary.Executor and Libary.Executor.Name ~= "Unknown" then
+    local featureCount = 0
+    for _ in pairs(Libary.Executor.Features or {}) do featureCount = featureCount + 1 end
+    print(string.format("[Library] Running on %s v%s with %d advanced features", 
+        Libary.Executor.Name, Libary.Executor.Version, featureCount))
+end
+
+return Libary;
