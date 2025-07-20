@@ -508,10 +508,14 @@ function Library:CreateWindow(Name, Toggle, keybind)
             Skeleton = false
         };
         
-        -- Main ESP Preview Frame - compact design like in image
+        -- Initialize animation variables
+        Window.ESPPreview.HealthBarFade = 0;
+        
+        -- Main ESP Preview Frame - positioned relative to main window
         Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.ESPPreview.Main.Size = UDim2.fromOffset(140, 280);
-        Window.ESPPreview.Main.Position = UDim2.new(1, -150, 0.5, -140); -- Right side of screen
+        Window.ESPPreview.Main.Size = UDim2.fromOffset(200, 350);
+        -- Will be positioned dynamically relative to main window
+        Window.ESPPreview.Main.Position = UDim2.fromOffset(800, 150); -- Initial position
         Window.ESPPreview.Main.BackgroundColor3 = Library.Theme.BackGround1;
         Window.ESPPreview.Main.ClipsDescendants = false;
         Window.ESPPreview.Main.Visible = false;
@@ -1488,29 +1492,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         end);
 
         -- ESP Preview Toggle Function
-        function Window:ToggleESPPreview(visible)
-            if visible == nil then
-                visible = not Window.ESPFrame.Visible;
-            end
-            
-            Window.ESPFrame.Visible = visible;
-            
-            if visible then
-                -- Update ESP window position relative to main window
-                Window.ESPFrame.Position = UDim2.new(
-                    Window.Main.Position.X.Scale, 
-                    Window.Main.Position.X.Offset + Window.Main.Size.X.Offset + 10,
-                    Window.Main.Position.Y.Scale, 
-                    Window.Main.Position.Y.Offset
-                );
-                
-                Library.Notify("ESP Preview", "ESP Preview window opened", 3);
-            else
-                Library.Notify("ESP Preview", "ESP Preview window closed", 3);
-            end
-            
-            return visible;
-        end;
+
 
         -- Add ESP Preview to Window methods  
         Window.ShowESPPreview = function() Window:ToggleESPPreview(true) end;
@@ -1576,7 +1558,17 @@ function Library:CreateWindow(Name, Toggle, keybind)
         -- ESP Toggle Functions
         function Window:ToggleESPPreview(state)
             Window.ESPPreview.Visible = state;
-            Window.ESPFrame.Visible = state;
+            if Window.ESPPreview.Main then
+                Window.ESPPreview.Main.Visible = state;
+                
+                -- Position ESP Preview to the right of main window
+                if state and Window.Main then
+                    Window.ESPPreview.Main.Position = UDim2.fromOffset(
+                        Window.Main.Position.X.Offset + Window.Main.Size.X.Offset + 10,
+                        Window.Main.Position.Y.Offset
+                    );
+                end
+            end
             
             if state then
                 Library:CreateNotification({
@@ -1599,7 +1591,8 @@ function Library:CreateWindow(Name, Toggle, keybind)
         function Window:UpdateESPHealthBar()
             if not Window.ESPPreview.Visible then return end
             
-            Window.ESPPreview.HealthBarFade = Window.ESPPreview.HealthBarFade + 0.015;
+            -- Safe arithmetic with nil check
+            Window.ESPPreview.HealthBarFade = (Window.ESPPreview.HealthBarFade or 0) + 0.015;
             local smoothened = (math.acos(math.cos(Window.ESPPreview.HealthBarFade * math.pi)) / math.pi);
             local healthPercent = math.floor(smoothened * 100);
             local barSize = math.floor(smoothened * 100);
@@ -1614,9 +1607,12 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 healthColor = Color3.fromRGB(255, 0, 0); -- Red
             end
             
-            Window.ESPHealthBar.BackgroundColor3 = healthColor;
-            Window.ESPHealthBar.Size = UDim2.fromOffset(2, barSize);
-            Window.ESPHealthBar.Position = UDim2.fromOffset(1, 101 - barSize);
+            -- Safe update with nil checks - update the actual ESP Preview health bar
+            if Window.ESPPreview.HealthBar then
+                Window.ESPPreview.HealthBar.BackgroundColor3 = healthColor;
+                Window.ESPPreview.HealthBar.Size = UDim2.fromOffset(6, barSize);
+                Window.ESPPreview.HealthBar.Position = UDim2.fromOffset(25, 30 + (120 - barSize));
+            end
         end
 
         -- ESP Close Button Functionality
@@ -4069,10 +4065,10 @@ function Library:StartPerformanceMonitor()
             self.Performance.MemoryUsage = collectgarbage("count")
         end
         
-        -- Update ESP objects
+        -- Update ESP objects (fix function call error)
         for _, esp in pairs(self.ESP) do
-            if esp and esp.Update then
-                esp:Update()
+            if esp and type(esp) == "table" and esp.Update and type(esp.Update) == "function" then
+                pcall(function() esp:Update() end)
             end
         end
     end)
