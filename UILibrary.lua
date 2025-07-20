@@ -4904,5 +4904,7 @@ else
     print("[Library] Drawing API compatibility layer loaded")
 end
 
-return Library;
+        return Window;
 end
+
+return Library;
