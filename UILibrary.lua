@@ -496,10 +496,10 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ScreenGui.ResetOnSpawn = false;
         Window.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 
-        -- ESP Preview Window with Visual Humanoid Representation
+        -- ESP Preview Window - Matches image design, positioned on right side
         Window.ESPPreview = {};
         
-        -- ESP Preview Settings
+        -- ESP Preview Settings 
         Window.ESPPreview.Settings = {
             Box = true,
             Name = true,
@@ -508,11 +508,12 @@ function Library:CreateWindow(Name, Toggle, keybind)
             Skeleton = false
         };
         
+        -- Main ESP Preview Frame - compact design like in image
         Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.ESPPreview.Main.Size = UDim2.fromOffset(380, 520);
-        Window.ESPPreview.Main.Position = UDim2.fromScale(0.65, 0.25);
+        Window.ESPPreview.Main.Size = UDim2.fromOffset(140, 280);
+        Window.ESPPreview.Main.Position = UDim2.new(1, -150, 0.5, -140); -- Right side of screen
         Window.ESPPreview.Main.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.Main.ClipsDescendants = true;
+        Window.ESPPreview.Main.ClipsDescendants = false;
         Window.ESPPreview.Main.Visible = false;
         Window.ESPPreview.Main.BorderSizePixel = 0;
 
@@ -524,9 +525,9 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ESPPreview.UIStroke.Thickness = 1;
         Window.ESPPreview.UIStroke.ApplyStrokeMode = "Border";
 
-        -- ESP Preview Header
+        -- ESP Preview Header (clean design matching image)
         Window.ESPPreview.Header = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.Header.Size = UDim2.fromOffset(378, 35);
+        Window.ESPPreview.Header.Size = UDim2.fromOffset(138, 25);
         Window.ESPPreview.Header.Position = UDim2.fromOffset(1, 1);
         Window.ESPPreview.Header.BackgroundColor3 = Library.Theme.BackGround2;
         Window.ESPPreview.Header.BorderSizePixel = 0;
@@ -539,209 +540,135 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ESPPreview.Title.BackgroundTransparency = 1;
         Window.ESPPreview.Title.Text = "ESP Preview";
         Window.ESPPreview.Title.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.Title.TextSize = 16;
+        Window.ESPPreview.Title.TextSize = 12;
         Window.ESPPreview.Title.Font = Library.Theme.Font;
         Window.ESPPreview.Title.TextXAlignment = Enum.TextXAlignment.Center;
 
-        -- Left Panel - ESP Options
-        Window.ESPPreview.LeftPanel = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.LeftPanel.Size = UDim2.fromOffset(180, 480);
-        Window.ESPPreview.LeftPanel.Position = UDim2.fromOffset(5, 40);
-        Window.ESPPreview.LeftPanel.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.LeftPanel.BorderSizePixel = 0;
+        -- Username Section
+        Window.ESPPreview.UsernameSection = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.UsernameSection.Size = UDim2.fromOffset(138, 20);
+        Window.ESPPreview.UsernameSection.Position = UDim2.fromOffset(1, 26);
+        Window.ESPPreview.UsernameSection.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreview.UsernameSection.BorderSizePixel = 0;
 
-        Window.ESPPreview.LeftCorner = Instance.new("UICorner", Window.ESPPreview.LeftPanel);
-        Window.ESPPreview.LeftCorner.CornerRadius = UDim.new(0, 4);
+        Window.ESPPreview.UsernameLabel = Instance.new("TextLabel", Window.ESPPreview.UsernameSection);
+        Window.ESPPreview.UsernameLabel.Size = UDim2.fromScale(1, 1);
+        Window.ESPPreview.UsernameLabel.BackgroundTransparency = 1;
+        Window.ESPPreview.UsernameLabel.Text = "Username";
+        Window.ESPPreview.UsernameLabel.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.UsernameLabel.TextSize = 11;
+        Window.ESPPreview.UsernameLabel.Font = Library.Theme.Font;
+        Window.ESPPreview.UsernameLabel.TextXAlignment = Enum.TextXAlignment.Center;
 
-        Window.ESPPreview.LeftStroke = Instance.new("UIStroke", Window.ESPPreview.LeftPanel);
-        Window.ESPPreview.LeftStroke.Color = Library.Theme.Outline;
-        Window.ESPPreview.LeftStroke.Thickness = 1;
+        -- Main ESP Display Area (gray background like image)
+        Window.ESPPreview.DisplayArea = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.DisplayArea.Size = UDim2.fromOffset(138, 180);
+        Window.ESPPreview.DisplayArea.Position = UDim2.fromOffset(1, 46);
+        Window.ESPPreview.DisplayArea.BackgroundColor3 = Color3.fromRGB(45, 45, 45); -- Dark gray like in image
+        Window.ESPPreview.DisplayArea.BorderSizePixel = 0;
 
-        -- Right Panel - Humanoid Visualization
-        Window.ESPPreview.RightPanel = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.RightPanel.Size = UDim2.fromOffset(185, 480);
-        Window.ESPPreview.RightPanel.Position = UDim2.fromOffset(190, 40);
-        Window.ESPPreview.RightPanel.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.RightPanel.BorderSizePixel = 0;
+        -- Humanoid Figure in Display Area
+        -- ESP Box around humanoid (green outline like in image)
+        Window.ESPPreview.ESPBox = Instance.new("Frame", Window.ESPPreview.DisplayArea);
+        Window.ESPPreview.ESPBox.Size = UDim2.fromOffset(60, 120);
+        Window.ESPPreview.ESPBox.Position = UDim2.fromOffset(39, 30);
+        Window.ESPPreview.ESPBox.BackgroundTransparency = 1;
+        Window.ESPPreview.ESPBox.BorderSizePixel = 0;
 
-        Window.ESPPreview.RightCorner = Instance.new("UICorner", Window.ESPPreview.RightPanel);
-        Window.ESPPreview.RightCorner.CornerRadius = UDim.new(0, 4);
+        Window.ESPPreview.ESPBoxStroke = Instance.new("UIStroke", Window.ESPPreview.ESPBox);
+        Window.ESPPreview.ESPBoxStroke.Color = Library.Theme.Selected; -- Use theme color
+        Window.ESPPreview.ESPBoxStroke.Thickness = 2;
 
-        Window.ESPPreview.RightStroke = Instance.new("UIStroke", Window.ESPPreview.RightPanel);
-        Window.ESPPreview.RightStroke.Color = Library.Theme.Outline;
-        Window.ESPPreview.RightStroke.Thickness = 1;
+        -- Health Bar on left side (green bar like in image)
+        Window.ESPPreview.HealthBar = Instance.new("Frame", Window.ESPPreview.DisplayArea);
+        Window.ESPPreview.HealthBar.Size = UDim2.fromOffset(6, 120);
+        Window.ESPPreview.HealthBar.Position = UDim2.fromOffset(25, 30);
+        Window.ESPPreview.HealthBar.BackgroundColor3 = Library.Theme.Selected;
+        Window.ESPPreview.HealthBar.BorderSizePixel = 0;
 
-        -- ESP Options Title
-        Window.ESPPreview.OptionsTitle = Instance.new("TextLabel", Window.ESPPreview.LeftPanel);
-        Window.ESPPreview.OptionsTitle.Size = UDim2.fromOffset(170, 25);
-        Window.ESPPreview.OptionsTitle.Position = UDim2.fromOffset(5, 5);
-        Window.ESPPreview.OptionsTitle.BackgroundTransparency = 1;
-        Window.ESPPreview.OptionsTitle.Text = "ESP Settings";
-        Window.ESPPreview.OptionsTitle.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.OptionsTitle.TextSize = 14;
-        Window.ESPPreview.OptionsTitle.Font = Library.Theme.Font;
-        Window.ESPPreview.OptionsTitle.TextXAlignment = Enum.TextXAlignment.Left;
+        -- Player name above box
+        Window.ESPPreview.PlayerName = Instance.new("TextLabel", Window.ESPPreview.DisplayArea);
+        Window.ESPPreview.PlayerName.Size = UDim2.fromOffset(80, 15);
+        Window.ESPPreview.PlayerName.Position = UDim2.fromOffset(29, 10);
+        Window.ESPPreview.PlayerName.BackgroundTransparency = 1;
+        Window.ESPPreview.PlayerName.Text = "Player123";
+        Window.ESPPreview.PlayerName.TextColor3 = Color3.fromRGB(255, 255, 255);
+        Window.ESPPreview.PlayerName.TextSize = 10;
+        Window.ESPPreview.PlayerName.Font = Library.Theme.Font;
+        Window.ESPPreview.PlayerName.TextXAlignment = Enum.TextXAlignment.Center;
 
-        -- Preview Title
-        Window.ESPPreview.PreviewTitle = Instance.new("TextLabel", Window.ESPPreview.RightPanel);
-        Window.ESPPreview.PreviewTitle.Size = UDim2.fromOffset(175, 25);
-        Window.ESPPreview.PreviewTitle.Position = UDim2.fromOffset(5, 5);
-        Window.ESPPreview.PreviewTitle.BackgroundTransparency = 1;
-        Window.ESPPreview.PreviewTitle.Text = "Preview";
-        Window.ESPPreview.PreviewTitle.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.PreviewTitle.TextSize = 14;
-        Window.ESPPreview.PreviewTitle.Font = Library.Theme.Font;
-        Window.ESPPreview.PreviewTitle.TextXAlignment = Enum.TextXAlignment.Center;
+        -- Number indicator (left side like in image)
+        Window.ESPPreview.NumberLabel = Instance.new("TextLabel", Window.ESPPreview.DisplayArea);
+        Window.ESPPreview.NumberLabel.Size = UDim2.fromOffset(30, 12);
+        Window.ESPPreview.NumberLabel.Position = UDim2.fromOffset(35, 60);
+        Window.ESPPreview.NumberLabel.BackgroundTransparency = 1;
+        Window.ESPPreview.NumberLabel.Text = "Number";
+        Window.ESPPreview.NumberLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+        Window.ESPPreview.NumberLabel.TextSize = 8;
+        Window.ESPPreview.NumberLabel.Font = Library.Theme.Font;
+        Window.ESPPreview.NumberLabel.TextXAlignment = Enum.TextXAlignment.Left;
 
-        -- Humanoid Preview Frame (properly sized to fit within panel)
-        Window.ESPPreview.HumanoidFrame = Instance.new("Frame", Window.ESPPreview.RightPanel);
-        Window.ESPPreview.HumanoidFrame.Size = UDim2.fromOffset(165, 225);
-        Window.ESPPreview.HumanoidFrame.Position = UDim2.fromOffset(10, 35);
-        Window.ESPPreview.HumanoidFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35);
-        Window.ESPPreview.HumanoidFrame.BorderSizePixel = 0;
+        -- Flags indicator (right side like in image)
+        Window.ESPPreview.FlagsLabel = Instance.new("TextLabel", Window.ESPPreview.DisplayArea);
+        Window.ESPPreview.FlagsLabel.Size = UDim2.fromOffset(25, 12);
+        Window.ESPPreview.FlagsLabel.Position = UDim2.fromOffset(105, 60);
+        Window.ESPPreview.FlagsLabel.BackgroundTransparency = 1;
+        Window.ESPPreview.FlagsLabel.Text = "Flags";
+        Window.ESPPreview.FlagsLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
+        Window.ESPPreview.FlagsLabel.TextSize = 8;
+        Window.ESPPreview.FlagsLabel.Font = Library.Theme.Font;
+        Window.ESPPreview.FlagsLabel.TextXAlignment = Enum.TextXAlignment.Right;
 
-        Window.ESPPreview.HumanoidCorner = Instance.new("UICorner", Window.ESPPreview.HumanoidFrame);
-        Window.ESPPreview.HumanoidCorner.CornerRadius = UDim.new(0, 4);
+        -- Distance Section (bottom like in image)
+        Window.ESPPreview.DistanceSection = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.DistanceSection.Size = UDim2.fromOffset(138, 20);
+        Window.ESPPreview.DistanceSection.Position = UDim2.fromOffset(1, 226);
+        Window.ESPPreview.DistanceSection.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreview.DistanceSection.BorderSizePixel = 0;
 
-        Window.ESPPreview.HumanoidStroke = Instance.new("UIStroke", Window.ESPPreview.HumanoidFrame);
-        Window.ESPPreview.HumanoidStroke.Color = Library.Theme.Selected;
-        Window.ESPPreview.HumanoidStroke.Thickness = 1;
+        Window.ESPPreview.DistanceLabel = Instance.new("TextLabel", Window.ESPPreview.DistanceSection);
+        Window.ESPPreview.DistanceLabel.Size = UDim2.fromScale(1, 1);
+        Window.ESPPreview.DistanceLabel.BackgroundTransparency = 1;
+        Window.ESPPreview.DistanceLabel.Text = "25m";
+        Window.ESPPreview.DistanceLabel.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.DistanceLabel.TextSize = 11;
+        Window.ESPPreview.DistanceLabel.Font = Library.Theme.Font;
+        Window.ESPPreview.DistanceLabel.TextXAlignment = Enum.TextXAlignment.Center;
 
-        -- Create Humanoid Visual Representation
-        Window.ESPPreview.CreateHumanoidVisual = function()
-            -- Clear existing visual elements
-            for _, child in pairs(Window.ESPPreview.HumanoidFrame:GetChildren()) do
-                if child.Name:find("ESP") then
-                    child:Destroy()
-                end
-            end
+        -- Weapon Section (bottom like in image)
+        Window.ESPPreview.WeaponSection = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.WeaponSection.Size = UDim2.fromOffset(138, 20);
+        Window.ESPPreview.WeaponSection.Position = UDim2.fromOffset(1, 246);
+        Window.ESPPreview.WeaponSection.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreview.WeaponSection.BorderSizePixel = 0;
 
-            local settings = Window.ESPPreview.Settings
-            local themeColor = Library.Theme.Selected
+        Window.ESPPreview.WeaponLabel = Instance.new("TextLabel", Window.ESPPreview.WeaponSection);
+        Window.ESPPreview.WeaponLabel.Size = UDim2.fromScale(1, 1);
+        Window.ESPPreview.WeaponLabel.BackgroundTransparency = 1;
+        Window.ESPPreview.WeaponLabel.Text = "Weapon";
+        Window.ESPPreview.WeaponLabel.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.WeaponLabel.TextSize = 11;
+        Window.ESPPreview.WeaponLabel.Font = Library.Theme.Font;
+        Window.ESPPreview.WeaponLabel.TextXAlignment = Enum.TextXAlignment.Center;
 
-            -- ESP Box
-            if settings.Box then
-                local espBox = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
-                espBox.Name = "ESPBox"
-                espBox.Size = UDim2.fromOffset(80, 140)
-                espBox.Position = UDim2.fromOffset(42, 40)
-                espBox.BackgroundTransparency = 1
-                espBox.BorderSizePixel = 0
-                
-                local boxStroke = Instance.new("UIStroke", espBox)
-                boxStroke.Color = themeColor
-                boxStroke.Thickness = 2
-            end
+        -- ESP Preview Toggle Visibility Function
+        Window.ESPPreview.SetVisible = function(visible)
+            Window.ESPPreview.Main.Visible = visible;
+        end;
 
-            -- Player Name
-            if settings.Name then
-                local nameLabel = Instance.new("TextLabel", Window.ESPPreview.HumanoidFrame)
-                nameLabel.Name = "ESPName"
-                nameLabel.Size = UDim2.fromOffset(120, 20)
-                nameLabel.Position = UDim2.fromOffset(22, 15)
-                nameLabel.BackgroundTransparency = 1
-                nameLabel.Text = "Player123"
-                nameLabel.TextColor3 = themeColor
-                nameLabel.TextSize = 12
-                nameLabel.Font = Library.Theme.Font
-                nameLabel.TextXAlignment = Enum.TextXAlignment.Center
-            end
+        -- ESP Preview is now complete with static humanoid figure built into DisplayArea
 
-            -- Health Bar
-            if settings.Health then
-                local healthBar = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
-                healthBar.Name = "ESPHealth"
-                healthBar.Size = UDim2.fromOffset(4, 140)
-                healthBar.Position = UDim2.fromOffset(35, 40)
-                healthBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-                healthBar.BorderSizePixel = 0
-                
-                local healthFill = Instance.new("Frame", healthBar)
-                healthFill.Size = UDim2.fromOffset(4, 98) -- 70% health
-                healthFill.Position = UDim2.fromOffset(0, 42)
-                healthFill.BackgroundColor3 = Color3.fromRGB(67, 181, 129)
-                healthFill.BorderSizePixel = 0
-            end
+        function Window:CreateColorPicker()
+                local ColorPicker = { };
+                ColorPicker.Flag = nil;
+                ColorPicker.Color = nil;
+                ColorPicker.HuePosition = 0;
 
-            -- Distance
-            if settings.Distance then
-                local distanceLabel = Instance.new("TextLabel", Window.ESPPreview.HumanoidFrame)
-                distanceLabel.Name = "ESPDistance"
-                distanceLabel.Size = UDim2.fromOffset(80, 15)
-                distanceLabel.Position = UDim2.fromOffset(42, 185)
-                distanceLabel.BackgroundTransparency = 1
-                distanceLabel.Text = "25m"
-                distanceLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
-                distanceLabel.TextSize = 10
-                distanceLabel.Font = Library.Theme.Font
-                distanceLabel.TextXAlignment = Enum.TextXAlignment.Center
-            end
-
-            -- Skeleton/Wireframe
-            if settings.Skeleton then
-                -- Head
-                local head = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
-                head.Name = "ESPHead"
-                head.Size = UDim2.fromOffset(20, 20)
-                head.Position = UDim2.fromOffset(72, 45)
-                head.BackgroundTransparency = 1
-                
-                local headStroke = Instance.new("UIStroke", head)
-                headStroke.Color = themeColor
-                headStroke.Thickness = 1
-                
-                local headCorner = Instance.new("UICorner", head)
-                headCorner.CornerRadius = UDim.new(0.5, 0)
-
-                -- Body lines would be more complex to draw with frames
-                -- This is a simplified representation
-                local bodyLine = Instance.new("Frame", Window.ESPPreview.HumanoidFrame)
-                bodyLine.Name = "ESPBody"
-                bodyLine.Size = UDim2.fromOffset(2, 60)
-                bodyLine.Position = UDim2.fromOffset(81, 65)
-                bodyLine.BackgroundColor3 = themeColor
-                bodyLine.BorderSizePixel = 0
-            end
-        end
-
-        -- Remove the automatic layout to use manual positioning for better control
-
-        -- Storage for ESP settings and visuals
-        Window.ESPPreview.Settings = {
-            Box = true;
-            Name = true;
-            Health = true;
-            Distance = true;
-            Skeleton = false;
-        };
-        Window.ESPPreview.PlayerFrames = {};
-        Window.ESPPreview.PlayerData = {};
-
-        -- Create initial visual
-        Window.ESPPreview.CreateHumanoidVisual();
-
-        -- ESP Visual Update Function
-        Window.ESPPreview.UpdateESP = function()
-            -- Update the visual representation when settings change
-            Window.ESPPreview.CreateHumanoidVisual()
-        end
-
-        -- Add ESP Option Toggles with proper spacing
-        Window.ESPPreview.CreateESPOptions = function()
-            local optionsList = {"Box", "Name", "Health", "Distance", "Skeleton"}
-            
-            for i, optionName in ipairs(optionsList) do
-                local enabled = Window.ESPPreview.Settings[optionName]
-                local yPos = 40 + (i - 1) * 32  -- 32px spacing between options
-                
-                local optionFrame = Instance.new("Frame", Window.ESPPreview.LeftPanel)
-                optionFrame.Size = UDim2.fromOffset(165, 28)
-                optionFrame.Position = UDim2.fromOffset(8, yPos)
-                optionFrame.BackgroundColor3 = Library.Theme.BackGround1
-                optionFrame.BorderSizePixel = 0
-
-                local optionCorner = Instance.new("UICorner", optionFrame)
-                optionCorner.CornerRadius = UDim.new(0, 4)
+                ColorPicker.Main = Instance.new("Frame", Window.ScreenGui);
+                ColorPicker.Main.Size = UDim2.fromOffset(266, 277);
+                ColorPicker.Main.BackgroundColor3 = Library.Theme.BackGround2
+                ColorPicker.Main.ClipsDescendants = true;
+                ColorPicker.Main.Name = "c"
 
                 local optionStroke = Instance.new("UIStroke", optionFrame)
                 optionStroke.Color = enabled and Library.Theme.Selected or Library.Theme.Outline
@@ -1071,7 +998,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         Sat < 1 and -1 or -3,
                                         math.clamp(1 - Val, 0, 1),
                                         1 - Val < 1 and -1 or -3
-                                );          
+                                );
 
                                 ColorPicker.HuePosition = Hue;
 
@@ -1352,25 +1279,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.UiList = Instance.new("UIListLayout", Window.Tablist);
         Window.UiList.FillDirection = "Vertical";
 
-        -- ESP Preview System Implementation with Drawing Support
-        Window.ESPPreview = {
-            Visible = false,
-            Size = {X = 0, Y = 0},
-            Color1 = Color3.fromRGB(0, 255, 0),
-            Color2 = Color3.fromRGB(255, 0, 0),
-            HealthBarFade = 0,
-            Fading = false,
-            State = false,
-            Components = {
-                Box = {Outline = nil, Box = nil, Fill = nil},
-                HealthBar = {Outline = nil, Box = nil, Value = nil},
-                Title = {Text = nil},
-                Distance = {Text = nil},
-                Tool = {Text = nil},
-                Flags = {Text = nil}
-            },
-            DrawingObjects = {}
-        };
+        -- Note: ESP Preview is already initialized above (line 500), don't overwrite it
         
         -- ESP Drawing Functions
         function Window:CreateESPDrawing(drawingType, properties)
@@ -3513,24 +3422,12 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                         return Sector;
                                 end
 
-                        end
-
-
                         return SubTab;
                 end
 
                 Window:UpdateTabList();
                 table.insert(Window.Tabs, Tab);
                 return Tab;
-        end
-
-        -- ESP Preview Toggle Method
-        function Window:ToggleESPPreview(visible)
-            if visible ~= nil then
-                Window.ESPPreview.SetVisible(visible);
-            else
-                Window.ESPPreview.SetVisible(not Window.ESPPreview.Main.Visible);
-            end
         end
 
         return Window;
@@ -3541,12 +3438,12 @@ end
 -- ====================================================================
 
 -- Initialize Executor Detection and Advanced Features
-local function InitializeExecutor()
+function Library:InitializeExecutor()
     -- Detect executor environment
     local success, name, version = pcall(identifyexecutor)
     if success then
-        Library.Executor.Name = name or "Unknown"
-        Library.Executor.Version = version or "Unknown"
+        self.Executor.Name = name or "Unknown"
+        self.Executor.Version = version or "Unknown"
     end
     
     -- Test for available executor functions
@@ -3564,7 +3461,7 @@ local function InitializeExecutor()
     
     for _, func in pairs(functions) do
         if _G[func] then
-            Library.Executor.Features[func] = true
+            self.Executor.Features[func] = true
         end
     end
     
@@ -4199,10 +4096,86 @@ if Library.StartPerformanceMonitor then
     pcall(Library.StartPerformanceMonitor, Library)
 end
 
--- Drawing API Enhancement
+-- ====================================================================
+-- COMPREHENSIVE ESP SYSTEM - PROFESSIONAL IMPLEMENTATION
+-- ====================================================================
+
+-- ESP System with proper Drawing API integration and advanced features
+-- Initialize ESP System
+Library.ESP = Library.ESP or {}
+Library.ESP.Drawings = {
+    ESP = {},
+    Tracers = {},
+    Boxes = {},
+    Healthbars = {},
+    Names = {},
+    Distances = {},
+    Snaplines = {},
+    Skeleton = {}
+}
+
+Library.ESP.Colors = {
+    Enemy = Color3.fromRGB(255, 25, 25),
+    Ally = Color3.fromRGB(25, 255, 25),
+    Neutral = Color3.fromRGB(255, 255, 255),
+    Selected = Color3.fromRGB(255, 210, 0),
+    Health = Color3.fromRGB(0, 255, 0),
+    Distance = Color3.fromRGB(200, 200, 200),
+    Rainbow = nil
+}
+
+Library.ESP.Highlights = {}
+
+Library.ESP.Settings = {
+    Enabled = false,
+    TeamCheck = false,
+    ShowTeam = false,
+    VisibilityCheck = true,
+    BoxESP = false,
+    BoxStyle = "Corner", -- Corner, Full, ThreeD
+    BoxOutline = true,
+    BoxFilled = false,
+    BoxFillTransparency = 0.5,
+    BoxThickness = 1,
+    TracerESP = false,
+    TracerOrigin = "Bottom", -- Bottom, Top, Mouse, Center
+    TracerStyle = "Line",
+    TracerThickness = 1,
+    HealthESP = false,
+    HealthStyle = "Bar", -- Bar, Text, Both
+    HealthBarSide = "Left",
+    HealthTextSuffix = "HP",
+    NameESP = false,
+    NameMode = "DisplayName",
+    ShowDistance = true,
+    DistanceUnit = "studs",
+    TextSize = 14,
+    TextFont = 2,
+    RainbowSpeed = 1,
+    MaxDistance = 1000,
+    RefreshRate = 1/144,
+    Snaplines = false,
+    SnaplineStyle = "Straight",
+    RainbowEnabled = false,
+    RainbowBoxes = false,
+    RainbowTracers = false,
+    RainbowText = false,
+    ChamsEnabled = false,
+    ChamsOutlineColor = Color3.fromRGB(255, 255, 255),
+    ChamsFillColor = Color3.fromRGB(255, 0, 0),
+    ChamsOccludedColor = Color3.fromRGB(150, 0, 0),
+    ChamsTransparency = 0.5,
+    ChamsOutlineTransparency = 0,
+    ChamsOutlineThickness = 0.1,
+    SkeletonESP = false,
+    SkeletonColor = Color3.fromRGB(255, 255, 255),
+    SkeletonThickness = 1.5,
+    SkeletonTransparency = 1
+}
+
+-- Drawing API Enhancement with better error handling
 function Library:CreateDrawing(drawingType, properties)
         if not Drawing then
-                self:Log("WARN", "Drawing API not available in this environment")
                 return nil
         end
         
@@ -4224,6 +4197,551 @@ function Library:CreateDrawing(drawingType, properties)
         return nil
 end
 
+-- Core ESP Creation Functions
+function Library.ESP:CreateESP(player)
+    if not player or player == LocalPlayer then return end
+    
+    local box = {
+        TopLeft = Drawing.new("Line"),
+        TopRight = Drawing.new("Line"),
+        BottomLeft = Drawing.new("Line"),
+        BottomRight = Drawing.new("Line"),
+        Left = Drawing.new("Line"),
+        Right = Drawing.new("Line"),
+        Top = Drawing.new("Line"),
+        Bottom = Drawing.new("Line")
+    }
+    
+    for _, line in pairs(box) do
+        line.Visible = false
+        line.Color = Library.ESP.Colors.Enemy
+        line.Thickness = Library.ESP.Settings.BoxThickness
+    end
+    
+    local tracer = Drawing.new("Line")
+    tracer.Visible = false
+    tracer.Color = Library.ESP.Colors.Enemy
+    tracer.Thickness = Library.ESP.Settings.TracerThickness
+    
+    local healthBar = {
+        Outline = Drawing.new("Square"),
+        Fill = Drawing.new("Square"),
+        Text = Drawing.new("Text")
+    }
+    
+    for _, obj in pairs(healthBar) do
+        obj.Visible = false
+        if obj == healthBar.Fill then
+            obj.Color = Library.ESP.Colors.Health
+            obj.Filled = true
+        elseif obj == healthBar.Text then
+            obj.Center = true
+            obj.Size = Library.ESP.Settings.TextSize
+            obj.Color = Library.ESP.Colors.Health
+            obj.Font = Library.ESP.Settings.TextFont
+        end
+    end
+    
+    local info = {
+        Name = Drawing.new("Text"),
+        Distance = Drawing.new("Text")
+    }
+    
+    for _, text in pairs(info) do
+        text.Visible = false
+        text.Center = true
+        text.Size = Library.ESP.Settings.TextSize
+        text.Color = Library.ESP.Colors.Enemy
+        text.Font = Library.ESP.Settings.TextFont
+        text.Outline = true
+    end
+    
+    local snapline = Drawing.new("Line")
+    snapline.Visible = false
+    snapline.Color = Library.ESP.Colors.Enemy
+    snapline.Thickness = 1
+    
+    local highlight = Instance.new("Highlight")
+    highlight.FillColor = Library.ESP.Settings.ChamsFillColor
+    highlight.OutlineColor = Library.ESP.Settings.ChamsOutlineColor
+    highlight.FillTransparency = Library.ESP.Settings.ChamsTransparency
+    highlight.OutlineTransparency = Library.ESP.Settings.ChamsOutlineTransparency
+    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    highlight.Enabled = Library.ESP.Settings.ChamsEnabled
+    
+    Library.ESP.Highlights[player] = highlight
+    
+    local skeleton = {
+        -- Spine & Head
+        Head = Drawing.new("Line"),
+        Neck = Drawing.new("Line"),
+        UpperSpine = Drawing.new("Line"),
+        LowerSpine = Drawing.new("Line"),
+        
+        -- Left Arm
+        LeftShoulder = Drawing.new("Line"),
+        LeftUpperArm = Drawing.new("Line"),
+        LeftLowerArm = Drawing.new("Line"),
+        LeftHand = Drawing.new("Line"),
+        
+        -- Right Arm
+        RightShoulder = Drawing.new("Line"),
+        RightUpperArm = Drawing.new("Line"),
+        RightLowerArm = Drawing.new("Line"),
+        RightHand = Drawing.new("Line"),
+        
+        -- Left Leg
+        LeftHip = Drawing.new("Line"),
+        LeftUpperLeg = Drawing.new("Line"),
+        LeftLowerLeg = Drawing.new("Line"),
+        LeftFoot = Drawing.new("Line"),
+        
+        -- Right Leg
+        RightHip = Drawing.new("Line"),
+        RightUpperLeg = Drawing.new("Line"),
+        RightLowerLeg = Drawing.new("Line"),
+        RightFoot = Drawing.new("Line")
+    }
+    
+    for _, line in pairs(skeleton) do
+        line.Visible = false
+        line.Color = Library.ESP.Settings.SkeletonColor
+        line.Thickness = Library.ESP.Settings.SkeletonThickness
+        line.Transparency = Library.ESP.Settings.SkeletonTransparency
+    end
+    
+    Library.ESP.Drawings.Skeleton[player] = skeleton
+    
+    Library.ESP.Drawings.ESP[player] = {
+        Box = box,
+        Tracer = tracer,
+        HealthBar = healthBar,
+        Info = info,
+        Snapline = snapline
+    }
+end
+
+-- ESP Helper Functions
+function Library.ESP:RemoveESP(player)
+    local esp = Library.ESP.Drawings.ESP[player]
+    if esp then
+        for _, obj in pairs(esp.Box) do obj:Remove() end
+        esp.Tracer:Remove()
+        for _, obj in pairs(esp.HealthBar) do obj:Remove() end
+        for _, obj in pairs(esp.Info) do obj:Remove() end
+        esp.Snapline:Remove()
+        Library.ESP.Drawings.ESP[player] = nil
+    end
+    
+    local highlight = Library.ESP.Highlights[player]
+    if highlight then
+        highlight:Destroy()
+        Library.ESP.Highlights[player] = nil
+    end
+    
+    local skeleton = Library.ESP.Drawings.Skeleton[player]
+    if skeleton then
+        for _, line in pairs(skeleton) do
+            line:Remove()
+        end
+        Library.ESP.Drawings.Skeleton[player] = nil
+    end
+end
+
+function Library.ESP:GetPlayerColor(player)
+    if Library.ESP.Settings.RainbowEnabled then
+        if Library.ESP.Settings.RainbowBoxes and Library.ESP.Settings.BoxESP then return Library.ESP.Colors.Rainbow end
+        if Library.ESP.Settings.RainbowTracers and Library.ESP.Settings.TracerESP then return Library.ESP.Colors.Rainbow end
+        if Library.ESP.Settings.RainbowText and (Library.ESP.Settings.NameESP or Library.ESP.Settings.HealthESP) then return Library.ESP.Colors.Rainbow end
+    end
+    return player.Team == LocalPlayer.Team and Library.ESP.Colors.Ally or Library.ESP.Colors.Enemy
+end
+
+function Library.ESP:GetTracerOrigin()
+    local origin = Library.ESP.Settings.TracerOrigin
+    if origin == "Bottom" then
+        return Vector2.new(CurrentCamera.ViewportSize.X/2, CurrentCamera.ViewportSize.Y)
+    elseif origin == "Top" then
+        return Vector2.new(CurrentCamera.ViewportSize.X/2, 0)
+    elseif origin == "Mouse" then
+        return UserInputService:GetMouseLocation()
+    else
+        return Vector2.new(CurrentCamera.ViewportSize.X/2, CurrentCamera.ViewportSize.Y/2)
+    end
+end
+
+-- Advanced ESP Update Function with all features
+function Library.ESP:UpdateESP(player)
+    if not Library.ESP.Settings.Enabled then return end
+    
+    local esp = Library.ESP.Drawings.ESP[player]
+    if not esp then return end
+    
+    local character = player.Character
+    if not character then 
+        -- Hide all drawings if character doesn't exist
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        esp.Tracer.Visible = false
+        for _, obj in pairs(esp.HealthBar) do obj.Visible = false end
+        for _, obj in pairs(esp.Info) do obj.Visible = false end
+        esp.Snapline.Visible = false
+        
+        local skeleton = Library.ESP.Drawings.Skeleton[player]
+        if skeleton then
+            for _, line in pairs(skeleton) do
+                line.Visible = false
+            end
+        end
+        return 
+    end
+    
+    local rootPart = character:FindFirstChild("HumanoidRootPart")
+    if not rootPart then 
+        -- Hide all drawings if rootPart doesn't exist
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        esp.Tracer.Visible = false
+        for _, obj in pairs(esp.HealthBar) do obj.Visible = false end
+        for _, obj in pairs(esp.Info) do obj.Visible = false end
+        esp.Snapline.Visible = false
+        
+        local skeleton = Library.ESP.Drawings.Skeleton[player]
+        if skeleton then
+            for _, line in pairs(skeleton) do
+                line.Visible = false
+            end
+        end
+        return 
+    end
+    
+    -- Early screen check to hide all drawings if player is off screen
+    local _, isOnScreen = CurrentCamera:WorldToViewportPoint(rootPart.Position)
+    if not isOnScreen then
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        esp.Tracer.Visible = false
+        for _, obj in pairs(esp.HealthBar) do obj.Visible = false end
+        for _, obj in pairs(esp.Info) do obj.Visible = false end
+        esp.Snapline.Visible = false
+        
+        local skeleton = Library.ESP.Drawings.Skeleton[player]
+        if skeleton then
+            for _, line in pairs(skeleton) do
+                line.Visible = false
+            end
+        end
+        return
+    end
+    
+    local humanoid = character:FindFirstChild("Humanoid")
+    if not humanoid or humanoid.Health <= 0 then
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        esp.Tracer.Visible = false
+        for _, obj in pairs(esp.HealthBar) do obj.Visible = false end
+        for _, obj in pairs(esp.Info) do obj.Visible = false end
+        esp.Snapline.Visible = false
+        
+        local skeleton = Library.ESP.Drawings.Skeleton[player]
+        if skeleton then
+            for _, line in pairs(skeleton) do
+                line.Visible = false
+            end
+        end
+        return
+    end
+    
+    local pos, onScreen = CurrentCamera:WorldToViewportPoint(rootPart.Position)
+    local distance = (rootPart.Position - CurrentCamera.CFrame.Position).Magnitude
+    
+    if not onScreen or distance > Library.ESP.Settings.MaxDistance then
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        esp.Tracer.Visible = false
+        for _, obj in pairs(esp.HealthBar) do obj.Visible = false end
+        for _, obj in pairs(esp.Info) do obj.Visible = false end
+        esp.Snapline.Visible = false
+        return
+    end
+    
+    if Library.ESP.Settings.TeamCheck and player.Team == LocalPlayer.Team and not Library.ESP.Settings.ShowTeam then
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        esp.Tracer.Visible = false
+        for _, obj in pairs(esp.HealthBar) do obj.Visible = false end
+        for _, obj in pairs(esp.Info) do obj.Visible = false end
+        esp.Snapline.Visible = false
+        return
+    end
+    
+    local color = Library.ESP:GetPlayerColor(player)
+    local size = character:GetExtentsSize()
+    local cf = rootPart.CFrame
+    
+    local top, top_onscreen = CurrentCamera:WorldToViewportPoint((cf * CFrame.new(0, size.Y/2, 0)).Position)
+    local bottom, bottom_onscreen = CurrentCamera:WorldToViewportPoint((cf * CFrame.new(0, -size.Y/2, 0)).Position)
+    
+    if not top_onscreen or not bottom_onscreen then
+        for _, obj in pairs(esp.Box) do obj.Visible = false end
+        return
+    end
+    
+    local screenSize = bottom.Y - top.Y
+    local boxWidth = screenSize * 0.65
+    local boxPosition = Vector2.new(top.X - boxWidth/2, top.Y)
+    local boxSize = Vector2.new(boxWidth, screenSize)
+    
+    -- Hide all box parts by default
+    for _, obj in pairs(esp.Box) do
+        obj.Visible = false
+    end
+    
+    -- Box ESP Implementation with different styles
+    if Library.ESP.Settings.BoxESP then
+        if Library.ESP.Settings.BoxStyle == "Corner" then
+            local cornerSize = boxWidth * 0.2
+            
+            esp.Box.TopLeft.From = boxPosition
+            esp.Box.TopLeft.To = boxPosition + Vector2.new(cornerSize, 0)
+            esp.Box.TopLeft.Visible = true
+            
+            esp.Box.TopRight.From = boxPosition + Vector2.new(boxSize.X, 0)
+            esp.Box.TopRight.To = boxPosition + Vector2.new(boxSize.X - cornerSize, 0)
+            esp.Box.TopRight.Visible = true
+            
+            esp.Box.BottomLeft.From = boxPosition + Vector2.new(0, boxSize.Y)
+            esp.Box.BottomLeft.To = boxPosition + Vector2.new(cornerSize, boxSize.Y)
+            esp.Box.BottomLeft.Visible = true
+            
+            esp.Box.BottomRight.From = boxPosition + Vector2.new(boxSize.X, boxSize.Y)
+            esp.Box.BottomRight.To = boxPosition + Vector2.new(boxSize.X - cornerSize, boxSize.Y)
+            esp.Box.BottomRight.Visible = true
+            
+            esp.Box.Left.From = boxPosition
+            esp.Box.Left.To = boxPosition + Vector2.new(0, cornerSize)
+            esp.Box.Left.Visible = true
+            
+            esp.Box.Right.From = boxPosition + Vector2.new(boxSize.X, 0)
+            esp.Box.Right.To = boxPosition + Vector2.new(boxSize.X, cornerSize)
+            esp.Box.Right.Visible = true
+            
+            esp.Box.Top.From = boxPosition + Vector2.new(0, boxSize.Y)
+            esp.Box.Top.To = boxPosition + Vector2.new(0, boxSize.Y - cornerSize)
+            esp.Box.Top.Visible = true
+            
+            esp.Box.Bottom.From = boxPosition + Vector2.new(boxSize.X, boxSize.Y)
+            esp.Box.Bottom.To = boxPosition + Vector2.new(boxSize.X, boxSize.Y - cornerSize)
+            esp.Box.Bottom.Visible = true
+            
+        else -- Full box
+            esp.Box.Left.From = boxPosition
+            esp.Box.Left.To = boxPosition + Vector2.new(0, boxSize.Y)
+            esp.Box.Left.Visible = true
+            
+            esp.Box.Right.From = boxPosition + Vector2.new(boxSize.X, 0)
+            esp.Box.Right.To = boxPosition + Vector2.new(boxSize.X, boxSize.Y)
+            esp.Box.Right.Visible = true
+            
+            esp.Box.Top.From = boxPosition
+            esp.Box.Top.To = boxPosition + Vector2.new(boxSize.X, 0)
+            esp.Box.Top.Visible = true
+            
+            esp.Box.Bottom.From = boxPosition + Vector2.new(0, boxSize.Y)
+            esp.Box.Bottom.To = boxPosition + Vector2.new(boxSize.X, boxSize.Y)
+            esp.Box.Bottom.Visible = true
+            
+            esp.Box.TopLeft.Visible = false
+            esp.Box.TopRight.Visible = false
+            esp.Box.BottomLeft.Visible = false
+            esp.Box.BottomRight.Visible = false
+        end
+        
+        for _, obj in pairs(esp.Box) do
+            if obj.Visible then
+                obj.Color = color
+                obj.Thickness = Library.ESP.Settings.BoxThickness
+            end
+        end
+    end
+    
+    -- Tracer ESP
+    if Library.ESP.Settings.TracerESP then
+        esp.Tracer.From = Library.ESP:GetTracerOrigin()
+        esp.Tracer.To = Vector2.new(pos.X, pos.Y)
+        esp.Tracer.Color = color
+        esp.Tracer.Visible = true
+    else
+        esp.Tracer.Visible = false
+    end
+    
+    -- Health ESP with bar and text
+    if Library.ESP.Settings.HealthESP then
+        local health = humanoid.Health
+        local maxHealth = humanoid.MaxHealth
+        local healthPercent = health/maxHealth
+        
+        local barHeight = screenSize * 0.8
+        local barWidth = 4
+        local barPos = Vector2.new(
+            boxPosition.X - barWidth - 2,
+            boxPosition.Y + (screenSize - barHeight)/2
+        )
+        
+        esp.HealthBar.Outline.Size = Vector2.new(barWidth, barHeight)
+        esp.HealthBar.Outline.Position = barPos
+        esp.HealthBar.Outline.Visible = true
+        
+        esp.HealthBar.Fill.Size = Vector2.new(barWidth - 2, barHeight * healthPercent)
+        esp.HealthBar.Fill.Position = Vector2.new(barPos.X + 1, barPos.Y + barHeight * (1-healthPercent))
+        esp.HealthBar.Fill.Color = Color3.fromRGB(255 - (255 * healthPercent), 255 * healthPercent, 0)
+        esp.HealthBar.Fill.Visible = true
+        
+        if Library.ESP.Settings.HealthStyle == "Both" or Library.ESP.Settings.HealthStyle == "Text" then
+            esp.HealthBar.Text.Text = math.floor(health) .. Library.ESP.Settings.HealthTextSuffix
+            esp.HealthBar.Text.Position = Vector2.new(barPos.X + barWidth + 2, barPos.Y + barHeight/2)
+            esp.HealthBar.Text.Visible = true
+        else
+            esp.HealthBar.Text.Visible = false
+        end
+    else
+        for _, obj in pairs(esp.HealthBar) do
+            obj.Visible = false
+        end
+    end
+    
+    -- Name ESP
+    if Library.ESP.Settings.NameESP then
+        esp.Info.Name.Text = player.DisplayName
+        esp.Info.Name.Position = Vector2.new(
+            boxPosition.X + boxWidth/2,
+            boxPosition.Y - 20
+        )
+        esp.Info.Name.Color = color
+        esp.Info.Name.Visible = true
+    else
+        esp.Info.Name.Visible = false
+    end
+    
+    -- Snaplines
+    if Library.ESP.Settings.Snaplines then
+        esp.Snapline.From = Vector2.new(CurrentCamera.ViewportSize.X/2, CurrentCamera.ViewportSize.Y)
+        esp.Snapline.To = Vector2.new(pos.X, pos.Y)
+        esp.Snapline.Color = color
+        esp.Snapline.Visible = true
+    else
+        esp.Snapline.Visible = false
+    end
+    
+    -- Chams/Highlights
+    local highlight = Library.ESP.Highlights[player]
+    if highlight then
+        if Library.ESP.Settings.ChamsEnabled and character then
+            highlight.Parent = character
+            highlight.FillColor = Library.ESP.Settings.ChamsFillColor
+            highlight.OutlineColor = Library.ESP.Settings.ChamsOutlineColor
+            highlight.FillTransparency = Library.ESP.Settings.ChamsTransparency
+            highlight.OutlineTransparency = Library.ESP.Settings.ChamsOutlineTransparency
+            highlight.Enabled = true
+        else
+            highlight.Enabled = false
+        end
+    end
+end
+
+-- ESP Management Functions
+function Library:ToggleESP(enabled)
+    Library.ESP.Settings.Enabled = enabled ~= nil and enabled or not Library.ESP.Settings.Enabled
+    
+    if Library.ESP.Settings.Enabled then
+        -- Create ESP for all players
+        for _, player in ipairs(Players:GetPlayers()) do
+            if player ~= LocalPlayer then
+                Library.ESP:CreateESP(player)
+            end
+        end
+        
+        -- Start update loop
+        if RunService then
+            Library.ESP.UpdateConnection = RunService.Heartbeat:Connect(function()
+                for _, player in ipairs(Players:GetPlayers()) do
+                    if player ~= LocalPlayer then
+                        Library.ESP:UpdateESP(player)
+                    end
+                end
+            end)
+        end
+    else
+        -- Disable ESP
+        if Library.ESP.UpdateConnection then
+            Library.ESP.UpdateConnection:Disconnect()
+            Library.ESP.UpdateConnection = nil
+        end
+        
+        for _, player in ipairs(Players:GetPlayers()) do
+            Library.ESP:RemoveESP(player)
+        end
+    end
+    
+    self:Log("INFO", "ESP " .. (Library.ESP.Settings.Enabled and "enabled" or "disabled"))
+    return Library.ESP.Settings.Enabled
+end
+
+function Library:ClearAllESP()
+    if Library.ESP.UpdateConnection then
+        Library.ESP.UpdateConnection:Disconnect()
+        Library.ESP.UpdateConnection = nil
+    end
+    
+    local count = 0
+    for _, player in ipairs(Players:GetPlayers()) do
+        if Library.ESP.Drawings.ESP[player] then
+            Library.ESP:RemoveESP(player)
+            count = count + 1
+        end
+    end
+    
+    Library.ESP.Drawings.ESP = {}
+    Library.ESP.Drawings.Skeleton = {}
+    Library.ESP.Highlights = {}
+    Library.ESP.Settings.Enabled = false
+    
+    self:Log("INFO", "Cleared " .. count .. " ESP objects")
+end
+
+function Library:GetESPSettings()
+    return Library.ESP.Settings
+end
+
+function Library:SetESPSetting(setting, value)
+    if Library.ESP.Settings[setting] ~= nil then
+        Library.ESP.Settings[setting] = value
+        self:Log("INFO", "ESP setting " .. setting .. " set to " .. tostring(value))
+        return true
+    end
+    return false
+end
+
+-- Player Management for ESP
+if Players then
+    Players.PlayerAdded:Connect(function(player)
+        if Library.ESP.Settings.Enabled and player ~= LocalPlayer then
+            Library.ESP:CreateESP(player)
+        end
+    end)
+    
+    Players.PlayerRemoving:Connect(function(player)
+        Library.ESP:RemoveESP(player)
+    end)
+end
+
+-- Initialize required Roblox services for ESP system with safe guards
+local Players, LocalPlayer, CurrentCamera, UserInputService, RunService
+if game then
+    pcall(function()
+        Players = game:GetService("Players")
+        LocalPlayer = Players.LocalPlayer  
+        CurrentCamera = workspace.CurrentCamera
+        UserInputService = game:GetService("UserInputService")
+        RunService = game:GetService("RunService")
+    end)
+end
+
+-- Simplified ESP Management for backward compatibility
 function Library:CreateESPBox(position, size, color, thickness, filled)
         return self:CreateDrawing("Square", {
                 Position = position or Vector2.new(100, 100);
@@ -4292,132 +4810,7 @@ function Library:CreateESPCircle(position, radius, color, thickness, filled)
         })
 end
 
--- Comprehensive ESP Management
-function Library:CreateESP(target, options)
-        if not target then return nil end
-        
-        local espObj = {
-                Target = target;
-                Options = options or {};
-                DrawingObjects = {};
-                Enabled = true;
-                
-                -- ESP Object Methods
-                Remove = function(self)
-                        for _, drawing in ipairs(self.DrawingObjects) do
-                                pcall(function()
-                                        if drawing.Remove then drawing:Remove() end
-                                        if drawing.Destroy then drawing:Destroy() end
-                                end)
-                        end
-                        self.DrawingObjects = {}
-                        
-                        -- Remove from library ESP tracking
-                        if Library.ESP and Library.ESP[self.Target] then
-                                Library.ESP[self.Target] = nil
-                        end
-                end;
-                
-                Update = function(self)
-                        -- Update ESP positions and visibility based on target
-                        if not self.Enabled then return end
-                        
-                        -- This would contain the logic to update ESP positions
-                        -- Implementation depends on the specific target type (player, part, etc.)
-                end;
-                
-                SetVisible = function(self, visible)
-                        for _, drawing in ipairs(self.DrawingObjects) do
-                                if drawing and drawing.Visible ~= nil then
-                                        drawing.Visible = visible and self.Enabled
-                                end
-                        end
-                end;
-                
-                SetColor = function(self, color)
-                        for _, drawing in ipairs(self.DrawingObjects) do
-                                if drawing and drawing.Color then
-                                        drawing.Color = color
-                                end
-                        end
-                end;
-        }
-        
-        -- Store ESP object for management
-        if not Library.ESP then Library.ESP = {} end
-        Library.ESP[target] = espObj
-        
-        return espObj
-end
-
--- ESP Settings Management
-function Library:ToggleESP(enabled)
-        if not self.ESP then self.ESP = {} end
-        if not self.ESP.Settings then
-                self.ESP.Settings = {
-                        Box = true,
-                        Name = true,
-                        Health = true,
-                        Distance = true,
-                        Skeleton = false,
-                        Enabled = true
-                }
-        end
-        
-        self.ESP.Settings.Enabled = enabled ~= nil and enabled or not self.ESP.Settings.Enabled
-        
-        -- Update all ESP objects
-        for _, espObj in pairs(self.ESP) do
-                if espObj and espObj.SetVisible then
-                        espObj:SetVisible(self.ESP.Settings.Enabled)
-                end
-        end
-        
-        self:Log("INFO", "ESP " .. (self.ESP.Settings.Enabled and "enabled" or "disabled"))
-        return self.ESP.Settings.Enabled
-end
-
-function Library:ClearAllESP()
-        if not self.ESP then return end
-        
-        local count = 0
-        for target, espObj in pairs(self.ESP) do
-                if espObj and espObj.Remove then
-                        espObj:Remove()
-                        count = count + 1
-                end
-        end
-        
-        self.ESP = {}
-        self:Log("INFO", "Cleared " .. count .. " ESP objects")
-end
-
-function Library:GetESPSettings()
-        if not self.ESP then self.ESP = {} end
-        if not self.ESP.Settings then
-                self.ESP.Settings = {
-                        Box = true,
-                        Name = true,
-                        Health = true,
-                        Distance = true,
-                        Skeleton = false,
-                        Enabled = true
-                }
-        end
-        return self.ESP.Settings
-end
-
-function Library:SetESPSetting(setting, value)
-        local settings = self:GetESPSettings()
-        if settings[setting] ~= nil then
-                settings[setting] = value
-                self:Log("INFO", "ESP setting " .. setting .. " set to " .. tostring(value))
-                return true
-        end
-        return false
-end
-
--- Drawing Cleanup Enhancement
+-- Enhanced Drawing Cleanup with comprehensive ESP system support
 local originalCleanup = Library.Cleanup
 function Library:Cleanup()
         -- Clean Drawing objects
@@ -4434,8 +4827,8 @@ function Library:Cleanup()
                 self:Log("INFO", "Cleaned " .. count .. " Drawing objects")
         end
         
-        -- Clean ESP objects
-        if self.ESP then
+        -- Clean comprehensive ESP system
+        if Library.ESP then
                 self:ClearAllESP()
         end
         
@@ -4445,8 +4838,10 @@ function Library:Cleanup()
                 self:Log("INFO", "Drawing cache cleared")
         end
         
-        -- Call original cleanup
-        return originalCleanup(self)
+        -- Call original cleanup if it exists
+        if originalCleanup then
+                return originalCleanup(self)
+        end
 end
 
 -- Success message
