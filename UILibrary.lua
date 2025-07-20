@@ -273,6 +273,17 @@ end
 -- Enhanced utility functions
 local Utility = {};
 
+-- Safe text assignment function to prevent table assignment errors
+local function SafeSetText(textObject, text)
+        if textObject and textObject.Text ~= nil then
+                if type(text) == "table" then
+                        textObject.Text = text.Name or text.Text or tostring(text);
+                else
+                        textObject.Text = tostring(text or "");
+                end
+        end
+end
+
 function Utility:Lerp(a, b, t)
         return a + (b - a) * t;
 end
@@ -348,7 +359,12 @@ end
 -- Enhanced window creation function
 function Library:CreateWindow(Name, Toggle, keybind)
         local Window = { };
-        Window.Name = Name or "Enhanced UI Library";
+        -- Ensure Name is a string, handle table input properly
+        if type(Name) == "table" then
+                Window.Name = Name.Name or "Enhanced UI Library";
+        else
+                Window.Name = tostring(Name or "Enhanced UI Library");
+        end
         Window.Toggle = Toggle or false;
         Window.Keybind = keybind or Enum.KeyCode.RightShift;
         Window.ColorPickerSelected = nil;
@@ -861,7 +877,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.Title.Size = UDim2.new(1, -100, 1, 0);
         Window.Title.Position = UDim2.fromOffset(15, 0);
         Window.Title.BackgroundTransparency = 1;
-        Window.Title.Text = Window.Name;
+        Window.Title.Text = tostring(Window.Name);
         Window.Title.Font = Enum.Font.Ubuntu;
         Window.Title.TextSize = 16;
         Window.Title.TextColor3 = Library.Theme.TextColor;
@@ -1015,7 +1031,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Tab.TextLabel.Size = UDim2.new(1, Tab.Icon and -30 or -15, 1, 0);
                 Tab.TextLabel.Position = UDim2.fromOffset(Tab.Icon and 30 or 10, 0);
                 Tab.TextLabel.BackgroundTransparency = 1;
-                Tab.TextLabel.Text = Tab.Name;
+                Tab.TextLabel.Text = tostring(Tab.Name);
                 Tab.TextLabel.Font = Enum.Font.Ubuntu;
                 Tab.TextLabel.TextSize = 14;
                 Tab.TextLabel.TextColor3 = Library.Theme.TextColor;
@@ -1991,7 +2007,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Keybind.Label.Size = UDim2.new(1, -100, 1, 0);
                                 Keybind.Label.Position = UDim2.fromOffset(10, 0);
                                 Keybind.Label.BackgroundTransparency = 1;
-                                Keybind.Label.Text = Keybind.Name;
+                                Keybind.Label.Text = tostring(Keybind.Name);
                                 Keybind.Label.Font = Enum.Font.Ubuntu;
                                 Keybind.Label.TextSize = 14;
                                 Keybind.Label.TextColor3 = Library.Theme.TextColor;
@@ -2003,7 +2019,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 Keybind.KeyLabel.Position = UDim2.new(1, -90, 0.5, -12);
                                 Keybind.KeyLabel.BackgroundColor3 = Library.Theme.BackGround3;
                                 Keybind.KeyLabel.BorderSizePixel = 0;
-                                Keybind.KeyLabel.Text = Keybind.Key.Name or "None";
+                                Keybind.KeyLabel.Text = tostring(Keybind.Key.Name or "None");
                                 Keybind.KeyLabel.Font = Enum.Font.Ubuntu;
                                 Keybind.KeyLabel.TextSize = 12;
                                 Keybind.KeyLabel.TextColor3 = Library.Theme.TextColor;
@@ -2013,7 +2029,7 @@ function Library:CreateWindow(Name, Toggle, keybind)
 
                                 function Keybind:Set(Key)
                                         Keybind.Key = Key;
-                                        Keybind.KeyLabel.Text = Key.Name or "None";
+                                        Keybind.KeyLabel.Text = tostring(Key.Name or "None");
                                         
                                         if Keybind.Flag then
                                                 Library.Flags[Keybind.Flag] = Key;
