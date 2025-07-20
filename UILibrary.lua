@@ -27,15 +27,36 @@ local Library = {
 local UserInputService, RunService, TweenService, CoreGui, PlayerGui, LocalPlayer, Mouse, CurrentCamera
 
 if game then
-    -- Executor environment - use real Roblox services
-    UserInputService = game:GetService("UserInputService")
-    RunService = game:GetService("RunService") 
-    TweenService = game:GetService("TweenService")
-    CoreGui = gethui and gethui() or game:GetService("CoreGui")
-    PlayerGui = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
-    LocalPlayer = game:GetService("Players").LocalPlayer
-    Mouse = LocalPlayer:GetMouse()
-    CurrentCamera = workspace.CurrentCamera
+    -- Executor environment - use real Roblox services with error handling
+    local success, result = pcall(function()
+        UserInputService = game:GetService("UserInputService")
+        RunService = game:GetService("RunService") 
+        TweenService = game:GetService("TweenService")
+        CoreGui = gethui and gethui() or game:GetService("CoreGui")
+        
+        local Players = game:GetService("Players")
+        if Players and Players.LocalPlayer then
+            LocalPlayer = Players.LocalPlayer
+            PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+            Mouse = LocalPlayer:GetMouse()
+        end
+        
+        if workspace then
+            CurrentCamera = workspace.CurrentCamera
+        end
+    end)
+    
+    if not success then
+        -- Fallback if services are not available
+        UserInputService = nil
+        RunService = nil
+        TweenService = nil
+        CoreGui = nil
+        PlayerGui = nil
+        LocalPlayer = nil
+        Mouse = nil
+        CurrentCamera = nil
+    end
 else
     -- Test environment - use fallback values
     UserInputService = nil
