@@ -63,7 +63,67 @@ if not TweenService then
 end
 
 -- Executor compatibility layer
-if not Color3 then Color3 = {fromRGB = function(r, g, b) return {r = r/255, g = g/255, b = b/255} end} end
+if not Color3 then 
+    Color3 = {
+        fromRGB = function(r, g, b) 
+            local color = {r = r/255, g = g/255, b = b/255}
+            -- Add ToHSV method to color objects
+            color.ToHSV = function(self)
+                local r, g, b = self.r, self.g, self.b
+                local max = math.max(r, g, b)
+                local min = math.min(r, g, b)
+                local h, s, v = 0, 0, max
+                
+                local delta = max - min
+                if max ~= 0 then s = delta / max end
+                
+                if delta ~= 0 then
+                    if max == r then
+                        h = (g - b) / delta
+                        if g < b then h = h + 6 end
+                    elseif max == g then
+                        h = (b - r) / delta + 2
+                    elseif max == b then
+                        h = (r - g) / delta + 4
+                    end
+                    h = h / 6
+                end
+                
+                return h, s, v
+            end
+            return color
+        end,
+        fromHSV = function(h, s, v)
+            local r, g, b = 0, 0, 0
+            local i = math.floor(h * 6)
+            local f = h * 6 - i
+            local p = v * (1 - s)
+            local q = v * (1 - f * s)
+            local t = v * (1 - (1 - f) * s)
+            
+            i = i % 6
+            if i == 0 then
+                r, g, b = v, t, p
+            elseif i == 1 then
+                r, g, b = q, v, p
+            elseif i == 2 then
+                r, g, b = p, v, t
+            elseif i == 3 then
+                r, g, b = p, q, v
+            elseif i == 4 then
+                r, g, b = t, p, v
+            elseif i == 5 then
+                r, g, b = v, p, q
+            end
+            
+            local color = {r = r, g = g, b = b}
+            color.ToHSV = function(self)
+                return h, s, v
+            end
+            return color
+        end
+    }
+end
 if not UDim2 then UDim2 = {new = function(xS, xO, yS, yO) return {X = {Scale = xS or 0, Offset = xO or 0}, Y = {Scale = yS or 0, Offset = yO or 0}} end, fromScale = function(x, y) return UDim2.new(x, 0, y, 0) end, fromOffset = function(x, y) return UDim2.new(0, x, 0, y) end} end
 if not UDim then UDim = {new = function(scale, offset) return {Scale = scale or 0, Offset = offset or 0} end} end
 if not Vector2 then Vector2 = {new = function(x, y) return {X = x or 0, Y = y or 0} end} end
@@ -703,6 +763,34 @@ function Library:CreateWindow(Name, Toggle, keybind)
                                 color = color.c;
                         end;
 
+                        -- Ensure color has ToHSV method
+                        if color and type(color) == "table" and not color.ToHSV then
+                                -- Add ToHSV method if missing
+                                color.ToHSV = function(self)
+                                    local r, g, b = self.r or self.R or 0, self.g or self.G or 0, self.b or self.B or 0
+                                    local max = math.max(r, g, b)
+                                    local min = math.min(r, g, b)
+                                    local h, s, v = 0, 0, max
+                                    
+                                    local delta = max - min
+                                    if max ~= 0 then s = delta / max end
+                                    
+                                    if delta ~= 0 then
+                                        if max == r then
+                                            h = (g - b) / delta
+                                            if g < b then h = h + 6 end
+                                        elseif max == g then
+                                            h = (b - r) / delta + 2
+                                        elseif max == b then
+                                            h = (r - g) / delta + 4
+                                        end
+                                        h = h / 6
+                                    end
+                                    
+                                    return h, s, v
+                                end
+                        end
+
                         Hue, Sat, Val = color:ToHSV();
 
                         ColorPicker.Color = color;
@@ -743,7 +831,38 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 function ColorPicker:Add(Flag, CallBack)
                         ColorPicker.Flag = Flag;
                         ColorPicker.CallBack = CallBack;
-                        ColorPicker:Set(Library.Flags[Flag], 0, false);
+                        
+                        -- Get flag value or use default color
+                        local flagColor = Library.Flags[Flag] or Color3.fromRGB(255, 255, 255);
+                        
+                        -- Ensure flagColor has ToHSV method if it's a table
+                        if flagColor and type(flagColor) == "table" and not flagColor.ToHSV then
+                                flagColor.ToHSV = function(self)
+                                    local r, g, b = self.r or self.R or 1, self.g or self.G or 1, self.b or self.B or 1
+                                    local max = math.max(r, g, b)
+                                    local min = math.min(r, g, b)
+                                    local h, s, v = 0, 0, max
+                                    
+                                    local delta = max - min
+                                    if max ~= 0 then s = delta / max end
+                                    
+                                    if delta ~= 0 then
+                                        if max == r then
+                                            h = (g - b) / delta
+                                            if g < b then h = h + 6 end
+                                        elseif max == g then
+                                            h = (b - r) / delta + 2
+                                        elseif max == b then
+                                            h = (r - g) / delta + 4
+                                        end
+                                        h = h / 6
+                                    end
+                                    
+                                    return h, s, v
+                                end
+                        end
+                        
+                        ColorPicker:Set(flagColor, 0, false);
                 end;
 
                 function ColorPicker.SlideSaturation(input)
