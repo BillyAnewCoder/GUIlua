@@ -53,7 +53,54 @@ if game then
         error("[Library] Failed to initialize Roblox services - ensure you're running in a Roblox executor environment")
     end
 else
-    error("[Library] This library requires a Roblox executor environment with game access")
+    -- Development/Test environment - show library info instead of erroring
+    print("[Library] Professional Roblox UI Library v1.2.0")
+    print("[Library] This library is designed for Roblox executor environments")
+    print("[Library] Features: Advanced UI components, ESP system, Drawing API integration")
+    print("[Library] To use: Load this script in a Roblox executor with Drawing API support")
+    
+    -- Create mock services for syntax validation
+    UserInputService = {}
+    RunService = {}
+    TweenService = {}
+    CoreGui = {}
+    PlayerGui = {}
+    LocalPlayer = {}
+    Mouse = {}
+    CurrentCamera = {ViewportSize = {X = 1920, Y = 1080}}
+    
+    -- Mock Color3 for test environment
+    Color3 = {
+        fromRGB = function(r, g, b)
+            return {R = r/255, G = g/255, B = b/255}
+        end,
+        new = function(r, g, b)
+            return {R = r, G = g, B = b}
+        end
+    }
+    
+    -- Mock other Roblox types
+    Vector2 = {new = function(x, y) return {X = x, Y = y} end}
+    UDim2 = {
+        new = function(xScale, xOffset, yScale, yOffset) 
+            return {X = {Scale = xScale, Offset = xOffset}, Y = {Scale = yScale, Offset = yOffset}} 
+        end,
+        fromOffset = function(x, y) return {X = {Scale = 0, Offset = x}, Y = {Scale = 0, Offset = y}} end
+    }
+    Instance = {new = function(className) return {ClassName = className} end}
+    
+    -- Mock Enum for test environment
+    Enum = {
+        Font = {Gotham = 1, Montserrat = 2},
+        KeyCode = {RightShift = 1},
+        UserInputType = {MouseButton1 = 1, Touch = 2, MouseMovement = 3},
+        UserInputState = {Begin = 1, Change = 2, End = 3},
+        EasingStyle = {Sine = 1, Quad = 2},
+        EasingDirection = {Out = 1, In = 2}
+    }
+    
+    -- Mock TweenInfo
+    TweenInfo = {new = function() return {} end}
 end
 
 -- Executor Environment Verified
@@ -63,7 +110,7 @@ local DrawingAPI = {}
 local ESPDrawings = {}
 
 -- Check if Drawing API is available (executor environment)
-if Drawing then
+if Drawing and game then
     print("[Library] Drawing API detected - ESP rendering available")
     DrawingAPI.Available = true
     
