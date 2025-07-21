@@ -144,7 +144,7 @@ function DiscordLib:Window(text)
         Title.Position = UDim2.new(0.0102790017, 0, 0, 0)
         Title.Size = UDim2.new(0, 192, 0, 23)
         Title.Font = Enum.Font.Gotham
-        Title.Text = text
+        Title.Text = "" -- Hide title text for cleaner appearance
         Title.TextColor3 = Color3.fromRGB(99, 102, 109)
         Title.TextSize = 13.000
         Title.TextXAlignment = Enum.TextXAlignment.Left
@@ -3375,6 +3375,164 @@ function DiscordLib:Window(text)
                                 ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
                         end
                         
+
+                        -- Console Server functionality for message sending and code execution
+                        -- Console Server functionality for message sending and code execution
+                        function ChannelContent:Console()
+                                local ConsoleFrame = Instance.new("ScrollingFrame")
+                                ConsoleFrame.Name = "ConsoleFrame"
+                                ConsoleFrame.Parent = ChannelHolder
+                                ConsoleFrame.BackgroundColor3 = Color3.fromRGB(32, 34, 37)
+                                ConsoleFrame.BorderSizePixel = 0
+                                ConsoleFrame.Size = UDim2.new(0, 395, 0, 200)
+                                ConsoleFrame.ScrollBarThickness = 6
+                                ConsoleFrame.ScrollBarImageColor3 = Color3.fromRGB(18, 19, 21)
+                                ConsoleFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+                                
+                                local ConsoleCorner = Instance.new("UICorner")
+                                ConsoleCorner.CornerRadius = UDim.new(0, 4)
+                                ConsoleCorner.Parent = ConsoleFrame
+                                
+                                local ConsoleLayout = Instance.new("UIListLayout")
+                                ConsoleLayout.Name = "ConsoleLayout"
+                                ConsoleLayout.Parent = ConsoleFrame
+                                ConsoleLayout.SortOrder = Enum.SortOrder.LayoutOrder
+                                ConsoleLayout.Padding = UDim.new(0, 2)
+                                
+                                -- Console input area
+                                local ConsoleInput = Instance.new("Frame")
+                                ConsoleInput.Name = "ConsoleInput"
+                                ConsoleInput.Parent = ChannelHolder
+                                ConsoleInput.BackgroundColor3 = Color3.fromRGB(54, 57, 63)
+                                ConsoleInput.BorderSizePixel = 0
+                                ConsoleInput.Size = UDim2.new(0, 395, 0, 35)
+                                
+                                local ConsoleInputCorner = Instance.new("UICorner")
+                                ConsoleInputCorner.CornerRadius = UDim.new(0, 4)
+                                ConsoleInputCorner.Parent = ConsoleInput
+                                
+                                local ConsoleInputBox = Instance.new("TextBox")
+                                ConsoleInputBox.Name = "ConsoleInputBox"
+                                ConsoleInputBox.Parent = ConsoleInput
+                                ConsoleInputBox.BackgroundTransparency = 1
+                                ConsoleInputBox.Position = UDim2.new(0, 8, 0, 0)
+                                ConsoleInputBox.Size = UDim2.new(0, 310, 1, 0)
+                                ConsoleInputBox.Font = Enum.Font.GothamMedium
+                                ConsoleInputBox.Text = ""
+                                ConsoleInputBox.TextColor3 = Color3.fromRGB(220, 221, 222)
+                                ConsoleInputBox.TextSize = 14
+                                ConsoleInputBox.TextXAlignment = Enum.TextXAlignment.Left
+                                ConsoleInputBox.PlaceholderText = "Type message or Lua code..."
+                                ConsoleInputBox.PlaceholderColor3 = Color3.fromRGB(114, 118, 125)
+                                
+                                local ConsoleSendBtn = Instance.new("TextButton")
+                                ConsoleSendBtn.Name = "ConsoleSendBtn"
+                                ConsoleSendBtn.Parent = ConsoleInput
+                                ConsoleSendBtn.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+                                ConsoleSendBtn.BorderSizePixel = 0
+                                ConsoleSendBtn.Position = UDim2.new(0, 325, 0, 2)
+                                ConsoleSendBtn.Size = UDim2.new(0, 30, 0, 31)
+                                ConsoleSendBtn.Font = Enum.Font.GothamBold
+                                ConsoleSendBtn.Text = ">"
+                                ConsoleSendBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                ConsoleSendBtn.TextSize = 14
+                                
+                                local SendBtnCorner = Instance.new("UICorner")
+                                SendBtnCorner.CornerRadius = UDim.new(0, 4)
+                                SendBtnCorner.Parent = ConsoleSendBtn
+                                
+                                local ConsoleExecuteBtn = Instance.new("TextButton")
+                                ConsoleExecuteBtn.Name = "ConsoleExecuteBtn"
+                                ConsoleExecuteBtn.Parent = ConsoleInput
+                                ConsoleExecuteBtn.BackgroundColor3 = Color3.fromRGB(67, 181, 129)
+                                ConsoleExecuteBtn.BorderSizePixel = 0
+                                ConsoleExecuteBtn.Position = UDim2.new(0, 360, 0, 2)
+                                ConsoleExecuteBtn.Size = UDim2.new(0, 30, 0, 31)
+                                ConsoleExecuteBtn.Font = Enum.Font.GothamBold
+                                ConsoleExecuteBtn.Text = "▶"
+                                ConsoleExecuteBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                ConsoleExecuteBtn.TextSize = 12
+                                
+                                local ExecBtnCorner = Instance.new("UICorner")
+                                ExecBtnCorner.CornerRadius = UDim.new(0, 4)
+                                ExecBtnCorner.Parent = ConsoleExecuteBtn
+                                
+                                -- Function to add messages to console
+                                local function addConsoleMessage(message, messageType)
+                                        local MessageFrame = Instance.new("Frame")
+                                        MessageFrame.BackgroundTransparency = 1
+                                        MessageFrame.Size = UDim2.new(1, 0, 0, 20)
+                                        MessageFrame.Parent = ConsoleFrame
+                                        
+                                        local MessageText = Instance.new("TextLabel")
+                                        MessageText.BackgroundTransparency = 1
+                                        MessageText.Size = UDim2.new(1, -10, 1, 0)
+                                        MessageText.Position = UDim2.new(0, 5, 0, 0)
+                                        MessageText.Parent = MessageFrame
+                                        MessageText.Font = Enum.Font.RobotoMono
+                                        MessageText.TextSize = 12
+                                        MessageText.TextXAlignment = Enum.TextXAlignment.Left
+                                        MessageText.TextWrapped = true
+                                        MessageText.Text = message
+                                        
+                                        if messageType == "output" then
+                                                MessageText.TextColor3 = Color3.fromRGB(67, 181, 129)
+                                        elseif messageType == "error" then
+                                                MessageText.TextColor3 = Color3.fromRGB(237, 66, 69)
+                                        else
+                                                MessageText.TextColor3 = Color3.fromRGB(220, 221, 222)
+                                        end
+                                        
+                                        ConsoleFrame.CanvasSize = UDim2.new(0, 0, 0, ConsoleLayout.AbsoluteContentSize.Y)
+                                        ConsoleFrame.CanvasPosition = Vector2.new(0, ConsoleFrame.CanvasSize.Y.Offset)
+                                end
+                                
+                                -- Send button functionality
+                                ConsoleSendBtn.MouseButton1Click:Connect(function()
+                                        local message = ConsoleInputBox.Text
+                                        if message ~= "" then
+                                                addConsoleMessage("> " .. message, "message")
+                                                ConsoleInputBox.Text = ""
+                                        end
+                                end)
+                                
+                                -- Execute button functionality
+                                ConsoleExecuteBtn.MouseButton1Click:Connect(function()
+                                        local code = ConsoleInputBox.Text
+                                        if code ~= "" then
+                                                addConsoleMessage("> " .. code, "message")
+                                                
+                                                local success, result = pcall(function()
+                                                        return loadstring(code)()
+                                                end)
+                                                
+                                                if success then
+                                                        if result ~= nil then
+                                                                addConsoleMessage(tostring(result), "output")
+                                                        else
+                                                                addConsoleMessage("Code executed successfully", "output")
+                                                        end
+                                                else
+                                                        addConsoleMessage("Error: " .. tostring(result), "error")
+                                                end
+                                                
+                                                ConsoleInputBox.Text = ""
+                                        end
+                                end)
+                                
+                                -- Enter key support for sending messages
+                                ConsoleInputBox.FocusLost:Connect(function(enterPressed)
+                                        if enterPressed then
+                                                ConsoleSendBtn.MouseButton1Click:Fire()
+                                        end
+                                end)
+                                
+                                -- Initial welcome message
+                                addConsoleMessage("Discord Console initialized. Send messages or execute Lua code.", "output")
+                                addConsoleMessage("Examples: print('Hello World!'), math.sqrt(16), game.Players.LocalPlayer.Name", "output")
+                                
+                                ChannelHolder.CanvasSize = UDim2.new(0,0,0,ChannelHolderLayout.AbsoluteContentSize.Y)
+                        end
                         return ChannelContent
                 end
                 
@@ -3382,4 +3540,4 @@ function DiscordLib:Window(text)
         end
         return ServerHold
 end
-return DiscordLib
+return DiscordLib                        -- Console Server functionality for message sending and code execution
