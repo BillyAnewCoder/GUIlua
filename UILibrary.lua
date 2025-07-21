@@ -1998,6 +1998,18 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         return Sector;
                 end;
 
+
+        -- Add CreateSection as alias for CreateSector for compatibility
+        function Tab:CreateSection(Name, Side)
+                return self:CreateSector(Name, Side or "left")
+        end
+        
+        -- Add CreateLabel method for compatibility
+        function Tab:CreateLabel(Name, Side)
+                local Sector = self:CreateSector(Name, Side or "left")
+                -- Make label-style sector with no additional components
+                return Sector
+        end
                 function Tab:CreateSub(Name) -- Fun
                         local SubTab = { };
                         SubTab.Name = Name or "";
