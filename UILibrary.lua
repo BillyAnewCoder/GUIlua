@@ -1,8 +1,9 @@
--- // My Bad The Code Is Shitty I Keep Taking Breaks For A Long Time.
+-- Professional Roblox UI Library - Executor Optimized
+-- Version: 1.2.0 - Enhanced for Production Use
 local Library = { 
         Flags = { };
         Items = { };
-        Version = "1.0";
+        Version = "1.2.0";
         Windows = {};
         Notifications = {};
         Connections = {};
@@ -10,11 +11,13 @@ local Library = {
             FrameCount = 0;
             MemoryUsage = 0;
             StartTime = os.time and os.time() or 0;
+            LastUpdate = 0;
         };
         ESP = {};
         Config = {
             DebugMode = false;
             SaveFolder = "UILibrary_Configs";
+            AutoSave = true;
         };
         Executor = {
             Name = "Unknown";
@@ -47,337 +50,85 @@ if game then
     end)
     
     if not success then
-        -- Fallback if services are not available
-        UserInputService = nil
-        RunService = nil
-        TweenService = nil
-        CoreGui = nil
-        PlayerGui = nil
-        LocalPlayer = nil
-        Mouse = nil
-        CurrentCamera = nil
+        error("[Library] Failed to initialize Roblox services - ensure you're running in a Roblox executor environment")
     end
 else
-    -- Test environment - use fallback values
-    UserInputService = nil
-    RunService = nil
-    TweenService = nil
-    CoreGui = nil
-    PlayerGui = nil
-    LocalPlayer = nil
-    Mouse = nil
-    CurrentCamera = nil
+    error("[Library] This library requires a Roblox executor environment with game access")
 end
 
--- Fallbacks for missing services in test environments
-if not UserInputService then
-    UserInputService = {
-        InputBegan = {Connect = function() return {Disconnect = function() end} end};
-        InputChanged = {Connect = function() return {Disconnect = function() end} end};
-        InputEnded = {Connect = function() return {Disconnect = function() end} end};
-        GetMouseLocation = function() return {X = 0, Y = 0} end;
-    }
-end
+-- Executor Environment Verified
 
--- Mouse compatibility for test environments
-if not Mouse then
-    Mouse = {
-        MouseButton1Down = {Connect = function() return {Disconnect = function() end} end};
-        MouseButton1Up = {Connect = function() return {Disconnect = function() end} end};
-        MouseMoved = {Connect = function() return {Disconnect = function() end} end};
-        Hit = {Position = {X = 0, Y = 0, Z = 0}};
-        Target = nil;
-    }
-end
+-- Drawing API Integration for ESP Preview
+local DrawingAPI = {}
+local ESPDrawings = {}
 
--- Enhance UserInputService if it exists but is missing methods
-if UserInputService and not UserInputService.InputBegan then
-    UserInputService.InputBegan = {Connect = function() return {Disconnect = function() end} end};
-end
-if UserInputService and not UserInputService.InputChanged then  
-    UserInputService.InputChanged = {Connect = function() return {Disconnect = function() end} end};
-end
-if UserInputService and not UserInputService.InputEnded then
-    UserInputService.InputEnded = {Connect = function() return {Disconnect = function() end} end};
-end
-
-if not RunService then
-    RunService = {
-        Heartbeat = {Connect = function() return {Disconnect = function() end} end};
-    }
-end
-
-if not TweenService then
-    TweenService = {
-        Create = function(instance, tweenInfo, properties) 
-            return {
-                Play = function() 
-                    -- Apply properties immediately for compatibility
-                    if instance and properties then
-                        for prop, value in pairs(properties) do
-                            pcall(function() instance[prop] = value end)
-                        end
-                    end
-                end, 
-                Cancel = function() end,
-                Completed = {Connect = function() end}
-            }
-        end;
-    }
-end
-
--- Instance compatibility for test environments
-if not Instance then
-    Instance = {
-        new = function(className, parent)
-            local obj = {
-                ClassName = className;
-                Parent = parent;
-                Size = UDim2 and UDim2.fromOffset(0, 0) or {X = {Scale = 0, Offset = 0}, Y = {Scale = 0, Offset = 0}};
-                Position = UDim2 and UDim2.fromOffset(0, 0) or {X = {Scale = 0, Offset = 0}, Y = {Scale = 0, Offset = 0}};
-                BackgroundColor3 = Color3 and Color3.fromRGB(255, 255, 255) or {r = 1, g = 1, b = 1};
-                TextColor3 = Color3 and Color3.fromRGB(255, 255, 255) or {r = 1, g = 1, b = 1};
-                BackgroundTransparency = 0;
-                BorderSizePixel = 0;
-                Visible = true;
-                Text = "";
-                Font = "Gotham";
-                TextSize = 14;
-                -- Enhanced mouse event compatibility
-                MouseButton1Click = {Connect = function() return {Disconnect = function() end} end};
-                MouseButton1Down = {Connect = function() return {Disconnect = function() end} end};
-                MouseButton1Up = {Connect = function() return {Disconnect = function() end} end};
-                MouseEnter = {Connect = function() return {Disconnect = function() end} end};
-                MouseLeave = {Connect = function() return {Disconnect = function() end} end};
-                InputBegan = {Connect = function() return {Disconnect = function() end} end};
-                InputChanged = {Connect = function() return {Disconnect = function() end} end};
-                InputEnded = {Connect = function() return {Disconnect = function() end} end};
-                Name = className .. "_MockObject";
-                -- Enhanced Instance methods
-                GetChildren = function() return {} end;
-                FindFirstChild = function() return nil end;
-                WaitForChild = function(name) return obj end;
-                IsA = function(checkType) return checkType == className end;
-                Destroy = function() end;
-            }
-            -- Add SelectedAnimation for compatibility
-            if className == "TextButton" then
-                obj.SelectedAnimation = {
-                    Size = UDim2 and UDim2.fromScale(0, 1) or {X = {Scale = 0, Offset = 0}, Y = {Scale = 1, Offset = 0}};
-                }
+-- Check if Drawing API is available (executor environment)
+if Drawing then
+    print("[Library] Drawing API detected - ESP rendering available")
+    DrawingAPI.Available = true
+    
+    -- Professional Drawing API wrapper
+    DrawingAPI.Create = function(drawingType, properties)
+        local drawing = Drawing.new(drawingType)
+        
+        -- Apply properties
+        if properties then
+            for property, value in pairs(properties) do
+                pcall(function()
+                    drawing[property] = value
+                end)
             end
-            return obj
         end
-    }
-end
-
--- Enum compatibility for test environments
-if not Enum then
-    Enum = {
-        KeyCode = {
-            RightShift = "RightShift";
-            LeftShift = "LeftShift";
-            Space = "Space";
-            Tab = "Tab";
-        };
-        EasingStyle = {
-            Sine = "Sine";
-            Linear = "Linear";
-            Quad = "Quad";
-        };
-        EasingDirection = {
-            Out = "Out";
-            In = "In";
-            InOut = "InOut";
-        };
-        ZIndexBehavior = {
-            Global = "Global";
-            Sibling = "Sibling";
-        };
-        TextXAlignment = {
-            Left = "Left";
-            Center = "Center";
-            Right = "Right";
-        };
-        TextYAlignment = {
-            Top = "Top";
-            Center = "Center";
-            Bottom = "Bottom";
-        };
-        Font = {
-            Gotham = "Gotham";
-            SourceSans = "SourceSans";
-            RobotoMono = "RobotoMono";
-        };
-        UserInputType = {
-            MouseButton1 = "MouseButton1";
-            MouseButton2 = "MouseButton2";
-            Keyboard = "Keyboard";
-        };
-        SortOrder = {
-            LayoutOrder = "LayoutOrder";
-            Name = "Name";
-        };
-        UserInputState = {
-            Begin = "Begin";
-            Change = "Change";
-            End = "End";
-        }
-    }
-end
-
--- ColorSequence compatibility for test environments
-if not ColorSequence then
-    ColorSequence = {
-        new = function(colors)
-            return {
-                Keypoints = colors or {};
-            }
-        end;
-    }
-end
-
-if not ColorSequenceKeypoint then
-    ColorSequenceKeypoint = {
-        new = function(time, color)
-            return {
-                Time = time;
-                Value = color;
-            }
-        end;
-    }
-end
-
--- tick() compatibility for test environments
-if not tick then
-    tick = function() return os.clock() or os.time() end
-end
-
--- TweenInfo compatibility for executor environments
-if not TweenInfo then
-    TweenInfo = {
-        new = function(duration, easingStyle, easingDirection, repeatCount, reverses, delayTime)
-            return {
-                Time = duration or 1;
-                EasingStyle = easingStyle or "Linear";
-                EasingDirection = easingDirection or "Out";
-                RepeatCount = repeatCount or 0;
-                Reverses = reverses or false;
-                DelayTime = delayTime or 0;
-            }
+        
+        -- Track drawing object
+        table.insert(ESPDrawings, drawing)
+        
+        return drawing
+    end
+    
+    DrawingAPI.Remove = function(drawing)
+        if drawing and drawing.Remove then
+            drawing:Remove()
         end
-    }
+        
+        -- Remove from tracking
+        for i, tracked in ipairs(ESPDrawings) do
+            if tracked == drawing then
+                table.remove(ESPDrawings, i)
+                break
+            end
+        end
+    end
+    
+    DrawingAPI.ClearAll = function()
+        for _, drawing in ipairs(ESPDrawings) do
+            if drawing and drawing.Remove then
+                drawing:Remove()
+            end
+        end
+        ESPDrawings = {}
+    end
+    
+else
+    print("[Library] ERROR: Drawing API not available! This library requires a Roblox executor with Drawing support.")
+    DrawingAPI.Available = false
+    
+    -- Create non-functional stubs for executors without Drawing API
+    DrawingAPI.Create = function(drawingType, properties)
+        warn("[Library] ESP functionality requires Drawing API - current executor does not support it")
+        return nil
+    end
+    
+    DrawingAPI.Remove = function(drawing)
+        -- No-op for missing Drawing API
+    end
+    
+    DrawingAPI.ClearAll = function()
+        ESPDrawings = {}
+    end
 end
 
--- Drawing compatibility for executor environments
-if not Drawing then
-    Drawing = {
-        new = function(drawingType)
-            local drawing = {
-                Type = drawingType;
-                Visible = false;
-                Color = Color3.fromRGB(255, 255, 255);
-                Position = Vector2.new(0, 0);
-                Size = Vector2.new(0, 0);
-                Thickness = 1;
-                Transparency = 1;
-                Remove = function(self) end;
-                Destroy = function(self) end;
-            }
-            
-            -- Type-specific properties
-            if drawingType == "Square" or drawingType == "Rectangle" then
-                drawing.Size = Vector2.new(100, 100)
-                drawing.Filled = false
-            elseif drawingType == "Circle" then
-                drawing.Radius = 50
-                drawing.NumSides = 16
-                drawing.Filled = false
-            elseif drawingType == "Line" then
-                drawing.From = Vector2.new(0, 0)
-                drawing.To = Vector2.new(100, 100)
-            elseif drawingType == "Text" then
-                drawing.Text = ""
-                drawing.Font = 2
-                drawing.Size = 18
-                drawing.Center = false
-                drawing.Outline = false
-                drawing.OutlineColor = Color3.fromRGB(0, 0, 0)
-            end
-            
-            return drawing
-        end
-    }
-end
-
--- Executor compatibility layer
-if not Color3 then 
-    Color3 = {
-        fromRGB = function(r, g, b) 
-            local color = {r = r/255, g = g/255, b = b/255}
-            -- Add ToHSV method to color objects
-            color.ToHSV = function(self)
-                local r, g, b = self.r, self.g, self.b
-                local max = math.max(r, g, b)
-                local min = math.min(r, g, b)
-                local h, s, v = 0, 0, max
-                
-                local delta = max - min
-                if max ~= 0 then s = delta / max end
-                
-                if delta ~= 0 then
-                    if max == r then
-                        h = (g - b) / delta
-                        if g < b then h = h + 6 end
-                    elseif max == g then
-                        h = (b - r) / delta + 2
-                    elseif max == b then
-                        h = (r - g) / delta + 4
-                    end
-                    h = h / 6
-                end
-                
-                return h, s, v
-            end
-            return color
-        end,
-        fromHSV = function(h, s, v)
-            local r, g, b = 0, 0, 0
-            local i = math.floor(h * 6)
-            local f = h * 6 - i
-            local p = v * (1 - s)
-            local q = v * (1 - f * s)
-            local t = v * (1 - (1 - f) * s)
-            
-            i = i % 6
-            if i == 0 then
-                r, g, b = v, t, p
-            elseif i == 1 then
-                r, g, b = q, v, p
-            elseif i == 2 then
-                r, g, b = p, v, t
-            elseif i == 3 then
-                r, g, b = p, q, v
-            elseif i == 4 then
-                r, g, b = t, p, v
-            elseif i == 5 then
-                r, g, b = v, p, q
-            end
-            
-            local color = {r = r, g = g, b = b}
-            color.ToHSV = function(self)
-                return h, s, v
-            end
-            return color
-        end
-    }
-end
-if not UDim2 then UDim2 = {new = function(xS, xO, yS, yO) return {X = {Scale = xS or 0, Offset = xO or 0}, Y = {Scale = yS or 0, Offset = yO or 0}} end, fromScale = function(x, y) return UDim2.new(x, 0, y, 0) end, fromOffset = function(x, y) return UDim2.new(0, x, 0, y) end} end
-if not UDim then UDim = {new = function(scale, offset) return {Scale = scale or 0, Offset = offset or 0} end} end
-if not Vector2 then Vector2 = {new = function(x, y) return {X = x or 0, Y = y or 0} end} end
-if not Vector3 then Vector3 = {new = function(x, y, z) return {X = x or 0, Y = y or 0, Z = z or 0} end} end
-if not TweenInfo then TweenInfo = {new = function(time, style, direction) return {Time = time or 1} end} end
-if not Enum then Enum = {KeyCode = {RightShift = "RightShift", F9 = "F9"}, UserInputType = {MouseButton1 = "MouseButton1", MouseMovement = "MouseMovement", Touch = "Touch"}, UserInputState = {End = "End"}, EasingStyle = {Sine = "Sine", Quad = "Quad"}, EasingDirection = {Out = "Out", In = "In"}, FillDirection = {Vertical = "Vertical", Horizontal = "Horizontal"}, HorizontalAlignment = {Left = "Left", Center = "Center"}, VerticalAlignment = {Top = "Top", Center = "Center"}, SortOrder = {LayoutOrder = "LayoutOrder"}, TextXAlignment = {Left = "Left", Center = "Center", Right = "Right"}, TextYAlignment = {Top = "Top", Center = "Center", Bottom = "Bottom"}, AutomaticSize = {Y = "Y"}, ApplyStrokeMode = {Border = "Border"}, ZIndexBehavior = {Global = "Global"}, TextTruncate = {AtEnd = "AtEnd"}} end
+-- Roblox Executor Optimized UI Library
 
 -- Console System
 Library.Console = {
@@ -397,32 +148,192 @@ Library.Console = {
 }
 
 Library.Theme = {
-        BackGround1 = Color3.fromRGB(47, 47, 47);
-        BackGround2 = Color3.fromRGB(38, 38, 38);
-        Background = Color3.fromRGB(47, 47, 47); -- Alias for compatibility
-
-        Outline = Color3.fromRGB(30, 87, 75);
-
-        Selected = Color3.fromRGB(18, 161, 130);
-        Accent = Color3.fromRGB(18, 161, 130); -- Alias for compatibility
-
-        TextColor = Color3.fromRGB(255, 255, 255);
-        Font = "Montserrat";
+        -- Professional Dark Theme - Optimized for Executors
+        BackGround1 = Color3.fromRGB(18, 18, 18);      -- Primary Background
+        BackGround2 = Color3.fromRGB(28, 28, 28);      -- Secondary Background
+        BackGround3 = Color3.fromRGB(38, 38, 38);      -- Tertiary Background
+        Background = Color3.fromRGB(18, 18, 18);       -- Alias for compatibility
+        
+        -- Modern Accent System
+        Outline = Color3.fromRGB(55, 55, 55);          -- Border Color
+        Selected = Color3.fromRGB(0, 162, 255);        -- Primary Accent (Modern Blue)
+        Accent = Color3.fromRGB(0, 162, 255);          -- Alias for compatibility
+        
+        -- Enhanced Color Palette
+        Success = Color3.fromRGB(76, 175, 80);         -- Green for success states
+        Warning = Color3.fromRGB(255, 193, 7);         -- Amber for warnings
+        Error = Color3.fromRGB(244, 67, 54);           -- Red for errors
+        
+        -- Typography System
+        TextColor = Color3.fromRGB(255, 255, 255);     -- Primary Text
+        TextColorDim = Color3.fromRGB(180, 180, 180);  -- Secondary Text
+        Font = Enum.Font.Gotham;                       -- Professional Font
         TextSize = 14;
+        
+        -- Animation Timings - Refined for Smooth UX
+        TabOptionsHoverTween = 0.15;
+        TabOptionsSelectTween = 0.2;
+        TabOptionsUnSelectTween = 0.15;
+        
+        TabTween = 0.3;
+        SubtabTween = 0.25;
+        SubtabbarTween = 0.3;
+        CloseOpenTween = 0.4;
+        
+        ToggleTween = 0.15;
+        SliderTween = 0.1;
+        
+        -- ESP Specific Colors
+        ESPBox = Color3.fromRGB(0, 162, 255);
+        ESPText = Color3.fromRGB(255, 255, 255);
+        ESPHealthGreen = Color3.fromRGB(76, 175, 80);
+        ESPHealthYellow = Color3.fromRGB(255, 193, 7);
+        ESPHealthRed = Color3.fromRGB(244, 67, 54);
+        ESPSkeleton = Color3.fromRGB(255, 255, 255);
+        ESPChams = Color3.fromRGB(139, 69, 139);
+};
 
-        TabOptionsHoverTween = 0.3;
-        TabOptionsSelectTween = 0.3;
-        TabOptionsUnSelectTween = 0.2;
-
-        TabTween = 0.5;
-
-        SubtabTween = 0.35;
-        SubtabbarTween = 0.4;
-
-        CloseOpenTween = 0.8;
-
-        ToggleTween = 0.2;
-        SliderTween = 0.07;
+-- Professional ESP Management System
+Library.ESP = {
+    Settings = {
+        Box = true,
+        Name = true,
+        Health = true,
+        Distance = true,
+        Skeleton = false,
+        Chams = false
+    },
+    Drawings = {},
+    
+    -- ESP Drawing Methods
+    CreateESPBox = function(self, position, size, color)
+        if not DrawingAPI.Available then return nil end
+        
+        local box = DrawingAPI.Create("Square", {
+            Size = size or Vector2.new(100, 150),
+            Position = position or Vector2.new(100, 100),
+            Color = color or Library.Theme.ESPBox,
+            Filled = false,
+            Thickness = 2,
+            Visible = true
+        })
+        
+        table.insert(self.Drawings, box)
+        return box
+    end,
+    
+    CreateESPText = function(self, position, text, color, size)
+        if not DrawingAPI.Available then return nil end
+        
+        local textObj = DrawingAPI.Create("Text", {
+            Position = position or Vector2.new(100, 80),
+            Text = text or "Player",
+            Color = color or Library.Theme.ESPText,
+            Size = size or 14,
+            Font = Drawing and Drawing.Fonts and Drawing.Fonts.UI or 2,
+            Center = true,
+            Outline = true,
+            OutlineColor = Color3.fromRGB(0, 0, 0),
+            Visible = true
+        })
+        
+        table.insert(self.Drawings, textObj)
+        return textObj
+    end,
+    
+    CreateESPHealthBar = function(self, position, health, maxHealth)
+        if not DrawingAPI.Available then return nil end
+        
+        local healthPercent = health / maxHealth
+        local barHeight = 100 * healthPercent
+        
+        -- Health bar background
+        local bg = DrawingAPI.Create("Square", {
+            Position = position or Vector2.new(80, 100),
+            Size = Vector2.new(4, 100),
+            Color = Color3.fromRGB(0, 0, 0),
+            Filled = true,
+            Visible = true
+        })
+        
+        -- Health bar fill
+        local healthColor = Library.Theme.ESPHealthGreen
+        if healthPercent <= 0.3 then
+            healthColor = Library.Theme.ESPHealthRed
+        elseif healthPercent <= 0.6 then
+            healthColor = Library.Theme.ESPHealthYellow
+        end
+        
+        local fill = DrawingAPI.Create("Square", {
+            Position = Vector2.new(position.X + 1, position.Y + (100 - barHeight)),
+            Size = Vector2.new(2, barHeight),
+            Color = healthColor,
+            Filled = true,
+            Visible = true
+        })
+        
+        table.insert(self.Drawings, bg)
+        table.insert(self.Drawings, fill)
+        
+        return {Background = bg, Fill = fill}
+    end,
+    
+    CreateESPLine = function(self, from, to, color, thickness)
+        if not DrawingAPI.Available then return nil end
+        
+        local line = DrawingAPI.Create("Line", {
+            From = from or Vector2.new(100, 100),
+            To = to or Vector2.new(150, 150),
+            Color = color or Library.Theme.ESPSkeleton,
+            Thickness = thickness or 1,
+            Visible = true
+        })
+        
+        table.insert(self.Drawings, line)
+        return line
+    end,
+    
+    CreateESPCircle = function(self, position, radius, color)
+        if not DrawingAPI.Available then return nil end
+        
+        local circle = DrawingAPI.Create("Circle", {
+            Position = position or Vector2.new(100, 100),
+            Radius = radius or 50,
+            Color = color or Library.Theme.ESPBox,
+            Filled = false,
+            Thickness = 2,
+            Visible = true
+        })
+        
+        table.insert(self.Drawings, circle)
+        return circle
+    end,
+    
+    -- ESP Management
+    ClearAllESP = function(self)
+        for _, drawing in ipairs(self.Drawings) do
+            DrawingAPI.Remove(drawing)
+        end
+        self.Drawings = {}
+    end,
+    
+    ToggleESP = function(self, enabled)
+        for _, drawing in ipairs(self.Drawings) do
+            if drawing and drawing.Visible ~= nil then
+                drawing.Visible = enabled
+            end
+        end
+    end,
+    
+    GetESPSettings = function(self)
+        return self.Settings
+    end,
+    
+    SetESPSetting = function(self, setting, value)
+        if self.Settings[setting] ~= nil then
+            self.Settings[setting] = value
+        end
+    end
 }; 
 
 function Library:CreateWindow(Name, Toggle, keybind)
@@ -496,10 +407,10 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ScreenGui.ResetOnSpawn = false;
         Window.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 
-        -- ESP Preview Window - Matches image design, positioned on right side
+        -- Professional ESP Preview System
         Window.ESPPreview = {};
         
-        -- ESP Preview Settings 
+        -- ESP Configuration
         Window.ESPPreview.Settings = {
             Box = true,
             Name = true,
@@ -508,186 +419,352 @@ function Library:CreateWindow(Name, Toggle, keybind)
             Skeleton = false
         };
         
-        -- Initialize animation variables
-        Window.ESPPreview.HealthBarFade = 0;
+        -- Health tracking variables for realistic simulation
+        Window.ESPPreview.CurrentHealth = 85;
+        Window.ESPPreview.MaxHealth = 100;
+        Window.ESPPreview.HealthDecayRate = 0.1;
         
-        -- Main ESP Preview Frame - positioned relative to main window
+        -- Main ESP Preview Window - Professional Design
         Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.ESPPreview.Main.Size = UDim2.fromOffset(200, 350);
-        -- Will be positioned dynamically relative to main window
-        Window.ESPPreview.Main.Position = UDim2.fromOffset(800, 150); -- Initial position
+        Window.ESPPreview.Main.Size = UDim2.fromOffset(280, 420);
+        Window.ESPPreview.Main.Position = UDim2.fromOffset(950, 100);
         Window.ESPPreview.Main.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.Main.ClipsDescendants = false;
+        Window.ESPPreview.Main.ClipsDescendants = true;
         Window.ESPPreview.Main.Visible = false;
         Window.ESPPreview.Main.BorderSizePixel = 0;
 
         Window.ESPPreview.UICorner = Instance.new("UICorner", Window.ESPPreview.Main);
-        Window.ESPPreview.UICorner.CornerRadius = UDim.new(0, 4);
+        Window.ESPPreview.UICorner.CornerRadius = UDim.new(0, 8);
 
         Window.ESPPreview.UIStroke = Instance.new("UIStroke", Window.ESPPreview.Main);
         Window.ESPPreview.UIStroke.Color = Library.Theme.Outline;
-        Window.ESPPreview.UIStroke.Thickness = 1;
+        Window.ESPPreview.UIStroke.Thickness = 2;
         Window.ESPPreview.UIStroke.ApplyStrokeMode = "Border";
 
-        -- ESP Preview Header (clean design matching image)
+        -- Professional Header
         Window.ESPPreview.Header = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.Header.Size = UDim2.fromOffset(138, 25);
-        Window.ESPPreview.Header.Position = UDim2.fromOffset(1, 1);
+        Window.ESPPreview.Header.Size = UDim2.fromOffset(280, 35);
+        Window.ESPPreview.Header.Position = UDim2.fromOffset(0, 0);
         Window.ESPPreview.Header.BackgroundColor3 = Library.Theme.BackGround2;
         Window.ESPPreview.Header.BorderSizePixel = 0;
 
         Window.ESPPreview.HeaderCorner = Instance.new("UICorner", Window.ESPPreview.Header);
-        Window.ESPPreview.HeaderCorner.CornerRadius = UDim.new(0, 4);
+        Window.ESPPreview.HeaderCorner.CornerRadius = UDim.new(0, 8);
 
         Window.ESPPreview.Title = Instance.new("TextLabel", Window.ESPPreview.Header);
         Window.ESPPreview.Title.Size = UDim2.fromScale(1, 1);
         Window.ESPPreview.Title.BackgroundTransparency = 1;
         Window.ESPPreview.Title.Text = "ESP Preview";
         Window.ESPPreview.Title.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.Title.TextSize = 12;
+        Window.ESPPreview.Title.TextSize = 16;
         Window.ESPPreview.Title.Font = Library.Theme.Font;
         Window.ESPPreview.Title.TextXAlignment = Enum.TextXAlignment.Center;
 
-        -- Username Section
-        Window.ESPPreview.UsernameSection = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.UsernameSection.Size = UDim2.fromOffset(138, 20);
-        Window.ESPPreview.UsernameSection.Position = UDim2.fromOffset(1, 26);
-        Window.ESPPreview.UsernameSection.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.UsernameSection.BorderSizePixel = 0;
+        -- Professional ESP Display Viewport
+        Window.ESPPreview.Viewport = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.Viewport.Size = UDim2.fromOffset(260, 280);
+        Window.ESPPreview.Viewport.Position = UDim2.fromOffset(10, 45);
+        Window.ESPPreview.Viewport.BackgroundColor3 = Library.Theme.BackGround3;
+        Window.ESPPreview.Viewport.BorderSizePixel = 0;
 
-        Window.ESPPreview.UsernameLabel = Instance.new("TextLabel", Window.ESPPreview.UsernameSection);
-        Window.ESPPreview.UsernameLabel.Size = UDim2.fromScale(1, 1);
-        Window.ESPPreview.UsernameLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.UsernameLabel.Text = "Username";
-        Window.ESPPreview.UsernameLabel.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.UsernameLabel.TextSize = 11;
-        Window.ESPPreview.UsernameLabel.Font = Library.Theme.Font;
-        Window.ESPPreview.UsernameLabel.TextXAlignment = Enum.TextXAlignment.Center;
+        Window.ESPPreview.ViewportCorner = Instance.new("UICorner", Window.ESPPreview.Viewport);
+        Window.ESPPreview.ViewportCorner.CornerRadius = UDim.new(0, 6);
 
-        -- Main ESP Display Area (gray background like image)
-        Window.ESPPreview.DisplayArea = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.DisplayArea.Size = UDim2.fromOffset(138, 180);
-        Window.ESPPreview.DisplayArea.Position = UDim2.fromOffset(1, 46);
-        Window.ESPPreview.DisplayArea.BackgroundColor3 = Color3.fromRGB(45, 45, 45); -- Dark gray like in image
-        Window.ESPPreview.DisplayArea.BorderSizePixel = 0;
+        Window.ESPPreview.ViewportStroke = Instance.new("UIStroke", Window.ESPPreview.Viewport);
+        Window.ESPPreview.ViewportStroke.Color = Library.Theme.Outline;
+        Window.ESPPreview.ViewportStroke.Thickness = 1;
 
-        -- Humanoid Figure in Display Area
-        -- ESP Box around humanoid (green outline like in image)
-        Window.ESPPreview.ESPBox = Instance.new("Frame", Window.ESPPreview.DisplayArea);
-        Window.ESPPreview.ESPBox.Size = UDim2.fromOffset(60, 120);
-        Window.ESPPreview.ESPBox.Position = UDim2.fromOffset(39, 30);
+        -- Create Professional Humanoid Figure
+        -- Humanoid Head
+        Window.ESPPreview.HumanoidHead = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.HumanoidHead.Size = UDim2.fromOffset(25, 25);
+        Window.ESPPreview.HumanoidHead.Position = UDim2.fromOffset(117, 50);
+        Window.ESPPreview.HumanoidHead.BackgroundColor3 = Color3.fromRGB(255, 204, 153);
+        Window.ESPPreview.HumanoidHead.BorderSizePixel = 0;
+
+        local headCorner = Instance.new("UICorner", Window.ESPPreview.HumanoidHead);
+        headCorner.CornerRadius = UDim.new(0.5, 0);
+
+        -- Humanoid Torso
+        Window.ESPPreview.HumanoidTorso = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.HumanoidTorso.Size = UDim2.fromOffset(30, 45);
+        Window.ESPPreview.HumanoidTorso.Position = UDim2.fromOffset(115, 75);
+        Window.ESPPreview.HumanoidTorso.BackgroundColor3 = Color3.fromRGB(70, 130, 180);
+        Window.ESPPreview.HumanoidTorso.BorderSizePixel = 0;
+
+        local torsoCorner = Instance.new("UICorner", Window.ESPPreview.HumanoidTorso);
+        torsoCorner.CornerRadius = UDim.new(0, 3);
+
+        -- Humanoid Arms
+        Window.ESPPreview.LeftArm = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.LeftArm.Size = UDim2.fromOffset(8, 35);
+        Window.ESPPreview.LeftArm.Position = UDim2.fromOffset(105, 80);
+        Window.ESPPreview.LeftArm.BackgroundColor3 = Color3.fromRGB(255, 204, 153);
+        Window.ESPPreview.LeftArm.BorderSizePixel = 0;
+
+        Window.ESPPreview.RightArm = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.RightArm.Size = UDim2.fromOffset(8, 35);
+        Window.ESPPreview.RightArm.Position = UDim2.fromOffset(147, 80);
+        Window.ESPPreview.RightArm.BackgroundColor3 = Color3.fromRGB(255, 204, 153);
+        Window.ESPPreview.RightArm.BorderSizePixel = 0;
+
+        -- Humanoid Legs
+        Window.ESPPreview.LeftLeg = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.LeftLeg.Size = UDim2.fromOffset(12, 40);
+        Window.ESPPreview.LeftLeg.Position = UDim2.fromOffset(118, 120);
+        Window.ESPPreview.LeftLeg.BackgroundColor3 = Color3.fromRGB(139, 69, 19);
+        Window.ESPPreview.LeftLeg.BorderSizePixel = 0;
+
+        Window.ESPPreview.RightLeg = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.RightLeg.Size = UDim2.fromOffset(12, 40);
+        Window.ESPPreview.RightLeg.Position = UDim2.fromOffset(130, 120);
+        Window.ESPPreview.RightLeg.BackgroundColor3 = Color3.fromRGB(139, 69, 19);
+        Window.ESPPreview.RightLeg.BorderSizePixel = 0;
+
+        -- ESP Box around humanoid
+        Window.ESPPreview.ESPBox = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.ESPBox.Size = UDim2.fromOffset(70, 130);
+        Window.ESPPreview.ESPBox.Position = UDim2.fromOffset(95, 45);
         Window.ESPPreview.ESPBox.BackgroundTransparency = 1;
         Window.ESPPreview.ESPBox.BorderSizePixel = 0;
 
         Window.ESPPreview.ESPBoxStroke = Instance.new("UIStroke", Window.ESPPreview.ESPBox);
-        Window.ESPPreview.ESPBoxStroke.Color = Library.Theme.Selected; -- Use theme color
+        Window.ESPPreview.ESPBoxStroke.Color = Library.Theme.ESPBox;
         Window.ESPPreview.ESPBoxStroke.Thickness = 2;
 
-        -- Health Bar on left side (green bar like in image)
-        Window.ESPPreview.HealthBar = Instance.new("Frame", Window.ESPPreview.DisplayArea);
-        Window.ESPPreview.HealthBar.Size = UDim2.fromOffset(6, 120);
-        Window.ESPPreview.HealthBar.Position = UDim2.fromOffset(25, 30);
-        Window.ESPPreview.HealthBar.BackgroundColor3 = Library.Theme.Selected;
+        -- Health Bar Background
+        Window.ESPPreview.HealthBarBG = Instance.new("Frame", Window.ESPPreview.Viewport);
+        Window.ESPPreview.HealthBarBG.Size = UDim2.fromOffset(6, 130);
+        Window.ESPPreview.HealthBarBG.Position = UDim2.fromOffset(85, 45);
+        Window.ESPPreview.HealthBarBG.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
+        Window.ESPPreview.HealthBarBG.BorderSizePixel = 0;
+
+        -- Actual Health Bar
+        Window.ESPPreview.HealthBar = Instance.new("Frame", Window.ESPPreview.HealthBarBG);
+        Window.ESPPreview.HealthBar.Size = UDim2.fromOffset(4, 110);
+        Window.ESPPreview.HealthBar.Position = UDim2.fromOffset(1, 19);
+        Window.ESPPreview.HealthBar.BackgroundColor3 = Library.Theme.ESPHealthGreen;
         Window.ESPPreview.HealthBar.BorderSizePixel = 0;
 
-        -- Player name above box
-        Window.ESPPreview.PlayerName = Instance.new("TextLabel", Window.ESPPreview.DisplayArea);
-        Window.ESPPreview.PlayerName.Size = UDim2.fromOffset(80, 15);
-        Window.ESPPreview.PlayerName.Position = UDim2.fromOffset(29, 10);
+        -- Player Name Above Humanoid
+        Window.ESPPreview.PlayerName = Instance.new("TextLabel", Window.ESPPreview.Viewport);
+        Window.ESPPreview.PlayerName.Size = UDim2.fromOffset(100, 20);
+        Window.ESPPreview.PlayerName.Position = UDim2.fromOffset(80, 25);
         Window.ESPPreview.PlayerName.BackgroundTransparency = 1;
         Window.ESPPreview.PlayerName.Text = "Player123";
-        Window.ESPPreview.PlayerName.TextColor3 = Color3.fromRGB(255, 255, 255);
-        Window.ESPPreview.PlayerName.TextSize = 10;
+        Window.ESPPreview.PlayerName.TextColor3 = Library.Theme.ESPText;
+        Window.ESPPreview.PlayerName.TextSize = 14;
         Window.ESPPreview.PlayerName.Font = Library.Theme.Font;
         Window.ESPPreview.PlayerName.TextXAlignment = Enum.TextXAlignment.Center;
 
-        -- Number indicator (left side like in image)
-        Window.ESPPreview.NumberLabel = Instance.new("TextLabel", Window.ESPPreview.DisplayArea);
-        Window.ESPPreview.NumberLabel.Size = UDim2.fromOffset(30, 12);
-        Window.ESPPreview.NumberLabel.Position = UDim2.fromOffset(35, 60);
-        Window.ESPPreview.NumberLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.NumberLabel.Text = "Number";
-        Window.ESPPreview.NumberLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-        Window.ESPPreview.NumberLabel.TextSize = 8;
-        Window.ESPPreview.NumberLabel.Font = Library.Theme.Font;
-        Window.ESPPreview.NumberLabel.TextXAlignment = Enum.TextXAlignment.Left;
-
-        -- Flags indicator (right side like in image)
-        Window.ESPPreview.FlagsLabel = Instance.new("TextLabel", Window.ESPPreview.DisplayArea);
-        Window.ESPPreview.FlagsLabel.Size = UDim2.fromOffset(25, 12);
-        Window.ESPPreview.FlagsLabel.Position = UDim2.fromOffset(105, 60);
-        Window.ESPPreview.FlagsLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.FlagsLabel.Text = "Flags";
-        Window.ESPPreview.FlagsLabel.TextColor3 = Color3.fromRGB(255, 255, 255);
-        Window.ESPPreview.FlagsLabel.TextSize = 8;
-        Window.ESPPreview.FlagsLabel.Font = Library.Theme.Font;
-        Window.ESPPreview.FlagsLabel.TextXAlignment = Enum.TextXAlignment.Right;
-
-        -- Distance Section (bottom like in image)
-        Window.ESPPreview.DistanceSection = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.DistanceSection.Size = UDim2.fromOffset(138, 20);
-        Window.ESPPreview.DistanceSection.Position = UDim2.fromOffset(1, 226);
-        Window.ESPPreview.DistanceSection.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.DistanceSection.BorderSizePixel = 0;
-
-        Window.ESPPreview.DistanceLabel = Instance.new("TextLabel", Window.ESPPreview.DistanceSection);
-        Window.ESPPreview.DistanceLabel.Size = UDim2.fromScale(1, 1);
+        -- Distance Below Humanoid
+        Window.ESPPreview.DistanceLabel = Instance.new("TextLabel", Window.ESPPreview.Viewport);
+        Window.ESPPreview.DistanceLabel.Size = UDim2.fromOffset(60, 16);
+        Window.ESPPreview.DistanceLabel.Position = UDim2.fromOffset(100, 185);
         Window.ESPPreview.DistanceLabel.BackgroundTransparency = 1;
         Window.ESPPreview.DistanceLabel.Text = "25m";
-        Window.ESPPreview.DistanceLabel.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.DistanceLabel.TextSize = 11;
+        Window.ESPPreview.DistanceLabel.TextColor3 = Library.Theme.ESPText;
+        Window.ESPPreview.DistanceLabel.TextSize = 12;
         Window.ESPPreview.DistanceLabel.Font = Library.Theme.Font;
         Window.ESPPreview.DistanceLabel.TextXAlignment = Enum.TextXAlignment.Center;
 
-        -- Weapon Section (bottom like in image)
-        Window.ESPPreview.WeaponSection = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.WeaponSection.Size = UDim2.fromOffset(138, 20);
-        Window.ESPPreview.WeaponSection.Position = UDim2.fromOffset(1, 246);
-        Window.ESPPreview.WeaponSection.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.WeaponSection.BorderSizePixel = 0;
-
-        Window.ESPPreview.WeaponLabel = Instance.new("TextLabel", Window.ESPPreview.WeaponSection);
-        Window.ESPPreview.WeaponLabel.Size = UDim2.fromScale(1, 1);
+        -- Weapon Label
+        Window.ESPPreview.WeaponLabel = Instance.new("TextLabel", Window.ESPPreview.Viewport);
+        Window.ESPPreview.WeaponLabel.Size = UDim2.fromOffset(80, 16);
+        Window.ESPPreview.WeaponLabel.Position = UDim2.fromOffset(90, 205);
         Window.ESPPreview.WeaponLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.WeaponLabel.Text = "Weapon";
-        Window.ESPPreview.WeaponLabel.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.WeaponLabel.Text = "AK-47";
+        Window.ESPPreview.WeaponLabel.TextColor3 = Library.Theme.ESPText;
         Window.ESPPreview.WeaponLabel.TextSize = 11;
         Window.ESPPreview.WeaponLabel.Font = Library.Theme.Font;
         Window.ESPPreview.WeaponLabel.TextXAlignment = Enum.TextXAlignment.Center;
+
+        -- ESP Controls Section
+        Window.ESPPreview.ControlsFrame = Instance.new("Frame", Window.ESPPreview.Main);
+        Window.ESPPreview.ControlsFrame.Size = UDim2.fromOffset(260, 85);
+        Window.ESPPreview.ControlsFrame.Position = UDim2.fromOffset(10, 330);
+        Window.ESPPreview.ControlsFrame.BackgroundColor3 = Library.Theme.BackGround2;
+        Window.ESPPreview.ControlsFrame.BorderSizePixel = 0;
+
+        local controlsCorner = Instance.new("UICorner", Window.ESPPreview.ControlsFrame);
+        controlsCorner.CornerRadius = UDim.new(0, 6);
+
+        -- ESP Options Title
+        Window.ESPPreview.OptionsTitle = Instance.new("TextLabel", Window.ESPPreview.ControlsFrame);
+        Window.ESPPreview.OptionsTitle.Size = UDim2.fromOffset(200, 20);
+        Window.ESPPreview.OptionsTitle.Position = UDim2.fromOffset(10, 5);
+        Window.ESPPreview.OptionsTitle.BackgroundTransparency = 1;
+        Window.ESPPreview.OptionsTitle.Text = "ESP Settings";
+        Window.ESPPreview.OptionsTitle.TextColor3 = Library.Theme.TextColor;
+        Window.ESPPreview.OptionsTitle.TextSize = 14;
+        Window.ESPPreview.OptionsTitle.Font = Library.Theme.Font;
+        Window.ESPPreview.OptionsTitle.TextXAlignment = Enum.TextXAlignment.Left;
+
+        -- Create ESP Toggle Buttons
+        local toggleOptions = {"Box", "Name", "Health", "Distance", "Skeleton"}
+        local togglePositions = {
+            {x = 10, y = 30},
+            {x = 70, y = 30},
+            {x = 130, y = 30},
+            {x = 190, y = 30},
+            {x = 10, y = 55}
+        }
+
+        Window.ESPPreview.Toggles = {}
+        
+        for i, option in ipairs(toggleOptions) do
+            local pos = togglePositions[i]
+            local enabled = Window.ESPPreview.Settings[option]
+            
+            local toggle = Instance.new("TextButton", Window.ESPPreview.ControlsFrame)
+            toggle.Size = UDim2.fromOffset(50, 20)
+            toggle.Position = UDim2.fromOffset(pos.x, pos.y)
+            toggle.BackgroundColor3 = enabled and Library.Theme.Selected or Library.Theme.BackGround3
+            toggle.Text = option
+            toggle.TextColor3 = Library.Theme.TextColor
+            toggle.TextSize = 11
+            toggle.Font = Library.Theme.Font
+            toggle.BorderSizePixel = 0
+
+            local toggleCorner = Instance.new("UICorner", toggle)
+            toggleCorner.CornerRadius = UDim.new(0, 4)
+
+            Window.ESPPreview.Toggles[option] = toggle
+            
+            toggle.MouseButton1Click:Connect(function()
+                Window.ESPPreview.Settings[option] = not Window.ESPPreview.Settings[option]
+                toggle.BackgroundColor3 = Window.ESPPreview.Settings[option] and Library.Theme.Selected or Library.Theme.BackGround3
+                Window.ESPPreview:UpdateVisibility()
+            end)
+        end
+
+        -- Professional Health Tracking System with Real-time Updates
+        Window.ESPPreview.HealthTracking = {
+            CurrentHealth = 85,
+            MaxHealth = 100,
+            HealthDecayRate = 0.02,
+            LastUpdate = tick(),
+            LastChange = tick(),
+            Direction = -1, -- -1 for decreasing, 1 for increasing
+            
+            UpdateHealth = function(self)
+                local currentTime = tick()
+                local deltaTime = currentTime - self.LastUpdate
+                self.LastUpdate = currentTime
+                
+                -- Change direction occasionally for realistic simulation
+                if currentTime - self.LastChange > 3 then -- Change every 3 seconds
+                    if math.random(1, 10) <= 3 then -- 30% chance to change direction
+                        self.Direction = self.Direction * -1
+                        self.LastChange = currentTime
+                    end
+                end
+                
+                -- Gradual health changes based on direction
+                if self.Direction == -1 then
+                    -- Decreasing health
+                    self.CurrentHealth = math.max(10, self.CurrentHealth - 0.5)
+                else
+                    -- Increasing health
+                    self.CurrentHealth = math.min(self.MaxHealth, self.CurrentHealth + 0.3)
+                end
+                
+                -- Update health bar visual
+                Window.ESPPreview:UpdateHealthBar()
+            end
+        }
+
+        -- Update health bar visual
+        Window.ESPPreview.UpdateHealthBar = function(self)
+            local healthPercent = self.HealthTracking.CurrentHealth / self.HealthTracking.MaxHealth
+            local barHeight = math.floor(healthPercent * 110)
+            
+            -- Determine health color
+            local healthColor
+            if healthPercent > 0.6 then
+                healthColor = Library.Theme.ESPHealthGreen
+            elseif healthPercent > 0.3 then
+                healthColor = Library.Theme.ESPHealthYellow
+            else
+                healthColor = Library.Theme.ESPHealthRed
+            end
+            
+            -- Update health bar
+            self.HealthBar.Size = UDim2.fromOffset(4, barHeight)
+            self.HealthBar.Position = UDim2.fromOffset(1, 130 - barHeight - 1)
+            self.HealthBar.BackgroundColor3 = healthColor
+        end
+
+        -- Update ESP element visibility
+        Window.ESPPreview.UpdateVisibility = function(self)
+            local settings = self.Settings
+            
+            -- Update ESP elements based on settings
+            self.ESPBox.Visible = settings.Box
+            self.PlayerName.Visible = settings.Name
+            self.HealthBarBG.Visible = settings.Health
+            self.HealthBar.Visible = settings.Health
+            self.DistanceLabel.Visible = settings.Distance
+        end
+
+        -- Initialize visibility
+        Window.ESPPreview:UpdateVisibility()
+
+        -- Start real-time health tracking with heartbeat connection
+        if RunService and RunService.Heartbeat then
+            Window.ESPPreview.HealthConnection = RunService.Heartbeat:Connect(function()
+                if Window.ESPPreview.Main.Visible then
+                    Window.ESPPreview.HealthTracking:UpdateHealth()
+                end
+            end)
+        end
 
         -- ESP Preview Toggle Visibility Function
         Window.ESPPreview.SetVisible = function(visible)
             Window.ESPPreview.Main.Visible = visible;
         end;
 
-        -- Create LeftPanel and RightPanel for ESP options
-        Window.ESPPreview.LeftPanel = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.LeftPanel.Size = UDim2.fromOffset(180, 300);
-        Window.ESPPreview.LeftPanel.Position = UDim2.fromOffset(-190, 0);
-        Window.ESPPreview.LeftPanel.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.LeftPanel.BorderSizePixel = 0;
-
-        local leftCorner = Instance.new("UICorner", Window.ESPPreview.LeftPanel);
-        leftCorner.CornerRadius = UDim.new(0, 4);
-
-        local leftStroke = Instance.new("UIStroke", Window.ESPPreview.LeftPanel);
-        leftStroke.Color = Library.Theme.Outline;
-        leftStroke.Thickness = 1;
-
-        Window.ESPPreview.RightPanel = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.RightPanel.Size = UDim2.fromOffset(180, 300);
-        Window.ESPPreview.RightPanel.Position = UDim2.fromOffset(150, 0);
-        Window.ESPPreview.RightPanel.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.RightPanel.BorderSizePixel = 0;
-
-        local rightCorner = Instance.new("UICorner", Window.ESPPreview.RightPanel);
-        rightCorner.CornerRadius = UDim.new(0, 4);
-
-        local rightStroke = Instance.new("UIStroke", Window.ESPPreview.RightPanel);
-        rightStroke.Color = Library.Theme.Outline;
-        rightStroke.Thickness = 1;
-
-        -- ESP Preview is now complete with static humanoid figure built into DisplayArea
+        -- Enhanced ESP Preview Methods for Library Integration
+        Window.ESPPreview.CreateESP = function(self, targetPlayer)
+            -- Integration with Library.ESP system
+            if targetPlayer and Library.ESP then
+                local character = targetPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local humanoidRootPart = character.HumanoidRootPart
+                    local humanoid = character:FindFirstChild("Humanoid")
+                    
+                    -- Create ESP components using Library.ESP methods
+                    local espBox = Library.ESP:CreateESPBox(
+                        Vector2.new(0, 0), 
+                        Vector2.new(100, 150), 
+                        Library.Theme.ESPBox
+                    )
+                    
+                    local nameTag = Library.ESP:CreateESPText(
+                        Vector2.new(0, -20),
+                        targetPlayer.Name,
+                        Library.Theme.ESPText,
+                        14
+                    )
+                    
+                    if humanoid then
+                        local healthBar = Library.ESP:CreateESPHealthBar(
+                            Vector2.new(-10, 0),
+                            humanoid.Health,
+                            humanoid.MaxHealth
+                        )
+                    end
+                    
+                    return {
+                        Box = espBox,
+                        Name = nameTag,
+                        Health = healthBar,
+                        Player = targetPlayer
+                    }
+                end
+            end
+            return nil
+        end;
 
         -- Create ESP Options Function
         Window.ESPPreview.CreateESPOptions = function()
@@ -1327,33 +1404,97 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.UiList = Instance.new("UIListLayout", Window.Tablist);
         Window.UiList.FillDirection = "Vertical";
 
-        -- Note: ESP Preview is already initialized above (line 500), don't overwrite it
+        -- Professional ESP Drawing API Integration
+        Window.ESPPreview.DrawingObjects = Window.ESPPreview.DrawingObjects or {}
         
-        -- ESP Drawing Functions
+        -- ESP Drawing Functions with Library.ESP integration
+        function Window:CreateESPBox(position, size, color)
+            return Library.ESP:CreateESPBox(position, size, color)
+        end
+        
+        function Window:CreateESPText(position, text, color, size)
+            return Library.ESP:CreateESPText(position, text, color, size)
+        end
+        
+        function Window:CreateESPHealthBar(position, health, maxHealth)
+            return Library.ESP:CreateESPHealthBar(position, health, maxHealth)
+        end
+        
+        function Window:CreateESPLine(from, to, color, thickness)
+            return Library.ESP:CreateESPLine(from, to, color, thickness)
+        end
+        
+        function Window:CreateESPCircle(position, radius, color)
+            return Library.ESP:CreateESPCircle(position, radius, color)
+        end
+        
         function Window:CreateESPDrawing(drawingType, properties)
-            if not Drawing then return nil end
-            
-            local drawing = Drawing.new(drawingType)
-            if drawing then
-                for property, value in pairs(properties or {}) do
-                    pcall(function()
-                        drawing[property] = value
-                    end)
-                end
-                table.insert(Window.ESPPreview.DrawingObjects, drawing)
-                return drawing
-            end
-            return nil
+            return DrawingAPI.Create(drawingType, properties)
         end
         
         function Window:ClearESPDrawings()
-            for _, drawing in ipairs(Window.ESPPreview.DrawingObjects) do
-                pcall(function()
-                    if drawing.Remove then drawing:Remove() end
-                    if drawing.Destroy then drawing:Destroy() end
-                end)
+            Library.ESP:ClearAllESP()
+            DrawingAPI.ClearAll()
+        end
+        
+        function Window:ToggleESP(enabled)
+            Library.ESP:ToggleESP(enabled)
+        end
+        
+        function Window:GetESPSettings()
+            return Library.ESP:GetESPSettings()
+        end
+        
+        function Window:SetESPSetting(setting, value)
+            Library.ESP:SetESPSetting(setting, value)
+        end
+        
+        function Window:UpdateESPHealthBar(healthBar, health, maxHealth)
+            if healthBar and healthBar.Fill then
+                local healthPercent = health / maxHealth
+                local barHeight = 100 * healthPercent
+                
+                -- Update health color based on percentage
+                local healthColor = Library.Theme.ESPHealthGreen
+                if healthPercent <= 0.3 then
+                    healthColor = Library.Theme.ESPHealthRed
+                elseif healthPercent <= 0.6 then
+                    healthColor = Library.Theme.ESPHealthYellow
+                end
+                
+                -- Update fill bar
+                healthBar.Fill.Size = Vector2.new(2, barHeight)
+                healthBar.Fill.Position = Vector2.new(healthBar.Background.Position.X + 1, healthBar.Background.Position.Y + (100 - barHeight))
+                healthBar.Fill.Color = healthColor
             end
-            Window.ESPPreview.DrawingObjects = {}
+        end
+        
+        -- Enhanced ESP Preview Methods
+        function Window:ShowESPPreview()
+            if Window.ESPPreview and Window.ESPPreview.Main then
+                Window.ESPPreview.Main.Visible = true
+                print("[INFO] ESP Preview: ESP Preview window opened")
+            end
+        end
+        
+        function Window:HideESPPreview()
+            if Window.ESPPreview and Window.ESPPreview.Main then
+                Window.ESPPreview.Main.Visible = false
+                print("[INFO] ESP Preview: ESP Preview window closed")
+            end
+        end
+        
+        function Window:ToggleESPPreview(visible)
+            if Window.ESPPreview and Window.ESPPreview.Main then
+                if visible ~= nil then
+                    Window.ESPPreview.Main.Visible = visible
+                else
+                    Window.ESPPreview.Main.Visible = not Window.ESPPreview.Main.Visible
+                end
+                
+                local status = Window.ESPPreview.Main.Visible and "opened" or "closed"
+                print("[INFO] ESP Preview: ESP Preview window " .. status)
+            end
         end
 
         -- ESP Preview Window Frame (positioned to right of main window)
