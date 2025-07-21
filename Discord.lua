@@ -1658,10 +1658,82 @@ function DiscordLib:Window(text)
         MakeDraggable(TopFrame, MainFrame)
         ServersHoldPadding.PaddingLeft = UDim.new(0, 14)
 
-        -- Show initialization notification to user
+        -- Show initialization popup notification
         spawn(function()
                 wait(0.5) -- Brief delay to let UI load properly
-                DiscordLib:Notification("Discord UI Initialized", "Enhanced Discord UI Library loaded successfully with authentic styling!", "Got it!")
+                
+                -- Create stylish popup notification
+                local InitPopup = Instance.new("Frame")
+                local InitPopupCorner = Instance.new("UICorner")
+                local InitIcon = Instance.new("Frame")
+                local InitIconCorner = Instance.new("UICorner")
+                local InitIconText = Instance.new("TextLabel")
+                local InitTitle = Instance.new("TextLabel")
+                local InitDesc = Instance.new("TextLabel")
+                
+                InitPopup.Name = "InitPopup"
+                InitPopup.Parent = MainFrame
+                InitPopup.AnchorPoint = Vector2.new(1, 0)
+                InitPopup.BackgroundColor3 = Color3.fromRGB(47, 49, 54)
+                InitPopup.BorderSizePixel = 0
+                InitPopup.Position = UDim2.new(1.05, 0, 0.1, 0)
+                InitPopup.Size = UDim2.new(0, 280, 0, 80)
+                InitPopup.BackgroundTransparency = 1
+                
+                InitPopupCorner.CornerRadius = UDim.new(0, 8)
+                InitPopupCorner.Parent = InitPopup
+                
+                InitIcon.Name = "InitIcon"
+                InitIcon.Parent = InitPopup
+                InitIcon.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+                InitIcon.Position = UDim2.new(0, 12, 0, 12)
+                InitIcon.Size = UDim2.new(0, 24, 0, 24)
+                
+                InitIconCorner.CornerRadius = UDim.new(1, 0)
+                InitIconCorner.Parent = InitIcon
+                
+                InitIconText.Parent = InitIcon
+                InitIconText.BackgroundTransparency = 1
+                InitIconText.Size = UDim2.new(1, 0, 1, 0)
+                InitIconText.Font = Enum.Font.GothamBold
+                InitIconText.Text = "✓"
+                InitIconText.TextColor3 = Color3.fromRGB(255, 255, 255)
+                InitIconText.TextSize = 14
+                
+                InitTitle.Name = "InitTitle"
+                InitTitle.Parent = InitPopup
+                InitTitle.BackgroundTransparency = 1
+                InitTitle.Position = UDim2.new(0, 44, 0, 8)
+                InitTitle.Size = UDim2.new(0, 224, 0, 20)
+                InitTitle.Font = Enum.Font.GothamBold
+                InitTitle.Text = "Discord UI Ready"
+                InitTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+                InitTitle.TextSize = 14
+                InitTitle.TextXAlignment = Enum.TextXAlignment.Left
+                
+                InitDesc.Name = "InitDesc"
+                InitDesc.Parent = InitPopup
+                InitDesc.BackgroundTransparency = 1
+                InitDesc.Position = UDim2.new(0, 44, 0, 28)
+                InitDesc.Size = UDim2.new(0, 224, 0, 44)
+                InitDesc.Font = Enum.Font.Gotham
+                InitDesc.Text = "Enhanced Discord UI loaded with authentic styling and welcome messages"
+                InitDesc.TextColor3 = Color3.fromRGB(163, 166, 170)
+                InitDesc.TextSize = 11
+                InitDesc.TextWrapped = true
+                InitDesc.TextXAlignment = Enum.TextXAlignment.Left
+                InitDesc.TextYAlignment = Enum.TextYAlignment.Top
+                
+                -- Animate popup appearance
+                InitPopup:TweenPosition(UDim2.new(0.95, 0, 0.1, 0), "Out", "Back", 0.4, true)
+                TweenService:Create(InitPopup, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {BackgroundTransparency = 0}):Play()
+                
+                -- Auto-dismiss after 3 seconds
+                wait(3)
+                InitPopup:TweenPosition(UDim2.new(1.05, 0, 0.1, 0), "Out", "Quad", 0.3, true)
+                TweenService:Create(InitPopup, TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 1}):Play()
+                wait(0.3)
+                InitPopup:Destroy()
         end)
         local ServerHold = {}
         function ServerHold:Server(text, img)
