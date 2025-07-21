@@ -148,40 +148,40 @@ Library.Console = {
 }
 
 Library.Theme = {
-        -- Professional Dark Theme - Optimized for Executors
-        BackGround1 = Color3.fromRGB(18, 18, 18);      -- Primary Background
-        BackGround2 = Color3.fromRGB(28, 28, 28);      -- Secondary Background
-        BackGround3 = Color3.fromRGB(38, 38, 38);      -- Tertiary Background
-        Background = Color3.fromRGB(18, 18, 18);       -- Alias for compatibility
+        -- Original Theme Colors - Restored from Source
+        BackGround1 = Color3.fromRGB(47, 47, 47);      -- Primary Background
+        BackGround2 = Color3.fromRGB(38, 38, 38);      -- Secondary Background
+        BackGround3 = Color3.fromRGB(38, 38, 38);      -- Tertiary Background (same as BackGround2)
+        Background = Color3.fromRGB(47, 47, 47);       -- Alias for compatibility
         
-        -- Modern Accent System
-        Outline = Color3.fromRGB(55, 55, 55);          -- Border Color
-        Selected = Color3.fromRGB(0, 162, 255);        -- Primary Accent (Modern Blue)
-        Accent = Color3.fromRGB(0, 162, 255);          -- Alias for compatibility
+        -- Original Accent System
+        Outline = Color3.fromRGB(30, 87, 75);          -- Original teal outline
+        Selected = Color3.fromRGB(18, 161, 130);       -- Original teal selection
+        Accent = Color3.fromRGB(18, 161, 130);         -- Alias for compatibility
         
         -- Enhanced Color Palette
         Success = Color3.fromRGB(76, 175, 80);         -- Green for success states
         Warning = Color3.fromRGB(255, 193, 7);         -- Amber for warnings
         Error = Color3.fromRGB(244, 67, 54);           -- Red for errors
         
-        -- Typography System
+        -- Original Typography System
         TextColor = Color3.fromRGB(255, 255, 255);     -- Primary Text
         TextColorDim = Color3.fromRGB(180, 180, 180);  -- Secondary Text
-        Font = Enum.Font.Gotham;                       -- Professional Font
+        Font = "Montserrat";                           -- Original font from source
         TextSize = 14;
         
-        -- Animation Timings - Refined for Smooth UX
-        TabOptionsHoverTween = 0.15;
-        TabOptionsSelectTween = 0.2;
-        TabOptionsUnSelectTween = 0.15;
+        -- Original Animation Timings - Restored from Source
+        TabOptionsHoverTween = 0.3;
+        TabOptionsSelectTween = 0.3;
+        TabOptionsUnSelectTween = 0.2;
         
-        TabTween = 0.3;
-        SubtabTween = 0.25;
-        SubtabbarTween = 0.3;
-        CloseOpenTween = 0.4;
+        TabTween = 0.5;
+        SubtabTween = 0.35;
+        SubtabbarTween = 0.4;
+        CloseOpenTween = 0.8;
         
-        ToggleTween = 0.15;
-        SliderTween = 0.1;
+        ToggleTween = 0.2;
+        SliderTween = 0.07;
         
         -- ESP Specific Colors
         ESPBox = Color3.fromRGB(0, 162, 255);
@@ -192,6 +192,80 @@ Library.Theme = {
         ESPSkeleton = Color3.fromRGB(255, 255, 255);
         ESPChams = Color3.fromRGB(139, 69, 139);
 };
+
+-- Utility Functions for ESP Preview
+local Utility = {}
+
+function Utility:Size(xScale, xOffset, yScale, yOffset, instance)
+    if instance then
+        local x = xScale * instance.Size.X + xOffset
+        local y = yScale * instance.Size.Y + yOffset
+        return Vector2.new(x, y)
+    else
+        local vx, vy = CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.Y
+        local x = xScale * vx + xOffset
+        local y = yScale * vy + yOffset
+        return Vector2.new(x, y)
+    end
+end
+
+function Utility:Position(xScale, xOffset, yScale, yOffset, instance)
+    if instance then
+        local x = instance.Position.X + xScale * instance.Size.X + xOffset
+        local y = instance.Position.Y + yScale * instance.Size.Y + yOffset
+        return Vector2.new(x, y)
+    else
+        local vx, vy = CurrentCamera.ViewportSize.X, CurrentCamera.ViewportSize.Y
+        local x = xScale * vx + xOffset
+        local y = yScale * vy + yOffset
+        return Vector2.new(x, y)
+    end
+end
+
+function Utility:Create(instanceType, instanceOffset, instanceProperties)
+    local instance = nil
+    
+    if instanceType == "Frame" or instanceType == "frame" then
+        instance = DrawingAPI.Create("Square", {
+            Visible = true,
+            Filled = true,
+            Thickness = 0,
+            Color = Color3.fromRGB(255, 255, 255),
+            Size = Vector2.new(100, 100),
+            Position = Vector2.new(0, 0),
+            ZIndex = 50,
+            Transparency = 1
+        })
+    elseif instanceType == "TextLabel" or instanceType == "textlabel" then
+        instance = DrawingAPI.Create("Text", {
+            Font = Drawing and Drawing.Fonts and Drawing.Fonts.UI or 2,
+            Visible = true,
+            Outline = true,
+            Center = false,
+            Color = Color3.fromRGB(255, 255, 255),
+            ZIndex = 50,
+            Transparency = 1
+        })
+    end
+    
+    if instance and instanceProperties then
+        for property, value in pairs(instanceProperties) do
+            pcall(function()
+                instance[property] = value
+            end)
+        end
+    end
+    
+    return instance
+end
+
+function Utility:ColorLerp(t, color1, color2)
+    return Color3.new(
+        color1.R + (color2.R - color1.R) * t,
+        color1.G + (color2.G - color1.G) * t,
+        color1.B + (color2.B - color1.B) * t
+    )
+end
 
 -- Professional ESP Management System
 Library.ESP = {
@@ -407,870 +481,237 @@ function Library:CreateWindow(Name, Toggle, keybind)
         Window.ScreenGui.ResetOnSpawn = false;
         Window.ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global;
 
-        -- Professional ESP Preview System
-        Window.ESPPreview = {};
-        
-        -- ESP Configuration
-        Window.ESPPreview.Settings = {
-            Box = true,
-            Name = true,
-            Health = true,
-            Distance = true,
-            Skeleton = false
+        -- Professional ESP Preview System with Drawing API Integration
+        Window.ESPPreview = {
+            Size = {X = 5, Y = 0},
+            Color1 = Library.Theme.ESPHealthGreen,
+            Color2 = Library.Theme.ESPHealthRed, 
+            HealthBarFade = 0,
+            Fading = false,
+            State = false,
+            Visible = true,
+            Drawings = {},
+            Settings = {
+                Box = true,
+                Name = true, 
+                Health = true,
+                Distance = true,
+                Skeleton = false,
+                Chams = false
+            }
         };
         
-        -- Health tracking variables for realistic simulation
-        Window.ESPPreview.CurrentHealth = 85;
-        Window.ESPPreview.MaxHealth = 100;
-        Window.ESPPreview.HealthDecayRate = 0.1;
-        
-        -- Main ESP Preview Window - Professional Design
-        Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
-        Window.ESPPreview.Main.Size = UDim2.fromOffset(280, 420);
-        Window.ESPPreview.Main.Position = UDim2.fromOffset(950, 100);
-        Window.ESPPreview.Main.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.Main.ClipsDescendants = true;
-        Window.ESPPreview.Main.Visible = false;
-        Window.ESPPreview.Main.BorderSizePixel = 0;
-
-        Window.ESPPreview.UICorner = Instance.new("UICorner", Window.ESPPreview.Main);
-        Window.ESPPreview.UICorner.CornerRadius = UDim.new(0, 8);
-
-        Window.ESPPreview.UIStroke = Instance.new("UIStroke", Window.ESPPreview.Main);
-        Window.ESPPreview.UIStroke.Color = Library.Theme.Outline;
-        Window.ESPPreview.UIStroke.Thickness = 2;
-        Window.ESPPreview.UIStroke.ApplyStrokeMode = "Border";
-
-        -- Professional Header
-        Window.ESPPreview.Header = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.Header.Size = UDim2.fromOffset(280, 35);
-        Window.ESPPreview.Header.Position = UDim2.fromOffset(0, 0);
-        Window.ESPPreview.Header.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.Header.BorderSizePixel = 0;
-
-        Window.ESPPreview.HeaderCorner = Instance.new("UICorner", Window.ESPPreview.Header);
-        Window.ESPPreview.HeaderCorner.CornerRadius = UDim.new(0, 8);
-
-        Window.ESPPreview.Title = Instance.new("TextLabel", Window.ESPPreview.Header);
-        Window.ESPPreview.Title.Size = UDim2.fromScale(1, 1);
-        Window.ESPPreview.Title.BackgroundTransparency = 1;
-        Window.ESPPreview.Title.Text = "ESP Preview";
-        Window.ESPPreview.Title.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.Title.TextSize = 16;
-        Window.ESPPreview.Title.Font = Library.Theme.Font;
-        Window.ESPPreview.Title.TextXAlignment = Enum.TextXAlignment.Center;
-
-        -- Professional ESP Display Viewport
-        Window.ESPPreview.Viewport = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.Viewport.Size = UDim2.fromOffset(260, 280);
-        Window.ESPPreview.Viewport.Position = UDim2.fromOffset(10, 45);
-        Window.ESPPreview.Viewport.BackgroundColor3 = Library.Theme.BackGround3;
-        Window.ESPPreview.Viewport.BorderSizePixel = 0;
-
-        Window.ESPPreview.ViewportCorner = Instance.new("UICorner", Window.ESPPreview.Viewport);
-        Window.ESPPreview.ViewportCorner.CornerRadius = UDim.new(0, 6);
-
-        Window.ESPPreview.ViewportStroke = Instance.new("UIStroke", Window.ESPPreview.Viewport);
-        Window.ESPPreview.ViewportStroke.Color = Library.Theme.Outline;
-        Window.ESPPreview.ViewportStroke.Thickness = 1;
-
-        -- Create Professional Humanoid Figure
-        -- Humanoid Head
-        Window.ESPPreview.HumanoidHead = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.HumanoidHead.Size = UDim2.fromOffset(25, 25);
-        Window.ESPPreview.HumanoidHead.Position = UDim2.fromOffset(117, 50);
-        Window.ESPPreview.HumanoidHead.BackgroundColor3 = Color3.fromRGB(255, 204, 153);
-        Window.ESPPreview.HumanoidHead.BorderSizePixel = 0;
-
-        local headCorner = Instance.new("UICorner", Window.ESPPreview.HumanoidHead);
-        headCorner.CornerRadius = UDim.new(0.5, 0);
-
-        -- Humanoid Torso
-        Window.ESPPreview.HumanoidTorso = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.HumanoidTorso.Size = UDim2.fromOffset(30, 45);
-        Window.ESPPreview.HumanoidTorso.Position = UDim2.fromOffset(115, 75);
-        Window.ESPPreview.HumanoidTorso.BackgroundColor3 = Color3.fromRGB(70, 130, 180);
-        Window.ESPPreview.HumanoidTorso.BorderSizePixel = 0;
-
-        local torsoCorner = Instance.new("UICorner", Window.ESPPreview.HumanoidTorso);
-        torsoCorner.CornerRadius = UDim.new(0, 3);
-
-        -- Humanoid Arms
-        Window.ESPPreview.LeftArm = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.LeftArm.Size = UDim2.fromOffset(8, 35);
-        Window.ESPPreview.LeftArm.Position = UDim2.fromOffset(105, 80);
-        Window.ESPPreview.LeftArm.BackgroundColor3 = Color3.fromRGB(255, 204, 153);
-        Window.ESPPreview.LeftArm.BorderSizePixel = 0;
-
-        Window.ESPPreview.RightArm = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.RightArm.Size = UDim2.fromOffset(8, 35);
-        Window.ESPPreview.RightArm.Position = UDim2.fromOffset(147, 80);
-        Window.ESPPreview.RightArm.BackgroundColor3 = Color3.fromRGB(255, 204, 153);
-        Window.ESPPreview.RightArm.BorderSizePixel = 0;
-
-        -- Humanoid Legs
-        Window.ESPPreview.LeftLeg = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.LeftLeg.Size = UDim2.fromOffset(12, 40);
-        Window.ESPPreview.LeftLeg.Position = UDim2.fromOffset(118, 120);
-        Window.ESPPreview.LeftLeg.BackgroundColor3 = Color3.fromRGB(139, 69, 19);
-        Window.ESPPreview.LeftLeg.BorderSizePixel = 0;
-
-        Window.ESPPreview.RightLeg = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.RightLeg.Size = UDim2.fromOffset(12, 40);
-        Window.ESPPreview.RightLeg.Position = UDim2.fromOffset(130, 120);
-        Window.ESPPreview.RightLeg.BackgroundColor3 = Color3.fromRGB(139, 69, 19);
-        Window.ESPPreview.RightLeg.BorderSizePixel = 0;
-
-        -- ESP Box around humanoid
-        Window.ESPPreview.ESPBox = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.ESPBox.Size = UDim2.fromOffset(70, 130);
-        Window.ESPPreview.ESPBox.Position = UDim2.fromOffset(95, 45);
-        Window.ESPPreview.ESPBox.BackgroundTransparency = 1;
-        Window.ESPPreview.ESPBox.BorderSizePixel = 0;
-
-        Window.ESPPreview.ESPBoxStroke = Instance.new("UIStroke", Window.ESPPreview.ESPBox);
-        Window.ESPPreview.ESPBoxStroke.Color = Library.Theme.ESPBox;
-        Window.ESPPreview.ESPBoxStroke.Thickness = 2;
-
-        -- Health Bar Background
-        Window.ESPPreview.HealthBarBG = Instance.new("Frame", Window.ESPPreview.Viewport);
-        Window.ESPPreview.HealthBarBG.Size = UDim2.fromOffset(6, 130);
-        Window.ESPPreview.HealthBarBG.Position = UDim2.fromOffset(85, 45);
-        Window.ESPPreview.HealthBarBG.BackgroundColor3 = Color3.fromRGB(0, 0, 0);
-        Window.ESPPreview.HealthBarBG.BorderSizePixel = 0;
-
-        -- Actual Health Bar
-        Window.ESPPreview.HealthBar = Instance.new("Frame", Window.ESPPreview.HealthBarBG);
-        Window.ESPPreview.HealthBar.Size = UDim2.fromOffset(4, 110);
-        Window.ESPPreview.HealthBar.Position = UDim2.fromOffset(1, 19);
-        Window.ESPPreview.HealthBar.BackgroundColor3 = Library.Theme.ESPHealthGreen;
-        Window.ESPPreview.HealthBar.BorderSizePixel = 0;
-
-        -- Player Name Above Humanoid
-        Window.ESPPreview.PlayerName = Instance.new("TextLabel", Window.ESPPreview.Viewport);
-        Window.ESPPreview.PlayerName.Size = UDim2.fromOffset(100, 20);
-        Window.ESPPreview.PlayerName.Position = UDim2.fromOffset(80, 25);
-        Window.ESPPreview.PlayerName.BackgroundTransparency = 1;
-        Window.ESPPreview.PlayerName.Text = "Player123";
-        Window.ESPPreview.PlayerName.TextColor3 = Library.Theme.ESPText;
-        Window.ESPPreview.PlayerName.TextSize = 14;
-        Window.ESPPreview.PlayerName.Font = Library.Theme.Font;
-        Window.ESPPreview.PlayerName.TextXAlignment = Enum.TextXAlignment.Center;
-
-        -- Distance Below Humanoid
-        Window.ESPPreview.DistanceLabel = Instance.new("TextLabel", Window.ESPPreview.Viewport);
-        Window.ESPPreview.DistanceLabel.Size = UDim2.fromOffset(60, 16);
-        Window.ESPPreview.DistanceLabel.Position = UDim2.fromOffset(100, 185);
-        Window.ESPPreview.DistanceLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.DistanceLabel.Text = "25m";
-        Window.ESPPreview.DistanceLabel.TextColor3 = Library.Theme.ESPText;
-        Window.ESPPreview.DistanceLabel.TextSize = 12;
-        Window.ESPPreview.DistanceLabel.Font = Library.Theme.Font;
-        Window.ESPPreview.DistanceLabel.TextXAlignment = Enum.TextXAlignment.Center;
-
-        -- Weapon Label
-        Window.ESPPreview.WeaponLabel = Instance.new("TextLabel", Window.ESPPreview.Viewport);
-        Window.ESPPreview.WeaponLabel.Size = UDim2.fromOffset(80, 16);
-        Window.ESPPreview.WeaponLabel.Position = UDim2.fromOffset(90, 205);
-        Window.ESPPreview.WeaponLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.WeaponLabel.Text = "AK-47";
-        Window.ESPPreview.WeaponLabel.TextColor3 = Library.Theme.ESPText;
-        Window.ESPPreview.WeaponLabel.TextSize = 11;
-        Window.ESPPreview.WeaponLabel.Font = Library.Theme.Font;
-        Window.ESPPreview.WeaponLabel.TextXAlignment = Enum.TextXAlignment.Center;
-
-        -- ESP Controls Section
-        Window.ESPPreview.ControlsFrame = Instance.new("Frame", Window.ESPPreview.Main);
-        Window.ESPPreview.ControlsFrame.Size = UDim2.fromOffset(260, 85);
-        Window.ESPPreview.ControlsFrame.Position = UDim2.fromOffset(10, 330);
-        Window.ESPPreview.ControlsFrame.BackgroundColor3 = Library.Theme.BackGround2;
-        Window.ESPPreview.ControlsFrame.BorderSizePixel = 0;
-
-        local controlsCorner = Instance.new("UICorner", Window.ESPPreview.ControlsFrame);
-        controlsCorner.CornerRadius = UDim.new(0, 6);
-
-        -- ESP Options Title
-        Window.ESPPreview.OptionsTitle = Instance.new("TextLabel", Window.ESPPreview.ControlsFrame);
-        Window.ESPPreview.OptionsTitle.Size = UDim2.fromOffset(200, 20);
-        Window.ESPPreview.OptionsTitle.Position = UDim2.fromOffset(10, 5);
-        Window.ESPPreview.OptionsTitle.BackgroundTransparency = 1;
-        Window.ESPPreview.OptionsTitle.Text = "ESP Settings";
-        Window.ESPPreview.OptionsTitle.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.OptionsTitle.TextSize = 14;
-        Window.ESPPreview.OptionsTitle.Font = Library.Theme.Font;
-        Window.ESPPreview.OptionsTitle.TextXAlignment = Enum.TextXAlignment.Left;
-
-        -- Create ESP Toggle Buttons
-        local toggleOptions = {"Box", "Name", "Health", "Distance", "Skeleton"}
-        local togglePositions = {
-            {x = 10, y = 30},
-            {x = 70, y = 30},
-            {x = 130, y = 30},
-            {x = 190, y = 30},
-            {x = 10, y = 55}
-        }
-
-        Window.ESPPreview.Toggles = {}
-        
-        for i, option in ipairs(toggleOptions) do
-            local pos = togglePositions[i]
-            local enabled = Window.ESPPreview.Settings[option]
+        -- ESP Preview Window Creation with Drawing API
+        if DrawingAPI.Available then
+            -- Main ESP Preview Frame
+            local esp_frame = DrawingAPI.Create("Square", {
+                Size = Vector2.new(236, 339),
+                Position = Vector2.new(930, 100), -- Position to right of main window
+                Color = Library.Theme.Outline,
+                Filled = true,
+                Visible = false,
+                ZIndex = 100
+            })
             
-            local toggle = Instance.new("TextButton", Window.ESPPreview.ControlsFrame)
-            toggle.Size = UDim2.fromOffset(50, 20)
-            toggle.Position = UDim2.fromOffset(pos.x, pos.y)
-            toggle.BackgroundColor3 = enabled and Library.Theme.Selected or Library.Theme.BackGround3
-            toggle.Text = option
-            toggle.TextColor3 = Library.Theme.TextColor
-            toggle.TextSize = 11
-            toggle.Font = Library.Theme.Font
-            toggle.BorderSizePixel = 0
-
-            local toggleCorner = Instance.new("UICorner", toggle)
-            toggleCorner.CornerRadius = UDim.new(0, 4)
-
-            Window.ESPPreview.Toggles[option] = toggle
+            -- Inner frame
+            local esp_inner = DrawingAPI.Create("Square", {
+                Size = Vector2.new(234, 337), 
+                Position = Vector2.new(931, 101),
+                Color = Library.Theme.BackGround1,
+                Filled = true,
+                Visible = false,
+                ZIndex = 101
+            })
             
-            toggle.MouseButton1Click:Connect(function()
-                Window.ESPPreview.Settings[option] = not Window.ESPPreview.Settings[option]
-                toggle.BackgroundColor3 = Window.ESPPreview.Settings[option] and Library.Theme.Selected or Library.Theme.BackGround3
-                Window.ESPPreview:UpdateVisibility()
-            end)
-        end
-
-        -- Professional Health Tracking System with Real-time Updates
-        Window.ESPPreview.HealthTracking = {
-            CurrentHealth = 85,
-            MaxHealth = 100,
-            HealthDecayRate = 0.02,
-            LastUpdate = tick(),
-            LastChange = tick(),
-            Direction = -1, -- -1 for decreasing, 1 for increasing
+            -- ESP Preview Title
+            local esp_title = DrawingAPI.Create("Text", {
+                Text = "ESP Preview",
+                Position = Vector2.new(940, 110),
+                Size = 14,
+                Color = Library.Theme.TextColor,
+                Font = Drawing and Drawing.Fonts and Drawing.Fonts.UI or 2,
+                Visible = false,
+                ZIndex = 102
+            })
             
-            UpdateHealth = function(self)
-                local currentTime = tick()
-                local deltaTime = currentTime - self.LastUpdate
-                self.LastUpdate = currentTime
+            -- ESP Box Preview (Humanoid outline)
+            local esp_box = DrawingAPI.Create("Square", {
+                Size = Vector2.new(80, 120),
+                Position = Vector2.new(1010, 160),
+                Color = Library.Theme.ESPBox,
+                Filled = false,
+                Thickness = 2,
+                Visible = false,
+                ZIndex = 102
+            })
+            
+            -- ESP Name Text
+            local esp_name = DrawingAPI.Create("Text", {
+                Text = "Player",
+                Position = Vector2.new(1050, 140),
+                Size = 12,
+                Color = Library.Theme.ESPText,
+                Font = Drawing and Drawing.Fonts and Drawing.Fonts.UI or 2,
+                Center = true,
+                Visible = false,
+                ZIndex = 102
+            })
+            
+            -- ESP Distance Text  
+            local esp_distance = DrawingAPI.Create("Text", {
+                Text = "25m",
+                Position = Vector2.new(1050, 290),
+                Size = 12,
+                Color = Library.Theme.ESPText,
+                Font = Drawing and Drawing.Fonts and Drawing.Fonts.UI or 2,
+                Center = true,
+                Visible = false,
+                ZIndex = 102
+            })
+            
+            -- ESP Health Bar Background
+            local health_bg = DrawingAPI.Create("Square", {
+                Size = Vector2.new(6, 120),
+                Position = Vector2.new(1000, 160),
+                Color = Color3.fromRGB(0, 0, 0),
+                Filled = true,
+                Visible = false,
+                ZIndex = 102
+            })
+            
+            -- ESP Health Bar Fill
+            local health_fill = DrawingAPI.Create("Square", {
+                Size = Vector2.new(4, 85), -- 85% health
+                Position = Vector2.new(1001, 195), -- Adjusted for 85% 
+                Color = Library.Theme.ESPHealthGreen,
+                Filled = true,
+                Visible = false,
+                ZIndex = 103
+            })
+            
+            -- Store ESP elements
+            Window.ESPPreview.Drawings = {
+                Frame = esp_frame,
+                Inner = esp_inner,
+                Title = esp_title,
+                Box = esp_box,
+                Name = esp_name,
+                Distance = esp_distance,
+                HealthBG = health_bg,
+                HealthFill = health_fill
+            }
+            
+            -- Health animation system
+            Window.ESPPreview.HealthBarFade = 0
+            Window.ESPPreview.HealthConnection = nil
+            
+            -- Health bar animation update
+            function Window.ESPPreview:UpdateHealthBar()
+                if not DrawingAPI.Available or not Window.ESPPreview.HealthConnection then return end
                 
-                -- Change direction occasionally for realistic simulation
-                if currentTime - self.LastChange > 3 then -- Change every 3 seconds
-                    if math.random(1, 10) <= 3 then -- 30% chance to change direction
-                        self.Direction = self.Direction * -1
-                        self.LastChange = currentTime
-                    end
+                Window.ESPPreview.HealthBarFade = Window.ESPPreview.HealthBarFade + 0.015
+                local smoothened = (math.acos(math.cos(Window.ESPPreview.HealthBarFade * math.pi)) / math.pi)
+                local healthPercent = 0.3 + (0.7 * smoothened) -- Health between 30-100%
+                
+                -- Update health bar size and color
+                local barHeight = 120 * healthPercent
+                local healthColor = Library.Theme.ESPHealthGreen
+                
+                if healthPercent <= 0.3 then
+                    healthColor = Library.Theme.ESPHealthRed
+                elseif healthPercent <= 0.6 then
+                    healthColor = Library.Theme.ESPHealthYellow  
                 end
                 
-                -- Gradual health changes based on direction
-                if self.Direction == -1 then
-                    -- Decreasing health
-                    self.CurrentHealth = math.max(10, self.CurrentHealth - 0.5)
+                -- Update health fill
+                if Window.ESPPreview.Drawings.HealthFill then
+                    Window.ESPPreview.Drawings.HealthFill.Size = Vector2.new(4, barHeight)
+                    Window.ESPPreview.Drawings.HealthFill.Position = Vector2.new(1001, 280 - barHeight)
+                    Window.ESPPreview.Drawings.HealthFill.Color = healthColor
+                end
+            end
+        else
+            -- Fallback UI-based ESP Preview for executors without Drawing API
+            Window.ESPPreview.Main = Instance.new("Frame", Window.ScreenGui);
+            Window.ESPPreview.Main.Size = UDim2.fromOffset(236, 339);
+            Window.ESPPreview.Main.Position = UDim2.fromOffset(930, 100);
+            Window.ESPPreview.Main.BackgroundColor3 = Library.Theme.BackGround1;
+            Window.ESPPreview.Main.BorderSizePixel = 1;
+            Window.ESPPreview.Main.BorderColor3 = Library.Theme.Outline;
+            Window.ESPPreview.Main.Visible = false;
+        end
+        
+        -- ESP Preview Control Methods
+        function Window:ShowESPPreview()
+            if DrawingAPI.Available and Window.ESPPreview.Drawings then
+                for _, drawing in pairs(Window.ESPPreview.Drawings) do
+                    if drawing and drawing.Visible ~= nil then
+                        drawing.Visible = true
+                    end
+                end
+                -- Start health animation
+                if not Window.ESPPreview.HealthConnection then
+                    Window.ESPPreview.HealthConnection = RunService.Heartbeat:Connect(function()
+                        pcall(function() Window.ESPPreview:UpdateHealthBar() end)
+                    end)
+                end
+            elseif Window.ESPPreview.Main then
+                Window.ESPPreview.Main.Visible = true
+            end
+        end
+        
+        function Window:HideESPPreview()
+            if DrawingAPI.Available and Window.ESPPreview.Drawings then
+                for _, drawing in pairs(Window.ESPPreview.Drawings) do
+                    if drawing and drawing.Visible ~= nil then
+                        drawing.Visible = false
+                    end
+                end
+                -- Stop health animation
+                if Window.ESPPreview.HealthConnection then
+                    Window.ESPPreview.HealthConnection:Disconnect()
+                    Window.ESPPreview.HealthConnection = nil
+                end
+            elseif Window.ESPPreview.Main then
+                Window.ESPPreview.Main.Visible = false
+            end
+        end
+        
+        function Window:ToggleESPPreview()
+            if DrawingAPI.Available and Window.ESPPreview.Drawings then
+                local isVisible = Window.ESPPreview.Drawings.Frame and Window.ESPPreview.Drawings.Frame.Visible
+                if isVisible then
+                    Window:HideESPPreview()
                 else
-                    -- Increasing health
-                    self.CurrentHealth = math.min(self.MaxHealth, self.CurrentHealth + 0.3)
+                    Window:ShowESPPreview()
                 end
-                
-                -- Update health bar visual
-                Window.ESPPreview:UpdateHealthBar()
-            end
-        }
-
-        -- Update health bar visual
-        Window.ESPPreview.UpdateHealthBar = function(self)
-            local healthPercent = self.HealthTracking.CurrentHealth / self.HealthTracking.MaxHealth
-            local barHeight = math.floor(healthPercent * 110)
-            
-            -- Determine health color
-            local healthColor
-            if healthPercent > 0.6 then
-                healthColor = Library.Theme.ESPHealthGreen
-            elseif healthPercent > 0.3 then
-                healthColor = Library.Theme.ESPHealthYellow
-            else
-                healthColor = Library.Theme.ESPHealthRed
-            end
-            
-            -- Update health bar
-            self.HealthBar.Size = UDim2.fromOffset(4, barHeight)
-            self.HealthBar.Position = UDim2.fromOffset(1, 130 - barHeight - 1)
-            self.HealthBar.BackgroundColor3 = healthColor
-        end
-
-        -- Update ESP element visibility
-        Window.ESPPreview.UpdateVisibility = function(self)
-            local settings = self.Settings
-            
-            -- Update ESP elements based on settings
-            self.ESPBox.Visible = settings.Box
-            self.PlayerName.Visible = settings.Name
-            self.HealthBarBG.Visible = settings.Health
-            self.HealthBar.Visible = settings.Health
-            self.DistanceLabel.Visible = settings.Distance
-        end
-
-        -- Initialize visibility
-        Window.ESPPreview:UpdateVisibility()
-
-        -- Start real-time health tracking with heartbeat connection
-        if RunService and RunService.Heartbeat then
-            Window.ESPPreview.HealthConnection = RunService.Heartbeat:Connect(function()
+            elseif Window.ESPPreview.Main then
                 if Window.ESPPreview.Main.Visible then
-                    Window.ESPPreview.HealthTracking:UpdateHealth()
-                end
-            end)
-        end
-
-        -- ESP Preview Toggle Visibility Function
-        Window.ESPPreview.SetVisible = function(visible)
-            Window.ESPPreview.Main.Visible = visible;
-        end;
-
-        -- Enhanced ESP Preview Methods for Library Integration
-        Window.ESPPreview.CreateESP = function(self, targetPlayer)
-            -- Integration with Library.ESP system
-            if targetPlayer and Library.ESP then
-                local character = targetPlayer.Character
-                if character and character:FindFirstChild("HumanoidRootPart") then
-                    local humanoidRootPart = character.HumanoidRootPart
-                    local humanoid = character:FindFirstChild("Humanoid")
-                    
-                    -- Create ESP components using Library.ESP methods
-                    local espBox = Library.ESP:CreateESPBox(
-                        Vector2.new(0, 0), 
-                        Vector2.new(100, 150), 
-                        Library.Theme.ESPBox
-                    )
-                    
-                    local nameTag = Library.ESP:CreateESPText(
-                        Vector2.new(0, -20),
-                        targetPlayer.Name,
-                        Library.Theme.ESPText,
-                        14
-                    )
-                    
-                    if humanoid then
-                        local healthBar = Library.ESP:CreateESPHealthBar(
-                            Vector2.new(-10, 0),
-                            humanoid.Health,
-                            humanoid.MaxHealth
-                        )
-                    end
-                    
-                    return {
-                        Box = espBox,
-                        Name = nameTag,
-                        Health = healthBar,
-                        Player = targetPlayer
-                    }
+                    Window:HideESPPreview()
+                else
+                    Window:ShowESPPreview()
                 end
             end
-            return nil
-        end;
-
-        -- Create ESP Options Function
-        Window.ESPPreview.CreateESPOptions = function()
-            -- Create ESP option toggles in LeftPanel
-            local options = {"Box", "Name", "Health", "Distance", "Skeleton"}
-            local yPos = 25
-            
-            for i, optionName in ipairs(options) do
-                local enabled = Window.ESPPreview.Settings[optionName]
-                
-                local optionFrame = Instance.new("Frame", Window.ESPPreview.LeftPanel)
-                optionFrame.Size = UDim2.fromOffset(165, 28)
-                optionFrame.Position = UDim2.fromOffset(8, yPos)
-                optionFrame.BackgroundColor3 = Library.Theme.BackGround1
-                optionFrame.BorderSizePixel = 0
-                
-                local optionCorner = Instance.new("UICorner", optionFrame)
-                optionCorner.CornerRadius = UDim.new(0, 4)
-
-                local optionStroke = Instance.new("UIStroke", optionFrame)
-                optionStroke.Color = enabled and Library.Theme.Selected or Library.Theme.Outline
-                optionStroke.Thickness = 1
-
-                local optionLabel = Instance.new("TextLabel", optionFrame)
-                optionLabel.Size = UDim2.fromOffset(120, 28)
-                optionLabel.Position = UDim2.fromOffset(10, 0)
-                optionLabel.BackgroundTransparency = 1
-                optionLabel.Text = optionName
-                optionLabel.TextColor3 = Library.Theme.TextColor
-                optionLabel.TextSize = 13
-                optionLabel.Font = Library.Theme.Font
-                optionLabel.TextXAlignment = Enum.TextXAlignment.Left
-
-                local optionToggle = Instance.new("Frame", optionFrame)
-                optionToggle.Size = UDim2.fromOffset(16, 16)
-                optionToggle.Position = UDim2.fromOffset(135, 6)
-                optionToggle.BackgroundColor3 = enabled and Library.Theme.Selected or Library.Theme.BackGround2
-                optionToggle.BorderSizePixel = 0
-
-                local toggleCorner = Instance.new("UICorner", optionToggle)
-                toggleCorner.CornerRadius = UDim.new(0, 3)
-
-                local toggleStroke = Instance.new("UIStroke", optionToggle)
-                toggleStroke.Color = Library.Theme.Selected
-                toggleStroke.Thickness = 1
-
-                -- Add checkmark when enabled
-                if enabled then
-                    local checkmark = Instance.new("TextLabel", optionToggle)
-                    checkmark.Size = UDim2.fromScale(1, 1)
-                    checkmark.BackgroundTransparency = 1
-                    checkmark.Text = "✓"
-                    checkmark.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    checkmark.TextSize = 12
-                    checkmark.Font = Library.Theme.Font
-                    checkmark.TextXAlignment = Enum.TextXAlignment.Center
-                    checkmark.Name = "Checkmark"
-                end
-
-                -- Make clickable
-                local optionButton = Instance.new("TextButton", optionFrame)
-                optionButton.Size = UDim2.fromScale(1, 1)
-                optionButton.BackgroundTransparency = 1
-                optionButton.Text = ""
-                
-                optionButton.MouseButton1Click:Connect(function()
-                    Window.ESPPreview.Settings[optionName] = not Window.ESPPreview.Settings[optionName]
-                    local newEnabled = Window.ESPPreview.Settings[optionName]
-                    
-                    optionStroke.Color = newEnabled and Library.Theme.Selected or Library.Theme.Outline
-                    optionToggle.BackgroundColor3 = newEnabled and Library.Theme.Selected or Library.Theme.BackGround2
-                    
-                    -- Update checkmark
-                    local checkmark = optionToggle:FindFirstChild("Checkmark")
-                    if newEnabled and not checkmark then
-                        checkmark = Instance.new("TextLabel", optionToggle)
-                        checkmark.Size = UDim2.fromScale(1, 1)
-                        checkmark.BackgroundTransparency = 1
-                        checkmark.Text = "✓"
-                        checkmark.TextColor3 = Color3.fromRGB(255, 255, 255)
-                        checkmark.TextSize = 12
-                        checkmark.Font = Library.Theme.Font
-                        checkmark.TextXAlignment = Enum.TextXAlignment.Center
-                        checkmark.Name = "Checkmark"
-                    elseif not newEnabled and checkmark then
-                        checkmark:Destroy()
-                    end
-                    
-                    -- Call UpdateESP if it exists
-                    if Window.ESPPreview.UpdateESP then
-                        Window.ESPPreview.UpdateESP()
-                    end
-                end)
-                
-                yPos = yPos + 35
+        end
+        
+        function Window:SetESPSetting(setting, value)
+            if Window.ESPPreview.Settings[setting] ~= nil then
+                Window.ESPPreview.Settings[setting] = value
+                print("ESP " .. setting .. ":", value)
             end
         end
-
-        -- Update ESP Function
-        Window.ESPPreview.UpdateESP = function()
-            -- This function can be expanded to update visual elements based on settings
-            print("ESP Preview settings updated")
+        
+        function Window:GetESPSettings()
+            return Window.ESPPreview.Settings
         end
 
-        -- Create the ESP options
-        Window.ESPPreview.CreateESPOptions()
-
-        -- Instructions Section
-        Window.ESPPreview.Instructions = Instance.new("TextLabel", Window.ESPPreview.LeftPanel);
-        Window.ESPPreview.Instructions.Size = UDim2.fromOffset(165, 40);
-        Window.ESPPreview.Instructions.Position = UDim2.fromOffset(8, 210);
-        Window.ESPPreview.Instructions.BackgroundTransparency = 1;
-        Window.ESPPreview.Instructions.Text = "Toggle ESP options to see\nreal-time preview changes";
-        Window.ESPPreview.Instructions.TextColor3 = Color3.fromRGB(150, 150, 150);
-        Window.ESPPreview.Instructions.TextSize = 11;
-        Window.ESPPreview.Instructions.Font = Library.Theme.Font;
-        Window.ESPPreview.Instructions.TextXAlignment = Enum.TextXAlignment.Center;
-        Window.ESPPreview.Instructions.TextWrapped = true;
-
-        -- Viewport Color Selection (positioned below humanoid preview with proper spacing)
-        Window.ESPPreview.ViewportColor = Instance.new("Frame", Window.ESPPreview.RightPanel);
-        Window.ESPPreview.ViewportColor.Size = UDim2.fromOffset(165, 30);
-        Window.ESPPreview.ViewportColor.Position = UDim2.fromOffset(10, 275);
-        Window.ESPPreview.ViewportColor.BackgroundColor3 = Library.Theme.BackGround1;
-        Window.ESPPreview.ViewportColor.BorderSizePixel = 0;
-
-        Window.ESPPreview.ViewportCorner = Instance.new("UICorner", Window.ESPPreview.ViewportColor);
-        Window.ESPPreview.ViewportCorner.CornerRadius = UDim.new(0, 4);
-
-        Window.ESPPreview.ViewportStroke = Instance.new("UIStroke", Window.ESPPreview.ViewportColor);
-        Window.ESPPreview.ViewportStroke.Color = Library.Theme.Outline;
-        Window.ESPPreview.ViewportStroke.Thickness = 1;
-
-        Window.ESPPreview.ViewportLabel = Instance.new("TextLabel", Window.ESPPreview.ViewportColor);
-        Window.ESPPreview.ViewportLabel.Size = UDim2.fromOffset(100, 30);
-        Window.ESPPreview.ViewportLabel.Position = UDim2.fromOffset(8, 0);
-        Window.ESPPreview.ViewportLabel.BackgroundTransparency = 1;
-        Window.ESPPreview.ViewportLabel.Text = "Theme Color";
-        Window.ESPPreview.ViewportLabel.TextColor3 = Library.Theme.TextColor;
-        Window.ESPPreview.ViewportLabel.TextSize = 12;
-        Window.ESPPreview.ViewportLabel.Font = Library.Theme.Font;
-        Window.ESPPreview.ViewportLabel.TextXAlignment = Enum.TextXAlignment.Left;
-
-        Window.ESPPreview.ColorDisplay = Instance.new("Frame", Window.ESPPreview.ViewportColor);
-        Window.ESPPreview.ColorDisplay.Size = UDim2.fromOffset(45, 18);
-        Window.ESPPreview.ColorDisplay.Position = UDim2.fromOffset(115, 6);
-        Window.ESPPreview.ColorDisplay.BackgroundColor3 = Library.Theme.Selected;
-        Window.ESPPreview.ColorDisplay.BorderSizePixel = 0;
-
-        Window.ESPPreview.ColorCorner = Instance.new("UICorner", Window.ESPPreview.ColorDisplay);
-        Window.ESPPreview.ColorCorner.CornerRadius = UDim.new(0, 3);
-
-        Window.ESPPreview.ColorButton = Instance.new("TextButton", Window.ESPPreview.ColorDisplay);
-        Window.ESPPreview.ColorButton.Size = UDim2.fromScale(1, 1);
-        Window.ESPPreview.ColorButton.BackgroundTransparency = 1;
-        Window.ESPPreview.ColorButton.Text = "";
-
-        -- Connect color picker
-        Window.ESPPreview.ColorButton.MouseButton1Click:Connect(function()
-            if Window.ColorPickerSelected then
-                Window.ColorPickerSelected:Add("esp_viewport_color", function(color)
-                    Window.ESPPreview.ColorDisplay.BackgroundColor3 = color;
-                    Library.Theme.Selected = color;
-                    Window.ESPPreview.UpdateESP();
-                end);
-                if ColorPickerM and ColorPickerM.Main then
-                    if ColorPickerM.Main.Visible then
-                        CloseFrame(ColorPickerM.Main);
-                    else
-                        OpenFrame(ColorPickerM.Main);
-                    end
-                end
-            end
-        end);
-
-        -- ESP Preview Toggle Visibility Function
-        Window.ESPPreview.SetVisible = function(visible)
-            Window.ESPPreview.Main.Visible = visible;
-        end
-
-        -- Store connection for cleanup
-        table.insert(Library.Items, Window.ESPPreview.UpdateConnection);
-
-        function Window:CreateColorPicker()
-                local ColorPicker = { };
-                ColorPicker.Flag = nil;
-                ColorPicker.Color = nil;
-                ColorPicker.HuePosition = 0;
-
-                ColorPicker.Main = Instance.new("Frame", Window.ScreenGui);
-                ColorPicker.Main.Size = UDim2.fromOffset(266, 277);
-                ColorPicker.Main.BackgroundColor3 = Library.Theme.BackGround2
-                ColorPicker.Main.ClipsDescendants = true;
-                ColorPicker.Main.Name = "c"
-
-                ColorPicker.UICorner = Instance.new("UICorner", ColorPicker.Main);
-                ColorPicker.UICorner.CornerRadius = UDim.new(0, 4);
-
-                ColorPicker.UIStroke = Instance.new("UIStroke", ColorPicker.Main);
-                ColorPicker.UIStroke.Color = Library.Theme.Outline;
-                ColorPicker.UIStroke.Thickness = 1;
-                ColorPicker.UIStroke.ApplyStrokeMode = "Border";
-
-                local dragging2, dragInput2, dragStart2, startPos2
-                UserInputService.InputChanged:Connect(function(input)
-                        if input == dragInput2 and dragging2 then
-                                local delta = input.Position - dragStart2
-                                ColorPicker.Main.Position = UDim2.new(startPos2.X.Scale, startPos2.X.Offset + delta.X, startPos2.Y.Scale, startPos2.Y.Offset + delta.Y)
-                        end
-                end)
-
-                local dragStart2 = function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-                                dragging2 = true
-                                dragStart2 = input.Position
-                                startPos2 = ColorPicker.Main.Position
-
-                                input.Changed:Connect(function()
-                                        if input.UserInputState == Enum.UserInputState.End then
-                                                dragging2 = false
-                                        end
-                                end)
-                        end
-                end
-
-                local dragend2 = function(input)
-                        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-                                dragInput2 = input
-                        end
-                end
-
-                UserInputService.InputBegan:Connect(function(Key)
-                        if Key.KeyCode == Window.Keybind then
-                                if ColorPicker.Main.Visible then
-                                        CloseFrame(ColorPicker.Main);
-                                else
-                                        OpenFrame(ColorPicker.Main);
-                                end
-                        end
-                end)
-                
-                ColorPicker.Main.InputBegan:Connect(dragStart2);
-                ColorPicker.Main.InputChanged:Connect(dragend2);
-
-                ColorPicker.Frame = Instance.new("Frame", ColorPicker.Main);
-                ColorPicker.Frame.Size = UDim2.fromScale(1, 1);
-                ColorPicker.Frame.BackgroundTransparency = 1;
-
-                ColorPicker.Line = Instance.new("Frame", ColorPicker.Frame);
-                ColorPicker.Line.Position = UDim2.fromOffset(0, 34);
-                ColorPicker.Line.Size = UDim2.new(1, 0, 0, 1);
-                ColorPicker.Line.BorderSizePixel = 0;
-                ColorPicker.Line.BackgroundColor3 = Library.Theme.Outline;
-
-                ColorPicker.Lable = Instance.new("TextLabel", ColorPicker.Frame);
-                ColorPicker.Lable.Size = UDim2.fromOffset(116, 34);
-                ColorPicker.Lable.BackgroundTransparency = 1;
-                ColorPicker.Lable.RichText = true;
-                ColorPicker.Lable.Text = "<b>" .. "Colorpicker" .."</b>";
-                ColorPicker.Lable.Font = Enum.Font.Ubuntu;
-                ColorPicker.Lable.TextSize = 18;
-                ColorPicker.Lable.TextColor3 = Color3.fromRGB(255, 255, 255);
-
-                ColorPicker.Saturation = Instance.new("ImageButton", ColorPicker.Frame);
-                ColorPicker.Saturation.BackgroundTransparency = 0;
-                ColorPicker.Saturation.Position = UDim2.fromOffset(11, 45);
-                ColorPicker.Saturation.Size = UDim2.fromOffset(220, 220);
-                ColorPicker.Saturation.Image = "rbxassetid://13901004307";
-                ColorPicker.Saturation.AutoButtonColor = false;
-
-                ColorPicker.SaturationSelect = Instance.new("Frame", ColorPicker.Saturation);
-                ColorPicker.SaturationSelect.Size = UDim2.fromOffset(1, 1);
-                ColorPicker.SaturationSelect.BackgroundColor3 = Color3.fromRGB(255 ,255 ,255);
-                ColorPicker.SaturationSelect.BorderColor3 = Color3.fromRGB(0, 0, 0);
-
-                ColorPicker.Hue = Instance.new("TextButton", ColorPicker.Frame);
-                ColorPicker.Hue.Position = UDim2.fromOffset(237, 45);
-                ColorPicker.Hue.Size = UDim2.fromOffset(22, 193);
-                ColorPicker.Hue.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
-                ColorPicker.Hue.BorderSizePixel = 0;
-                ColorPicker.Hue.AutoButtonColor = false;
-                ColorPicker.Hue.Text = "";
-
-                ColorPicker.UiGradient = Instance.new("UIGradient", ColorPicker.Hue);
-                ColorPicker.UiGradient.Color = ColorSequence.new{ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 0, 0)), ColorSequenceKeypoint.new(0.17, Color3.fromRGB(255, 0, 255)), ColorSequenceKeypoint.new(0.33, Color3.fromRGB(0, 0, 255)), ColorSequenceKeypoint.new(0.50, Color3.fromRGB(0, 255, 255)), ColorSequenceKeypoint.new(0.67, Color3.fromRGB(0, 255, 0)), ColorSequenceKeypoint.new(0.83, Color3.fromRGB(255, 255, 0)), ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 0, 0))}
-                ColorPicker.UiGradient.Rotation = 90;
-
-                ColorPicker.HueSelect = Instance.new("Frame", ColorPicker.Hue);
-                ColorPicker.HueSelect.Size = UDim2.fromOffset(22, 1);
-                ColorPicker.HueSelect.BackgroundColor3 = Color3.fromRGB(255 ,255 ,255);
-                ColorPicker.HueSelect.BorderColor3 = Color3.fromRGB(0, 0, 0);
-
-                ColorPicker.View = Instance.new("Frame", ColorPicker.Frame);
-                ColorPicker.View.Position = UDim2.fromOffset(237, 243);
-                ColorPicker.View.Size = UDim2.fromOffset(22, 22);
-                ColorPicker.View.BackgroundColor3 = Color3.fromRGB(255 ,255 ,255);
-                ColorPicker.View.BorderSizePixel = 0;
-
-                local Hue, Sat, Val;
-
-                function ColorPicker:Set(color, transparency, ignore)
-                        transparency = transparency or 0;
-
-                        if type(color) == "table" then
-                                transparency = color.a or transparency;
-                                color = color.c or color;
-                        end;
-
-                        -- Handle nil color
-                        if not color then
-                                color = Color3.fromRGB(255, 255, 255);
-                        end
-
-                        -- Ensure color has ToHSV method
-                        if color and type(color) == "table" and not color.ToHSV then
-                                -- Add ToHSV method if missing
-                                color.ToHSV = function(self)
-                                    local r, g, b = self.r or self.R or 1, self.g or self.G or 1, self.b or self.B or 1
-                                    local max = math.max(r, g, b)
-                                    local min = math.min(r, g, b)
-                                    local h, s, v = 0, 0, max
-                                    
-                                    local delta = max - min
-                                    if max ~= 0 then s = delta / max end
-                                    
-                                    if delta ~= 0 then
-                                        if max == r then
-                                            h = (g - b) / delta
-                                            if g < b then h = h + 6 end
-                                        elseif max == g then
-                                            h = (b - r) / delta + 2
-                                        elseif max == b then
-                                            h = (r - g) / delta + 4
-                                        end
-                                        h = h / 6
-                                    end
-                                    
-                                    return h, s, v
-                                end
-                        end
-
-                        -- Safe ToHSV call with error handling
-                        local success, h, s, v = pcall(function() return color:ToHSV() end)
-                        if success then
-                                Hue, Sat, Val = h, s, v
-                        else
-                                Hue, Sat, Val = 0, 0, 1 -- Default values
-                        end
-
-                        ColorPicker.Color = color;
-                        ColorPicker.Transparency = transparency;
-
-                        if not ignore then
-                                ColorPicker.SaturationSelect.Position = UDim2.new(
-                                        math.clamp(Sat, 0, 1),
-                                        Sat < 1 and -1 or -3,
-                                        math.clamp(1 - Val, 0, 1),
-                                        1 - Val < 1 and -1 or -3
-                                );
-
-                                ColorPicker.HuePosition = Hue;
-
-                                ColorPicker.HueSelect.Position = UDim2.new(
-                                        0,
-                                        0,
-                                        math.clamp(1 - Hue, 0, 1),
-                                        1 - Hue < 1 and -1 or -2
-                                );
-
-                                Library.Flags[ColorPicker.Flag] = color;
-                        end;
-
-                        if ColorPicker.Flag then
-                                Library.Flags[ColorPicker.Flag] = color;
-                        end;
-
-                        if ColorPicker.CallBack then
-                                pcall(ColorPicker.CallBack, color);
-                        end;
-
-                        ColorPicker.Saturation.BackgroundColor3 = Color3.fromHSV(ColorPicker.HuePosition, 1, 1);
-                        ColorPicker.View.BackgroundColor3 = color;
-                end
-
-                function ColorPicker:Add(Flag, CallBack)
-                        ColorPicker.Flag = Flag;
-                        ColorPicker.CallBack = CallBack;
-                        
-                        -- Get flag value or use default color with safe fallback
-                        local flagColor = Library.Flags and Library.Flags[Flag] or Color3.fromRGB(255, 255, 255);
-                        
-                        -- Handle nil flagColor
-                        if not flagColor then
-                                flagColor = Color3.fromRGB(255, 255, 255);
-                        end
-                        
-                        -- Ensure flagColor has ToHSV method if it's a table
-                        if flagColor and type(flagColor) == "table" and not flagColor.ToHSV then
-                                flagColor.ToHSV = function(self)
-                                    local r, g, b = self.r or self.R or 1, self.g or self.G or 1, self.b or self.B or 1
-                                    local max = math.max(r, g, b)
-                                    local min = math.min(r, g, b)
-                                    local h, s, v = 0, 0, max
-                                    
-                                    local delta = max - min
-                                    if max ~= 0 then s = delta / max end
-                                    
-                                    if delta ~= 0 then
-                                        if max == r then
-                                            h = (g - b) / delta
-                                            if g < b then h = h + 6 end
-                                        elseif max == g then
-                                            h = (b - r) / delta + 2
-                                        elseif max == b then
-                                            h = (r - g) / delta + 4
-                                        end
-                                        h = h / 6
-                                    end
-                                    
-                                    return h, s, v
-                                end
-                        end
-                        
-                        -- Safe Set call with error handling  
-                        pcall(function() ColorPicker:Set(flagColor, 0, false) end);
-                end;
-
-                function ColorPicker.SlideSaturation(input)
-                        local SizeX = math.clamp((input.Position.X - ColorPicker.Saturation.AbsolutePosition.X) / ColorPicker.Saturation.AbsoluteSize.X, 0, 1);
-                        local SizeY = 1 - math.clamp((input.Position.Y - ColorPicker.Saturation.AbsolutePosition.Y) / ColorPicker.Saturation.AbsoluteSize.Y, 0, 1);
-
-                        ColorPicker.SaturationSelect.Position = UDim2.new(SizeX, SizeX < 1 and -1 or -3, 1 - SizeY, 1 - SizeY < 1 and -1 or -3);
-                        ColorPicker:Set(Color3.fromHSV(ColorPicker.HuePosition, SizeX, SizeY), 0, true);
-                end;
-
-                -- MouseButton1Down compatibility fix for ColorPicker.Saturation
-                if ColorPicker.Saturation.MouseButton1Down then
-                    ColorPicker.Saturation.MouseButton1Down:Connect(function()
-                        ColorPicker.SlidingSaturation = true;
-                        ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
-                    end);
-                end
-
-                if ColorPicker.Saturation.InputChanged then
-                    ColorPicker.Saturation.InputChanged:Connect(function()
-                        if ColorPicker.SlidingSaturation then
-                            ColorPicker.SlideSaturation({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
-                        end;
-                    end);
-                end
-
-                -- MouseButton1Up and MouseLeave compatibility fixes
-                if ColorPicker.Saturation.MouseButton1Up then
-                    ColorPicker.Saturation.MouseButton1Up:Connect(function()
-                        ColorPicker.SlidingSaturation = false;
-                    end);
-                end
-
-                if ColorPicker.Saturation.MouseLeave then
-                    ColorPicker.Saturation.MouseLeave:Connect(function()
-                        ColorPicker.SlidingSaturation = false;
-                    end);
-                end
-
-                function ColorPicker.SlideHue(input)
-                        local SizeY = 1 - math.clamp((input.Position.Y - ColorPicker.Hue.AbsolutePosition.Y) / ColorPicker.Hue.AbsoluteSize.Y, 0, 1)
-
-                        ColorPicker.HueSelect.Position = UDim2.new(0, 0, 1 - SizeY, 1 - SizeY < 1 and -1 or -2);
-                        ColorPicker.HuePosition = SizeY;
-
-                        ColorPicker:Set(Color3.fromHSV(SizeY, Sat, Val), 0, true);
-                end;
-
-                -- MouseButton1Down compatibility fix for ColorPicker.Hue
-                if ColorPicker.Hue.MouseButton1Down then
-                    ColorPicker.Hue.MouseButton1Down:Connect(function()
-                        ColorPicker.SlidingHue = true;
-                        ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
-                    end);
-                end
-
-                if ColorPicker.Hue.InputChanged then
-                    ColorPicker.Hue.InputChanged:Connect(function()
-                        if ColorPicker.SlidingHue then
-                            ColorPicker.SlideHue({ Position = UserInputService:GetMouseLocation() - Vector2.new(0, 42)});
-                        end;
-                    end);
-                end
-
-                -- MouseButton1Up and MouseLeave compatibility fixes for Hue
-                if ColorPicker.Hue.MouseButton1Up then
-                    ColorPicker.Hue.MouseButton1Up:Connect(function()
-                        ColorPicker.SlidingHue = false;
-                    end);
-                end
-
-                if ColorPicker.Hue.MouseLeave then
-                    ColorPicker.Hue.MouseLeave:Connect(function()
-                        ColorPicker.SlidingHue = false;
-                    end);
-                end
-
-                return ColorPicker;
-        end;
-
-        local ColorPickerM = Window:CreateColorPicker();
+        -- Add ESP Drawing Methods to Window  
+        Window.CreateESPBox = Library.ESP.CreateESPBox
+        Window.CreateESPText = Library.ESP.CreateESPText
+        Window.CreateESPHealthBar = Library.ESP.CreateESPHealthBar
+        Window.CreateESPLine = Library.ESP.CreateESPLine
+        Window.CreateESPCircle = Library.ESP.CreateESPCircle
+        Window.ClearESPDrawings = Library.ESP.ClearAllESP
 
         Window.Main = Instance.new("TextButton", Window.ScreenGui);
         Window.Main.Size = UDim2.fromOffset(921, 428);
