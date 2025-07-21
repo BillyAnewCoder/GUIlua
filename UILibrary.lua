@@ -53,105 +53,7 @@ if game then
         error("[Library] Failed to initialize Roblox services - ensure you're running in a Roblox executor environment")
     end
 else
-    -- Development/Test environment - show library info instead of erroring
-    print("[Library] Professional Roblox UI Library v1.2.0")
-    print("[Library] This library is designed for Roblox executor environments")
-    print("[Library] Features: Advanced UI components, ESP system, Drawing API integration")
-    print("[Library] To use: Load this script in a Roblox executor with Drawing API support")
-    
-    -- Create mock services for syntax validation
-    UserInputService = {
-        InputBegan = {Connect = function(callback) return {Disconnect = function() end} end},
-        InputEnded = {Connect = function(callback) return {Disconnect = function() end} end},
-        InputChanged = {Connect = function(callback) return {Disconnect = function() end} end}
-    }
-    RunService = {
-        Heartbeat = {Connect = function(callback) return {Disconnect = function() end} end},
-        RenderStepped = {Connect = function(callback) return {Disconnect = function() end} end}
-    }
-    TweenService = {
-        Create = function(instance, tweenInfo, properties)
-            return {
-                Play = function() end,
-                Pause = function() end,
-                Cancel = function() end,
-                Completed = {Connect = function(callback) return {Disconnect = function() end} end}
-            }
-        end
-    }
-    CoreGui = {
-        ZIndexBehavior = 1,
-        Name = "CoreGui"
-    }
-    PlayerGui = {
-        ZIndexBehavior = 1,
-        Name = "PlayerGui"
-    }
-    LocalPlayer = {}
-    Mouse = {}
-    CurrentCamera = {ViewportSize = {X = 1920, Y = 1080}}
-    
-    -- Mock Color3 for test environment
-    Color3 = {
-        fromRGB = function(r, g, b)
-            return {R = r/255, G = g/255, B = b/255}
-        end,
-        new = function(r, g, b)
-            return {R = r, G = g, B = b}
-        end
-    }
-    
-    -- Mock other Roblox types
-    Vector2 = {new = function(x, y) return {X = x, Y = y} end}
-    UDim2 = {
-        new = function(xScale, xOffset, yScale, yOffset) 
-            return {X = {Scale = xScale, Offset = xOffset}, Y = {Scale = yScale, Offset = yOffset}} 
-        end,
-        fromOffset = function(x, y) return {X = {Scale = 0, Offset = x}, Y = {Scale = 0, Offset = y}} end,
-        fromScale = function(x, y) return {X = {Scale = x, Offset = 0}, Y = {Scale = y, Offset = 0}} end
-    }
-    Instance = {
-        new = function(className, parent)
-            local obj = {
-                ClassName = className,
-                Name = className,
-                Parent = parent,
-                Size = UDim2.new(0, 100, 0, 100),
-                Position = UDim2.new(0, 0, 0, 0),
-                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-                BackgroundTransparency = 0,
-                BorderSizePixel = 1,
-                Visible = true,
-                ZIndex = 1,
-                Text = "",
-                TextColor3 = Color3.fromRGB(0, 0, 0),
-                TextSize = 14,
-                Font = 1,
-                TextXAlignment = "Center",
-                TextYAlignment = "Center",
-                ResetOnSpawn = false,
-                ZIndexBehavior = 1,
-                GetChildren = function() return {} end,
-                FindFirstChild = function() return nil end,
-                WaitForChild = function(name) return obj end
-            }
-            return obj
-        end
-    }
-    
-    -- Mock Enum for test environment
-    Enum = {
-        Font = {Gotham = 1, Montserrat = 2},
-        KeyCode = {RightShift = 1, F1 = 2, F3 = 3},
-        UserInputType = {MouseButton1 = 1, Touch = 2, MouseMovement = 3},
-        UserInputState = {Begin = 1, Change = 2, End = 3},
-        EasingStyle = {Sine = 1, Quad = 2},
-        EasingDirection = {Out = 1, In = 2},
-        ZIndexBehavior = {Global = 1, Sibling = 2}
-    }
-    
-    -- Mock TweenInfo
-    TweenInfo = {new = function() return {} end}
+    error("[Library] This library requires a Roblox executor environment")
 end
 
 -- Executor Environment Verified
@@ -160,70 +62,127 @@ end
 local DrawingAPI = {}
 local ESPDrawings = {}
 
--- Check if Drawing API is available (executor environment)
-if Drawing and game then
-    print("[Library] Drawing API detected - ESP rendering available")
-    DrawingAPI.Available = true
-    
-    -- Professional Drawing API wrapper
-    DrawingAPI.Create = function(drawingType, properties)
-        local drawing = Drawing.new(drawingType)
-        
-        -- Apply properties
-        if properties then
-            for property, value in pairs(properties) do
-                pcall(function()
-                    drawing[property] = value
-                end)
+-- Stores each drawing with its type for advanced management
+local DrawingTypes = {}
+
+-- Professional Drawing API validation for executor environments
+local function ValidateExecutorDrawing()
+    local candidates = {
+        Drawing,
+        getgenv and getgenv().Drawing,
+        _G.Drawing,
+        rawget(_G, "Drawing")
+    }
+
+    for _, candidate in ipairs(candidates) do
+        if candidate then
+            local success = pcall(function()
+                local test = candidate.new("Square")
+                test.Size = Vector2.new(1, 1)
+                test.Position = Vector2.new(-1000, -1000)
+                test.Visible = false
+                test:Remove()
+            end)
+            if success then
+                return candidate
             end
         end
-        
-        -- Track drawing object
+    end
+
+    return nil
+end
+
+local ValidDrawing = ValidateExecutorDrawing()
+
+if ValidDrawing then
+    print("[Library] Drawing API validated - Professional ESP rendering active")
+    DrawingAPI.Available = true
+    Drawing = ValidDrawing
+
+    function DrawingAPI.Create(drawingType, properties)
+        local success, drawing = pcall(function()
+            return Drawing.new(drawingType)
+        end)
+
+        if not success or type(drawing) ~= "userdata" then
+            warn("[DrawingAPI] Failed to create drawing of type:", drawingType)
+            return nil
+        end
+
+        if type(properties) == "table" then
+            for property, value in pairs(properties) do
+                if type(property) == "string" then
+                    local ok, err = pcall(function()
+                        drawing[property] = value
+                    end)
+                    if not ok then
+                        warn("[DrawingAPI] Failed to set property:", property, "Error:", err)
+                    end
+                end
+            end
+        end
+
         table.insert(ESPDrawings, drawing)
-        
+        DrawingTypes[drawing] = drawingType
+
         return drawing
     end
-    
-    DrawingAPI.Remove = function(drawing)
-        if drawing and drawing.Remove then
+
+    function DrawingAPI.Remove(drawing)
+        if not drawing then return end
+
+        pcall(function()
             drawing:Remove()
-        end
-        
-        -- Remove from tracking
-        for i, tracked in ipairs(ESPDrawings) do
-            if tracked == drawing then
+        end)
+
+        for i = #ESPDrawings, 1, -1 do
+            if ESPDrawings[i] == drawing then
                 table.remove(ESPDrawings, i)
                 break
             end
         end
+
+        DrawingTypes[drawing] = nil
     end
-    
-    DrawingAPI.ClearAll = function()
-        for _, drawing in ipairs(ESPDrawings) do
-            if drawing and drawing.Remove then
+
+    function DrawingAPI.ClearAll()
+        for i, drawing in ipairs(ESPDrawings) do
+            pcall(function()
                 drawing:Remove()
-            end
+                ESPDrawings[i] = nil
+            end)
         end
         ESPDrawings = {}
+        DrawingTypes = {}
     end
-    
+
+    function DrawingAPI.GetType(drawing)
+        return DrawingTypes[drawing]
+    end
+
+    function DrawingAPI.GetAllByType(drawingType)
+        local filtered = {}
+        for _, drawing in ipairs(ESPDrawings) do
+            if DrawingTypes[drawing] == drawingType then
+                table.insert(filtered, drawing)
+            end
+        end
+        return filtered
+    end
+
 else
-    print("[Library] ERROR: Drawing API not available! This library requires a Roblox executor with Drawing support.")
+    print("[Library] Drawing API unavailable - Using UI fallback for ESP features")
     DrawingAPI.Available = false
-    
-    -- Create non-functional stubs for executors without Drawing API
-    DrawingAPI.Create = function(drawingType, properties)
-        warn("[Library] ESP functionality requires Drawing API - current executor does not support it")
+
+    function DrawingAPI.Create()
+        warn("[DrawingAPI] Drawing API unavailable; Create call ignored.")
         return nil
     end
-    
-    DrawingAPI.Remove = function(drawing)
-        -- No-op for missing Drawing API
-    end
-    
-    DrawingAPI.ClearAll = function()
-        ESPDrawings = {}
-    end
+
+    function DrawingAPI.Remove() end
+    function DrawingAPI.ClearAll() ESPDrawings = {} DrawingTypes = {} end
+    function DrawingAPI.GetType() return nil end
+    function DrawingAPI.GetAllByType() return {} end
 end
 
 -- Roblox Executor Optimized UI Library
@@ -3154,10 +3113,10 @@ function Library:CreateWindow(Name, Toggle, keybind)
                         return SubTab;
                 end
 
-		-- CreateSection method - proper implementation
-		function Tab:CreateSection(Name, Side)
-			return self:CreateSector(Name, Side or "left")
-		end
+                -- CreateSection method - proper implementation
+                function Tab:CreateSection(Name, Side)
+                        return self:CreateSector(Name, Side or "left")
+                end
 
                 Window:UpdateTabList();
                 table.insert(Window.Tabs, Tab);
