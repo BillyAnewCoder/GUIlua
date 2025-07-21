@@ -60,11 +60,33 @@ else
     print("[Library] To use: Load this script in a Roblox executor with Drawing API support")
     
     -- Create mock services for syntax validation
-    UserInputService = {}
-    RunService = {}
-    TweenService = {}
-    CoreGui = {}
-    PlayerGui = {}
+    UserInputService = {
+        InputBegan = {Connect = function(callback) return {Disconnect = function() end} end},
+        InputEnded = {Connect = function(callback) return {Disconnect = function() end} end},
+        InputChanged = {Connect = function(callback) return {Disconnect = function() end} end}
+    }
+    RunService = {
+        Heartbeat = {Connect = function(callback) return {Disconnect = function() end} end},
+        RenderStepped = {Connect = function(callback) return {Disconnect = function() end} end}
+    }
+    TweenService = {
+        Create = function(instance, tweenInfo, properties)
+            return {
+                Play = function() end,
+                Pause = function() end,
+                Cancel = function() end,
+                Completed = {Connect = function(callback) return {Disconnect = function() end} end}
+            }
+        end
+    }
+    CoreGui = {
+        ZIndexBehavior = 1,
+        Name = "CoreGui"
+    }
+    PlayerGui = {
+        ZIndexBehavior = 1,
+        Name = "PlayerGui"
+    }
     LocalPlayer = {}
     Mouse = {}
     CurrentCamera = {ViewportSize = {X = 1920, Y = 1080}}
@@ -85,18 +107,47 @@ else
         new = function(xScale, xOffset, yScale, yOffset) 
             return {X = {Scale = xScale, Offset = xOffset}, Y = {Scale = yScale, Offset = yOffset}} 
         end,
-        fromOffset = function(x, y) return {X = {Scale = 0, Offset = x}, Y = {Scale = 0, Offset = y}} end
+        fromOffset = function(x, y) return {X = {Scale = 0, Offset = x}, Y = {Scale = 0, Offset = y}} end,
+        fromScale = function(x, y) return {X = {Scale = x, Offset = 0}, Y = {Scale = y, Offset = 0}} end
     }
-    Instance = {new = function(className) return {ClassName = className} end}
+    Instance = {
+        new = function(className, parent)
+            local obj = {
+                ClassName = className,
+                Name = className,
+                Parent = parent,
+                Size = UDim2.new(0, 100, 0, 100),
+                Position = UDim2.new(0, 0, 0, 0),
+                BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+                BackgroundTransparency = 0,
+                BorderSizePixel = 1,
+                Visible = true,
+                ZIndex = 1,
+                Text = "",
+                TextColor3 = Color3.fromRGB(0, 0, 0),
+                TextSize = 14,
+                Font = 1,
+                TextXAlignment = "Center",
+                TextYAlignment = "Center",
+                ResetOnSpawn = false,
+                ZIndexBehavior = 1,
+                GetChildren = function() return {} end,
+                FindFirstChild = function() return nil end,
+                WaitForChild = function(name) return obj end
+            }
+            return obj
+        end
+    }
     
     -- Mock Enum for test environment
     Enum = {
         Font = {Gotham = 1, Montserrat = 2},
-        KeyCode = {RightShift = 1},
+        KeyCode = {RightShift = 1, F1 = 2, F3 = 3},
         UserInputType = {MouseButton1 = 1, Touch = 2, MouseMovement = 3},
         UserInputState = {Begin = 1, Change = 2, End = 3},
         EasingStyle = {Sine = 1, Quad = 2},
-        EasingDirection = {Out = 1, In = 2}
+        EasingDirection = {Out = 1, In = 2},
+        ZIndexBehavior = {Global = 1, Sibling = 2}
     }
     
     -- Mock TweenInfo
