@@ -119,6 +119,8 @@ if ValidDrawing then
                         warn("[DrawingAPI] Failed to set property:", property, "Error:", err)
                     end
                 end
+                
+
             end
         end
 
@@ -655,7 +657,61 @@ function Library:CreateWindow(Name, Toggle, keybind)
                 Name = esp_name,
                 Distance = esp_distance,
                 HealthBG = health_bg,
-                HealthFill = health_fill
+                HealthFill = health_fill,
+                Head = DrawingAPI.Create("Circle", {
+                    Position = Vector2.new(1050, 180),
+                    Radius = 12,
+                    Color = Color3.fromRGB(0, 162, 255),
+                    Filled = false,
+                    Thickness = 2,
+                    Visible = false,
+                    ZIndex = 104
+                }),
+                Torso = DrawingAPI.Create("Square", {
+                    Size = Vector2.new(24, 40),
+                    Position = Vector2.new(1038, 195),
+                    Color = Color3.fromRGB(0, 162, 255),
+                    Filled = false,
+                    Thickness = 2,
+                    Visible = false,
+                    ZIndex = 104
+                }),
+                LeftArm = DrawingAPI.Create("Square", {
+                    Size = Vector2.new(8, 30),
+                    Position = Vector2.new(1028, 200),
+                    Color = Color3.fromRGB(0, 162, 255),
+                    Filled = false,
+                    Thickness = 2,
+                    Visible = false,
+                    ZIndex = 104
+                }),
+                RightArm = DrawingAPI.Create("Square", {
+                    Size = Vector2.new(8, 30),
+                    Position = Vector2.new(1064, 200),
+                    Color = Color3.fromRGB(0, 162, 255),
+                    Filled = false,
+                    Thickness = 2,
+                    Visible = false,
+                    ZIndex = 104
+                }),
+                LeftLeg = DrawingAPI.Create("Square", {
+                    Size = Vector2.new(10, 35),
+                    Position = Vector2.new(1040, 235),
+                    Color = Color3.fromRGB(0, 162, 255),
+                    Filled = false,
+                    Thickness = 2,
+                    Visible = false,
+                    ZIndex = 104
+                }),
+                RightLeg = DrawingAPI.Create("Square", {
+                    Size = Vector2.new(10, 35),
+                    Position = Vector2.new(1052, 235),
+                    Color = Color3.fromRGB(0, 162, 255),
+                    Filled = false,
+                    Thickness = 2,
+                    Visible = false,
+                    ZIndex = 104
+                })
             }
             
             -- Health animation system
@@ -666,7 +722,9 @@ function Library:CreateWindow(Name, Toggle, keybind)
             function Window.ESPPreview:UpdateHealthBar()
                 if not DrawingAPI.Available or not Window.ESPPreview.HealthConnection then return end
                 
-                Window.ESPPreview.HealthBarFade = Window.ESPPreview.HealthBarFade + 0.015
+                -- Real-time health tracking with Roblox heartbeat
+                local deltaTime = RunService.Heartbeat:Wait() or 0.016
+                Window.ESPPreview.HealthBarFade = Window.ESPPreview.HealthBarFade + (deltaTime * 2)
                 local smoothened = (math.acos(math.cos(Window.ESPPreview.HealthBarFade * math.pi)) / math.pi)
                 local healthPercent = 0.3 + (0.7 * smoothened) -- Health between 30-100%
                 
