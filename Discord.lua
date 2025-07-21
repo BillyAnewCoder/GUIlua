@@ -2241,7 +2241,7 @@ function DiscordLib:Window(text)
                                 WelcomeTitle.Font = Enum.Font.GothamBold
                                 WelcomeTitle.Text = "Welcome to"
                                 WelcomeTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-                                WelcomeTitle.TextSize = 24.000
+                                WelcomeTitle.TextSize = 16.000
                                 
                                 WelcomeSubtitle.Parent = WelcomeFrame
                                 WelcomeSubtitle.BackgroundTransparency = 1.000
@@ -2250,7 +2250,7 @@ function DiscordLib:Window(text)
                                 WelcomeSubtitle.Font = Enum.Font.GothamBold
                                 WelcomeSubtitle.Text = "#" .. text
                                 WelcomeSubtitle.TextColor3 = Color3.fromRGB(255, 255, 255)
-                                WelcomeSubtitle.TextSize = 32.000
+                                WelcomeSubtitle.TextSize = 20.000
                                 
                                 WelcomeDescription.Parent = WelcomeFrame
                                 WelcomeDescription.BackgroundTransparency = 1.000
