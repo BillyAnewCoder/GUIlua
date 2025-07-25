@@ -1062,10 +1062,6 @@ local drawing = {} do
     end
 end
 
--- // ENHANCED UI LIBRARY V2.0 - EXECUTOR OPTIMIZED
--- // Advanced Features: Animation System, Theme Engine, Performance Monitoring
--- // Designed for High-Performance Executor Environments
-
 local services = setmetatable({}, {
     __index = function(_, k)
         local aliases = {
@@ -1077,7 +1073,8 @@ local services = setmetatable({}, {
             RunService = "RunService",
             TweenService = "TweenService",
             Lighting = "Lighting",
-            ReplicatedStorage = "ReplicatedStorage"
+            ReplicatedStorage = "ReplicatedStorage",
+            HttpService = "HttpService"
         }
         k = aliases[k] or k
         return game:GetService(k)
@@ -1104,21 +1101,56 @@ local utility = {
     -- Theme system
     themes = {
         dark = {
-            background = Color3.fromRGB(30, 30, 30),
-            surface = Color3.fromRGB(45, 45, 45),
-            primary = Color3.fromRGB(70, 130, 255),
-            text = Color3.fromRGB(255, 255, 255),
-            accent = Color3.fromRGB(255, 100, 100)
+            ["Accent"] = Color3.fromRGB(70, 130, 255),
+            ["Window Background"] = Color3.fromRGB(25, 25, 25),
+            ["Window Border"] = Color3.fromRGB(40, 40, 40),
+            ["Tab Background"] = Color3.fromRGB(30, 30, 30),
+            ["Tab Border"] = Color3.fromRGB(50, 50, 50),
+            ["Tab Toggle Background"] = Color3.fromRGB(35, 35, 35),
+            ["Section Background"] = Color3.fromRGB(20, 20, 20),
+            ["Section Border"] = Color3.fromRGB(45, 45, 45),
+            ["Text"] = Color3.fromRGB(255, 255, 255),
+            ["Disabled Text"] = Color3.fromRGB(150, 150, 150),
+            ["Object Background"] = Color3.fromRGB(35, 35, 35),
+            ["Object Border"] = Color3.fromRGB(60, 60, 60),
+            ["Dropdown Option Background"] = Color3.fromRGB(40, 40, 40)
         },
         light = {
-            background = Color3.fromRGB(245, 245, 245),
-            surface = Color3.fromRGB(255, 255, 255),
-            primary = Color3.fromRGB(70, 130, 255),
-            text = Color3.fromRGB(30, 30, 30),
-            accent = Color3.fromRGB(255, 100, 100)
+            ["Accent"] = Color3.fromRGB(70, 130, 255),
+            ["Window Background"] = Color3.fromRGB(245, 245, 245),
+            ["Window Border"] = Color3.fromRGB(200, 200, 200),
+            ["Tab Background"] = Color3.fromRGB(235, 235, 235),
+            ["Tab Border"] = Color3.fromRGB(180, 180, 180),
+            ["Tab Toggle Background"] = Color3.fromRGB(220, 220, 220),
+            ["Section Background"] = Color3.fromRGB(250, 250, 250),
+            ["Section Border"] = Color3.fromRGB(190, 190, 190),
+            ["Text"] = Color3.fromRGB(30, 30, 30),
+            ["Disabled Text"] = Color3.fromRGB(120, 120, 120),
+            ["Object Background"] = Color3.fromRGB(230, 230, 230),
+            ["Object Border"] = Color3.fromRGB(170, 170, 170),
+            ["Dropdown Option Background"] = Color3.fromRGB(240, 240, 240)
+        },
+        midnight = {
+            ["Accent"] = Color3.fromRGB(138, 43, 226),
+            ["Window Background"] = Color3.fromRGB(15, 15, 23),
+            ["Window Border"] = Color3.fromRGB(30, 30, 45),
+            ["Tab Background"] = Color3.fromRGB(20, 20, 30),
+            ["Tab Border"] = Color3.fromRGB(35, 35, 50),
+            ["Tab Toggle Background"] = Color3.fromRGB(25, 25, 35),
+            ["Section Background"] = Color3.fromRGB(12, 12, 20),
+            ["Section Border"] = Color3.fromRGB(28, 28, 40),
+            ["Text"] = Color3.fromRGB(220, 220, 255),
+            ["Disabled Text"] = Color3.fromRGB(130, 130, 150),
+            ["Object Background"] = Color3.fromRGB(25, 25, 35),
+            ["Object Border"] = Color3.fromRGB(45, 45, 65),
+            ["Dropdown Option Background"] = Color3.fromRGB(30, 30, 40)
         }
     },
-    currentTheme = "dark"
+    currentTheme = "dark",
+    
+    configs = {},
+    configFolder = "UILibraryConfigs",
+    configExtension = "json"
 }
 
 -- Enhanced dragging system with smooth animations and constraints
@@ -1373,6 +1405,100 @@ function utility.clearCaches()
     textCache = {}
     udim2Cache = {}
     collectgarbage("collect")
+end
+
+function utility.saveConfig(name, data, universal)
+    universal = universal or false
+    local folder = universal and "UniversalConfigs" or utility.configFolder
+    local filename = name .. "." .. utility.configExtension
+    
+    if not isfolder(folder) then
+        makefolder(folder)
+    end
+    
+    local success, result = pcall(function()
+        local jsonData = services.HttpService:JSONEncode(data)
+        writefile(folder .. "/" .. filename, jsonData)
+    end)
+    
+    return success
+end
+
+function utility.loadConfig(name, universal)
+    universal = universal or false
+    local folder = universal and "UniversalConfigs" or utility.configFolder
+    local filename = name .. "." .. utility.configExtension
+    local filepath = folder .. "/" .. filename
+    
+    if isfile(filepath) then
+        local success, result = pcall(function()
+            local fileContent = readfile(filepath)
+            return services.HttpService:JSONDecode(fileContent)
+        end)
+        
+        if success then
+            return result
+        end
+    end
+    
+    return nil
+end
+
+function utility.deleteConfig(name, universal)
+    universal = universal or false
+    local folder = universal and "UniversalConfigs" or utility.configFolder
+    local filename = name .. "." .. utility.configExtension
+    local filepath = folder .. "/" .. filename
+    
+    if isfile(filepath) then
+        delfile(filepath)
+        return true
+    end
+    
+    return false
+end
+
+function utility.getConfigs(universal)
+    universal = universal or false
+    local folder = universal and "UniversalConfigs" or utility.configFolder
+    local configs = {}
+    
+    if isfolder(folder) then
+        for _, file in pairs(listfiles(folder)) do
+            local name = file:match("([^/]+)%." .. utility.configExtension .. "$")
+            if name then
+                table.insert(configs, name)
+            end
+        end
+    end
+    
+    return configs
+end
+
+function utility.getThemes()
+    local themeList = {}
+    for themeName, _ in pairs(utility.themes) do
+        table.insert(themeList, themeName)
+    end
+    return themeList
+end
+
+function utility.saveCustomTheme(name)
+    if name and name ~= "" then
+        utility.themes[name] = {}
+        for key, value in pairs(utility.themes[utility.currentTheme]) do
+            utility.themes[name][key] = value
+        end
+        return true
+    end
+    return false
+end
+
+function utility.changeThemeOption(option, color)
+    if utility.themes[utility.currentTheme] then
+        utility.themes[utility.currentTheme][option] = color
+        utility.onThemeChanged(utility.currentTheme)
+    end
 end
 
 function utility.getcenter(sizeX, sizeY)
@@ -4333,6 +4459,82 @@ library.createTooltip = utility.createTooltip
 library.showNotification = utility.showNotification
 library.setTheme = utility.setTheme
 library.createCustomTheme = utility.createCustomTheme
+library.saveConfig = utility.saveConfig
+library.loadConfig = utility.loadConfig
+library.deleteConfig = utility.deleteConfig
+library.getConfigs = utility.getConfigs
+library.getThemes = utility.getThemes
+library.saveCustomTheme = utility.saveCustomTheme
+library.changeThemeOption = utility.changeThemeOption
+library.currenttheme = utility.currentTheme
+library.theme = utility.themes[utility.currentTheme]
+
+function library:SetTheme(themeName)
+    if utility.themes[themeName] then
+        utility.currentTheme = themeName
+        library.currenttheme = themeName
+        library.theme = utility.themes[themeName]
+        utility.onThemeChanged(themeName)
+        return true
+    end
+    return false
+end
+
+function library:GetThemes()
+    return utility.getThemes()
+end
+
+function library:SaveConfig(name, universal)
+    local data = {}
+    for flag, value in pairs(library.flags or {}) do
+        data[flag] = value
+    end
+    return utility.saveConfig(name, data, universal)
+end
+
+function library:LoadConfig(name, universal)
+    local data = utility.loadConfig(name, universal)
+    if data then
+        library.flags = library.flags or {}
+        for flag, value in pairs(data) do
+            library.flags[flag] = value
+        end
+        return true
+    end
+    return false
+end
+
+function library:DeleteConfig(name, universal)
+    return utility.deleteConfig(name, universal)
+end
+
+function library:GetConfigs(universal)
+    return utility.getConfigs(universal)
+end
+
+function library:SaveCustomTheme(name)
+    return utility.saveCustomTheme(name)
+end
+
+function library:ChangeThemeOption(option, color)
+    utility.changeThemeOption(option, color)
+    library.theme = utility.themes[utility.currentTheme]
+end
+
+function library:ConfigIgnore(flag)
+    library.configIgnored = library.configIgnored or {}
+    library.configIgnored[flag] = true
+end
+
+function library:Close()
+    if library.main and library.main.Visible ~= nil then
+        library.main.Visible = not library.main.Visible
+    end
+end
+
+function library:Unload()
+    self:cleanup()
+end
 
 function library:cleanup()
     local animationsCleared = utility.cleanupAnimations()
@@ -4360,7 +4562,9 @@ function library:getInfo()
         totalObjects = totalObjects,
         activeAnimations = #utility.animations,
         performance = utility.performance,
-        currentTheme = utility.currentTheme
+        currentTheme = utility.currentTheme,
+        themes = utility.getThemes(),
+        configs = utility.getConfigs()
     }
 end
 
