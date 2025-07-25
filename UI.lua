@@ -1043,7 +1043,11 @@ local drawing = {} do
                     return
                 end
 
-                obj[k] = v
+                if k == "Color" and v ~= nil and typeof(v) ~= "Color3" then
+                    obj[k] = Color3.fromRGB(255, 255, 255)
+                else
+                    obj[k] = v
+                end
             end
         })
 
