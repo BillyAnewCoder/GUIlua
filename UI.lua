@@ -1791,7 +1791,12 @@ function utility.outline(obj, color)
     if typeof(color) == "Color3" then
         outline.Color = color
     else
-        outline.Color = library.theme[color]
+        local themeColor = library.theme and library.theme[color]
+        if themeColor and typeof(themeColor) == "Color3" then
+            outline.Color = themeColor
+        else
+            outline.Color = Color3.fromRGB(255, 255, 255)
+        end
         themeobjects[outline] = color
     end
 
@@ -1808,7 +1813,12 @@ function utility.create(class, properties)
     for prop, v in next, properties do
         if prop == "Theme" then
             themeobjects[obj] = v
-            obj.Color = library.theme[v]
+            local themeColor = library.theme and library.theme[v]
+            if themeColor and typeof(themeColor) == "Color3" then
+                obj.Color = themeColor
+            else
+                obj.Color = Color3.fromRGB(255, 255, 255)
+            end
         else
             obj[prop] = v
         end
@@ -1819,7 +1829,12 @@ end
 
 function utility.changeobjecttheme(object, color)
     themeobjects[object] = color
-    object.Color = library.theme[color]
+    local themeColor = library.theme and library.theme[color]
+    if themeColor and typeof(themeColor) == "Color3" then
+        object.Color = themeColor
+    else
+        object.Color = Color3.fromRGB(255, 255, 255)
+    end
 end
 
 function utility.connect(signal, callback)
