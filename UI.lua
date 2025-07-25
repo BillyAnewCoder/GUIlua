@@ -88,14 +88,14 @@ local drawing = {} do
     ]=]
     function Signal:Fire(...)
         if not self._bindableEvent then
-            warn(("Enhanced Signal is already destroyed. %s"):format(self._source))
+            warn(("Enhanced Signal is already destroyed. %s"):format(self._source or "unknown"))
             return
         end
 
         local args = table.pack(...)
         
         -- Performance tracking
-        self._fireCount = self._fireCount + 1
+        self._fireCount = (self._fireCount or 0) + 1
         local startTime = ENABLE_PERFORMANCE_METRICS and tick() or nil
 
         -- Optimized key generation with better performance
@@ -130,9 +130,9 @@ local drawing = {} do
             local args = self._argMap[key]
             if args then
                 -- Protected call to prevent one handler from breaking others
-                local success, result = pcall(handler, table.unpack(args, 1, args.n))
+                local success, result = pcall(handler, table.unpack(args, 1, args.n or 0))
                 if not success and ENABLE_TRACEBACK then
-                    warn(("Enhanced Signal handler error in connection %d: %s"):format(connectionId, tostring(result)))
+                    warn(("Enhanced Signal handler error in connection %s: %s"):format(tostring(connectionId or "unknown"), tostring(result or "unknown error")))
                 end
             else
                 if ENABLE_TRACEBACK then
@@ -143,8 +143,8 @@ local drawing = {} do
             -- Track handler performance
             if ENABLE_PERFORMANCE_METRICS and startTime then
                 local duration = tick() - startTime
-                if duration > 0.1 then -- Warn about slow handlers
-                    warn(("Slow signal handler detected: %.3fs in connection %d"):format(duration, connectionId))
+                if duration and duration > 0.1 then -- Warn about slow handlers
+                    warn(("Slow signal handler detected: %.3fs in connection %s"):format(duration or 0, tostring(connectionId or "unknown")))
                 end
             end
         end)
@@ -1043,9 +1043,16 @@ local drawing = {} do
                     return
                 end
 
-                if k == "Color" and v ~= nil and typeof(v) ~= "Color3" then
-                    obj[k] = Color3.fromRGB(255, 255, 255)
-                else
+                if k == "Color" then
+                    if v ~= nil and typeof(v) == "Color3" then
+                        obj[k] = v
+                    elseif v ~= nil then
+                        -- Try to handle invalid color values gracefully
+                        obj[k] = Color3.fromRGB(255, 255, 255)
+                    else
+                        obj[k] = Color3.fromRGB(255, 255, 255)
+                    end
+                elseif k ~= nil and v ~= nil then
                     obj[k] = v
                 end
             end
@@ -1106,52 +1113,52 @@ local utility = {
     -- Theme system
     themes = {
         dark = {
-            ["Accent"] = Color3.fromRGB(70, 130, 255),
-            ["Window Background"] = Color3.fromRGB(25, 25, 25),
-            ["Window Border"] = Color3.fromRGB(40, 40, 40),
-            ["Tab Background"] = Color3.fromRGB(30, 30, 30),
-            ["Tab Border"] = Color3.fromRGB(50, 50, 50),
-            ["Tab Toggle Background"] = Color3.fromRGB(35, 35, 35),
-            ["Section Background"] = Color3.fromRGB(20, 20, 20),
-            ["Section Border"] = Color3.fromRGB(45, 45, 45),
-            ["Text"] = Color3.fromRGB(255, 255, 255),
-            ["Disabled Text"] = Color3.fromRGB(150, 150, 150),
-            ["Object Background"] = Color3.fromRGB(35, 35, 35),
-            ["Object Border"] = Color3.fromRGB(60, 60, 60),
-            ["Dropdown Option Background"] = Color3.fromRGB(40, 40, 40)
+            ["Accent"] = Color3.fromRGB(138, 43, 226),
+            ["Window Background"] = Color3.fromRGB(15, 15, 20),
+            ["Window Border"] = Color3.fromRGB(30, 30, 40),
+            ["Tab Background"] = Color3.fromRGB(18, 18, 25),
+            ["Tab Border"] = Color3.fromRGB(35, 35, 45),
+            ["Tab Toggle Background"] = Color3.fromRGB(25, 25, 30),
+            ["Section Background"] = Color3.fromRGB(12, 12, 18),
+            ["Section Border"] = Color3.fromRGB(28, 28, 35),
+            ["Text"] = Color3.fromRGB(220, 220, 230),
+            ["Disabled Text"] = Color3.fromRGB(120, 120, 130),
+            ["Object Background"] = Color3.fromRGB(20, 20, 25),
+            ["Object Border"] = Color3.fromRGB(40, 40, 50),
+            ["Dropdown Option Background"] = Color3.fromRGB(22, 22, 28)
         },
         light = {
             ["Accent"] = Color3.fromRGB(70, 130, 255),
-            ["Window Background"] = Color3.fromRGB(245, 245, 245),
-            ["Window Border"] = Color3.fromRGB(200, 200, 200),
-            ["Tab Background"] = Color3.fromRGB(235, 235, 235),
-            ["Tab Border"] = Color3.fromRGB(180, 180, 180),
-            ["Tab Toggle Background"] = Color3.fromRGB(220, 220, 220),
-            ["Section Background"] = Color3.fromRGB(250, 250, 250),
-            ["Section Border"] = Color3.fromRGB(190, 190, 190),
-            ["Text"] = Color3.fromRGB(30, 30, 30),
-            ["Disabled Text"] = Color3.fromRGB(120, 120, 120),
-            ["Object Background"] = Color3.fromRGB(230, 230, 230),
-            ["Object Border"] = Color3.fromRGB(170, 170, 170),
-            ["Dropdown Option Background"] = Color3.fromRGB(240, 240, 240)
+            ["Window Background"] = Color3.fromRGB(250, 250, 252),
+            ["Window Border"] = Color3.fromRGB(220, 220, 225),
+            ["Tab Background"] = Color3.fromRGB(245, 245, 248),
+            ["Tab Border"] = Color3.fromRGB(200, 200, 205),
+            ["Tab Toggle Background"] = Color3.fromRGB(235, 235, 240),
+            ["Section Background"] = Color3.fromRGB(255, 255, 255),
+            ["Section Border"] = Color3.fromRGB(210, 210, 215),
+            ["Text"] = Color3.fromRGB(20, 20, 25),
+            ["Disabled Text"] = Color3.fromRGB(100, 100, 110),
+            ["Object Background"] = Color3.fromRGB(240, 240, 245),
+            ["Object Border"] = Color3.fromRGB(190, 190, 200),
+            ["Dropdown Option Background"] = Color3.fromRGB(248, 248, 252)
         },
         midnight = {
             ["Accent"] = Color3.fromRGB(138, 43, 226),
-            ["Window Background"] = Color3.fromRGB(15, 15, 23),
-            ["Window Border"] = Color3.fromRGB(30, 30, 45),
-            ["Tab Background"] = Color3.fromRGB(20, 20, 30),
-            ["Tab Border"] = Color3.fromRGB(35, 35, 50),
-            ["Tab Toggle Background"] = Color3.fromRGB(25, 25, 35),
-            ["Section Background"] = Color3.fromRGB(12, 12, 20),
-            ["Section Border"] = Color3.fromRGB(28, 28, 40),
-            ["Text"] = Color3.fromRGB(220, 220, 255),
-            ["Disabled Text"] = Color3.fromRGB(130, 130, 150),
-            ["Object Background"] = Color3.fromRGB(25, 25, 35),
-            ["Object Border"] = Color3.fromRGB(45, 45, 65),
-            ["Dropdown Option Background"] = Color3.fromRGB(30, 30, 40)
+            ["Window Background"] = Color3.fromRGB(8, 8, 15),
+            ["Window Border"] = Color3.fromRGB(25, 25, 35),
+            ["Tab Background"] = Color3.fromRGB(12, 12, 20),
+            ["Tab Border"] = Color3.fromRGB(30, 30, 40),
+            ["Tab Toggle Background"] = Color3.fromRGB(18, 18, 25),
+            ["Section Background"] = Color3.fromRGB(6, 6, 12),
+            ["Section Border"] = Color3.fromRGB(22, 22, 30),
+            ["Text"] = Color3.fromRGB(230, 230, 250),
+            ["Disabled Text"] = Color3.fromRGB(110, 110, 130),
+            ["Object Background"] = Color3.fromRGB(15, 15, 22),
+            ["Object Border"] = Color3.fromRGB(35, 35, 50),
+            ["Dropdown Option Background"] = Color3.fromRGB(18, 18, 28)
         }
     },
-    currentTheme = "dark",
+    currentTheme = "midnight",
     
     configs = {},
     configFolder = "UILibraryConfigs",
@@ -1780,7 +1787,7 @@ local themes = {
 
 local themeobjects = {}
 
-local library = utility.table({theme = utility.table(themes.Default), folder = "vozoiduilib", extension = "vozoid", flags = {}, open = true, keybind = Enum.KeyCode.RightShift, mousestate = services.InputService.MouseIconEnabled, cursor = nil, holder = nil, connections = {}}, true)
+local library = utility.table({theme = utility.table(themes.Midnight), folder = "vozoiduilib", extension = "vozoid", flags = {}, open = true, keybind = Enum.KeyCode.RightShift, mousestate = services.InputService.MouseIconEnabled, cursor = nil, holder = nil, connections = {}}, true)
 local decode = (syn and syn.crypt.base64.decode) or (crypt and crypt.base64decode) or base64_decode
 library.gradient = decode("iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABuSURBVChTxY9BDoAgDASLGD2ReOYNPsR/+BAfroI7hibe9OYmky2wbUPIOdsXdc1f9WMwppQm+SDGBnUvomAQBH49qzhFEag25869ElzaIXDhD4JGbyoEVxUedN8FKwnfmwhucgKICc+pNB1mZhdCdhsa2ky0FAAAAABJRU5ErkJggg==")
 library.utility = utility
