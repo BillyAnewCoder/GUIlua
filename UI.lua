@@ -1091,6 +1091,7 @@ local utility = {
     performance = {
         totalFrames = 0,
         averageFPS = 60,
+        avgFPS = 60,
         lastFPSUpdate = tick(),
         memoryUsage = 0
     },
