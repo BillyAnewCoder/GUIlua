@@ -1776,7 +1776,7 @@ local themes = {
 
 local themeobjects = {}
 
-local library = utility.table({theme = table.clone(themes.Default), folder = "vozoiduilib", extension = "vozoid", flags = {}, open = true, keybind = Enum.KeyCode.RightShift, mousestate = services.InputService.MouseIconEnabled, cursor = nil, holder = nil, connections = {}}, true)
+local library = utility.table({theme = utility.table(themes.Default), folder = "vozoiduilib", extension = "vozoid", flags = {}, open = true, keybind = Enum.KeyCode.RightShift, mousestate = services.InputService.MouseIconEnabled, cursor = nil, holder = nil, connections = {}}, true)
 local decode = (syn and syn.crypt.base64.decode) or (crypt and crypt.base64decode) or base64_decode
 library.gradient = decode("iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAABuSURBVChTxY9BDoAgDASLGD2ReOYNPsR/+BAfroI7hibe9OYmky2wbUPIOdsXdc1f9WMwppQm+SDGBnUvomAQBH49qzhFEag25869ElzaIXDhD4JGbyoEVxUedN8FKwnfmwhucgKICc+pNB1mZhdCdhsa2ky0FAAAAABJRU5ErkJggg==")
 library.utility = utility
@@ -1990,7 +1990,7 @@ function library:SetTheme(theme)
     self.currenttheme = theme
 
     if themes[theme] then
-        self.theme = table.clone(themes[theme])
+        self.theme = utility.table(themes[theme])
 
         for object, color in next, themeobjects do
             if rawget(object, "exists") == true then
@@ -3434,7 +3434,7 @@ function library:Load(options)
     end
 
     self.currenttheme = theme
-    self.theme = table.clone(themes[theme])
+    self.theme = utility.table(utility.themes[theme] or utility.themes["dark"])
 
     for opt, value in next, overrides do
         self.theme[opt] = value
